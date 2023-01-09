@@ -11,6 +11,6 @@ jobs:
         with:
           source_repo: "git@github.com:nLatt/GLaDOS-2023.git"
           source_branch: "refs/remotes/source/*"
-          destination_repo: "git@github.com:https://github.com/EpitechPromo2025/B-FUN-500-BER-5-2-glados-nicolas.lattemann"
+          destination_repo: "git@github.com:EpitechPromo2025/B-FUN-500-BER-5-2-glados-nicolas.lattemann"
           destination_branch: "refs/heads/*"
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
