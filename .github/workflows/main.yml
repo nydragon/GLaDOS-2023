@@ -4,7 +4,7 @@ on: push
 
 jobs:
   git-sync:
-    runs-on: ubuntu-lahttps://github.com/nLatt/GLaDOS-2023/pull/1/conflict?name=.github%252Fworkflows%252Fmain.yml&ancestor_oid=85ddbd7fd3267772d98c8b88777ddeff8ac5e681&base_oid=861d560358c6b33bf31e158d000df718efb9f446&head_oid=fbc209b01d3fae6f56773f42aebc44c913a16f8btest
+    runs-on: ubuntu-latest
     steps:
       - name: git-sync
         uses: wei/git-sync@v3
