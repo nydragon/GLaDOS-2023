@@ -4,8 +4,7 @@
 # Install Dependencies
 
 ```sh
-yay -S ghc;
-yay -S cabal-install
+yay -S ghc cabal-install cabal-static;
 
 cabal update;
 ```
