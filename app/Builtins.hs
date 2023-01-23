@@ -1,12 +1,4 @@
-module Builtins
-(
-    division,
-    modulo,
-    multiply,
-    substract,
-    add,
-    lt
-) where
+module Builtins where
 
 division :: Integer -> Integer -> Either Integer String
 division a 0 = Right "ZeroDivisionError"
