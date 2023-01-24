@@ -1,28 +1,35 @@
-module Parsing (Parser) where
+module Parsing where
 
--- ─── Data Structures ─────────────────────────────────────────────────────────────────────────────
+-- Removes all return characters in given string
+removeReturns :: String -> String
+removeReturns (x:xs) = if x == '\n'
+    then removeReturns xs
+    else (x:removeReturns xs)
+removeReturns [] = []
 
--- Type representing a parsed value
--- a is the type of the value
--- Constructs Maybe value of tuple containing parsed a, and rest of string
-type Parser a = String -> Maybe (a, String)
+-- Split on given character
+-- Note: Uses parametric typing so can also work with integers ie
+splitOn :: (Eq a) => a -> [a] -> [[a]]
+splitOn _ [] = []
+splitOn c arr = (take nextSep arr) : splitOn c (drop nextSep arr)
+    where nextSep = (getNextSep c arr 0) + 1 -- +1 because it's a character count
 
--- ─── Bootstrap Stuff ─────────────────────────────────────────────────────────────────────────────
+-- Gets index of next occurence of separator
+getNextSep :: (Eq a) => a -> [a] -> Int -> Int
+getNextSep _ [] i = i - 1 -- -1 because will have been incremented in recursive call
+getNextSep t (x:xs) i
+    | t == x = i
+    | otherwise = getNextSep t xs (i + 1)
 
-parseChar :: Char -> Parser Char
-parseChar c (x:xs)
-    | c == x = Just (c, xs)
-    | otherwise = Nothing
-parseChar c arr = Nothing
+-- Tokenizes a string into a list of strings
+-- Tokenization is essentially splitting on a space and ignoring LFs
+tokenizeBuf :: String -> [String]
+tokenizeBuf buf = words (removeReturns buf)
 
-parseAnyChar :: String -> Parser Char
-parseAnyChar (x:xs) str = case res of
-    Nothing -> parseAnyChar xs str
-    Just _ -> res
-    where res = parseChar x str
-parseAnyChar [] _ = Nothing
+-- Main function for parsing
+runParser :: String -> IO ()
+runParser path = do
+    -- Read file content into buffer
+    buf <- readFile path
 
--- parseOr :: (String -> Maybe (a, String)) -> (String -> Maybe (a, String)) -> (String -> Maybe (a, String))
-
--- parseOr parser_a parser_b
---     | parser_a 
+    -- Tokenize
