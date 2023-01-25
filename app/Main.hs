@@ -7,9 +7,10 @@ import Parsing.Args
 
 main :: IO ()
 main = do
+    -- Parse args
     parsedArgs <- parseArgs
-    print parsedArgs
-    -- let tokenizedcode = tokenizePath "./TestFiles/1"
-    -- print tokenizedcode
+
+    tokenizedcode <- tokenizeFile "./TestFiles/1"
+    print tokenizedcode
     
     

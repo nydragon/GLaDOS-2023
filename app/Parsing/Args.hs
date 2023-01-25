@@ -3,8 +3,6 @@ module Parsing.Args where
 import System.Environment
 import System.Exit
 
--- Args parsing
-
 -- ParsedArgs structure
 -- Boolean true if flag found
 data ParsedArgs = ParsedArgs {
@@ -28,23 +26,8 @@ parseArgs' (x:xs) c args
     | x == "-h" = parseArgs' xs (c + 1) (args { usage = True })
     | otherwise = parseArgs' xs (c + 1) args
 
--- parseArgs'' :: [String] -> Maybe ParsedArgs
--- parseArgs'' arr = parseArgs'
-
 -- Arg parsing utility function to call main function
 --
 -- Returns parsed file path
 parseArgs :: IO ParsedArgs
 parseArgs = getArgs >>= (\arr -> parseArgs' arr 0 (ParsedArgs False ""))
--- parseArgs = do
---     args <- getArgs
-
---     parseArgs' args 0 (ParsedArgs False "")
-
---X how to passe multiple args to bind operation
--- 
---  Finish parse args error handling
---
---  Hopefully conversion from IO to Maybe works
---
---  Custom type for args
