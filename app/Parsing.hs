@@ -41,3 +41,13 @@ tokenize' (x:xs) str = tokenize' xs (str <> [x])
 -- Utility entry point function
 tokenize :: String -> [String]
 tokenize str = tokenize' str ""
+
+-- Function to tokenize a given file
+--
+-- Args : path
+tokenizeFile :: String -> [String]
+tokenizeFile path = do
+        -- Read file and Tokenize
+        fileStr <- readFile path
+
+        return (tokenize fileStr)
