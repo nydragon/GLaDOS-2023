@@ -4,20 +4,20 @@ module Main where
 
 
 tokenize :: String -> String -> [String]
-tokenize [] b = []
-tokenize (' ':xs) b
-        | length b == 0 = tokenize xs ""
-        | otherwise = b : tokenize xs ""
-tokenize ('\n':xs) b
-        | length b == 0 = tokenize xs ""
-        | otherwise = b : tokenize xs ""
-tokenize ('(':xs) b
-        | length b == 0 = "(" : tokenize xs ""
-        | otherwise = b : tokenize ('(':xs) ""
-tokenize (')':xs) b
-        | length b == 0 = ")" : tokenize xs ""
-        | otherwise = b : tokenize (')':xs) ""
-tokenize (x:xs) b = tokenize xs (b <> [x])
+tokenize [] str = []
+tokenize (' ':xs) str
+        | length str == 0 = tokenize xs ""
+        | otherwise = str : tokenize xs ""
+tokenize ('\n':xs) str
+        | length str == 0 = tokenize xs ""
+        | otherwise = str : tokenize xs ""
+tokenize ('(':xs) str
+        | length str == 0 = "(" : tokenize xs ""
+        | otherwise = str : tokenize ('(':xs) ""
+tokenize (')':xs) str
+        | length str == 0 = ")" : tokenize xs ""
+        | otherwise = str : tokenize (')':xs) ""
+tokenize (x:xs) str = tokenize xs (str <> [x])
 
 
 
