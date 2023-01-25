@@ -1,5 +1,6 @@
 module Builtins where
 
+
 division :: Integer -> Integer -> Either Integer String
 division a 0 = Right "ZeroDivisionError"
 division a b = Left (div a b)
@@ -14,7 +15,8 @@ multiply a b = a * b
 substract :: Integer -> Integer -> Integer
 substract a b = a - b
 
-add :: Integer -> Integer -> Integer
+add :: Integer -> Integer ->   Integer
+
 add a b = a + b
 
 lt :: (Ord a) => a -> a -> Bool
