@@ -15,39 +15,3 @@ getNextSep _ [] i = i - 1 -- -1 because will have been incremented in recursive 
 getNextSep t (x:xs) i
         | t == x = i
         | otherwise = getNextSep t xs (i + 1)
-
--- ─── Tokenization ────────────────────────────────────────────────────────────────────────────────
-
--- Function that tokenizes string
---
--- Tokens are : ' ', '\n', '(', ')'
--- Args are : Input -> Temp Str -> Output List
-tokenize' :: String -> String -> [String]
-tokenize' [] str = []
-tokenize' (' ':xs) str
-        | null str = tokenize' xs ""
-        | otherwise = str : tokenize' xs ""
-tokenize' ('\n':xs) str
-        | null str = tokenize' xs ""
-        | otherwise = str : tokenize' xs ""
-tokenize' ('(':xs) str
-        | null str = "(" : tokenize' xs ""
-        | otherwise = str : tokenize' ('(':xs) ""
-tokenize' (')':xs) str
-        | null str = ")" : tokenize' xs ""
-        | otherwise = str : tokenize' (')':xs) ""
-tokenize' (x:xs) str = tokenize' xs (str <> [x])
-
--- Utility entry point function
-tokenize :: String -> [String]
-tokenize str = tokenize' str ""
-
--- Function to tokenize a given file
---
--- Args : path
-tokenizeFile :: String -> [String]
-tokenizeFile path = do
-        -- Read file and Tokenize
-        fileStr <- readFile path
-
-        return (tokenize fileStr)

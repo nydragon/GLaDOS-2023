@@ -1,14 +1,15 @@
 module Main where
 
--- Library modules
-import System.Args
-
 -- Our modules
 import Parsing
+import Parsing.Lang
+import Parsing.Args
 
 main :: IO ()
 main = do
-    let tokenizedcode = tokenizePath "(define x 2)\n\n( add    x 3 )"
-    print tokenizedcode
+    parsedArgs <- parseArgs
+    print parsedArgs
+    -- let tokenizedcode = tokenizePath "./TestFiles/1"
+    -- print tokenizedcode
     
     
