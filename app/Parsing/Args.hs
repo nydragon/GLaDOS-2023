@@ -26,7 +26,7 @@ parseArgs' (x:xs) c args
     | x == "-h" = parseArgs' xs (c + 1) (args { usage = True })
     | otherwise = parseArgs' xs (c + 1) args
 
--- Arg parsing utility function to call main function
+-- Utility entry point function
 --
 -- Returns parsed file path
 parseArgs :: IO ParsedArgs

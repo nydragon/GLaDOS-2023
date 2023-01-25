@@ -2,6 +2,16 @@ module Parsing.Lang where
 
 -- ─── Tokenization ────────────────────────────────────────────────────────────────────────────────
 
+-- Token Datatype
+data Token = OpenScope
+        | CloseScope
+        | Number Integer
+        | Keyword String
+        | OpenSingle -- single quotes
+        | CloseSingle
+        | OpenDouble -- double quotes
+        | CloseDouble
+
 -- Function that tokenizes string
 --
 -- Tokens are : ' ', '\n', '(', ')'
@@ -34,4 +44,5 @@ tokenizeFile path = do
         -- Read file and Tokenize
         fileStr <- readFile path
 
+        -- Return tokenization result
         return (tokenize fileStr)
