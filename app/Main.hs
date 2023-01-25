@@ -1,23 +1,6 @@
 module Main where
 
-tokenize' :: String -> String -> [String]
-tokenize' [] str = []
-tokenize' (' ':xs) str
-        | length str == 0 = tokenize' xs ""
-        | otherwise = str : tokenize' xs ""
-tokenize' ('\n':xs) str
-        | length str == 0 = tokenize' xs ""
-        | otherwise = str : tokenize' xs ""
-tokenize' ('(':xs) str
-        | length str == 0 = "(" : tokenize' xs ""
-        | otherwise = str : tokenize' ('(':xs) ""
-tokenize' (')':xs) str
-        | length str == 0 = ")" : tokenize' xs ""
-        | otherwise = str : tokenize' (')':xs) ""
-tokenize' (x:xs) str = tokenize' xs (str <> [x])
-
-tokenize :: String -> [String]
-tokenize str = tokenize' str ""
+import Parsing
 
 main :: IO ()
 main = do
