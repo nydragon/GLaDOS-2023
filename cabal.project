@@ -1,2 +1,4 @@
 packages : ./GLaDOS2023.cabal
 tests: True
+coverage: True
+library-coverage: True
