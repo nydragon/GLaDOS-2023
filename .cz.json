@@ -5,9 +5,9 @@
             "message_template": "[{{change_type}}]{% if show_message %} {{message}}{% endif %}",
             "example": "[Feature]: this feature enable customize through config file",
             "schema": "[<type>] <body>",
-            "schema_pattern": "\\[(Feature|Fix|Merge|Revert|Doc|Test|Assets|Build|Refactor|Style)\\](\\s.*)",
+            "schema_pattern": "\\[(WIP-Building|WIP-Not-Building|Feature|Fix|Merge|Revert|Doc|Test|Assets|Build|Refactor|Style)\\](\\s.*)",
             "info": "This is customized info",
-            "commit_parser": "^\\[(?P<change_type>feature|fix|merge|revert|doc|test|assets|build|refactor|style)\\]\\s(?P<message>.*)?",
+            "commit_parser": "^\\[(?P<change_type>feature|WIP-Building|WIP-Not-Building|fix|merge|revert|doc|test|assets|build|refactor|style)\\]\\s(?P<message>.*)?",
             "change_type_map": {
                 "feature": "Feat",
                 "fix": "Fix"
@@ -56,6 +56,14 @@
                         {
                             "value": "Style",
                             "name": "[Style] A modification in code style without logic changes."
+                        },
+                        {
+                            "value": "WIP-Not-Building",
+                            "name": "[WIP-Not-Building] A partial, not working modification."
+                        },
+                        {
+                            "value": "WIP-Building",
+                            "name": "[WIP-Building] A partial, still working modification."
                         }
                     ],
                     "message": "Select the type of change you are committing"

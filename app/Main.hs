@@ -1,15 +1,25 @@
 module Main where
 
+tokenize' :: String -> String -> [String]
+tokenize' [] str = []
+tokenize' (' ':xs) str
+        | length str == 0 = tokenize' xs ""
+        | otherwise = str : tokenize' xs ""
+tokenize' ('\n':xs) str
+        | length str == 0 = tokenize' xs ""
+        | otherwise = str : tokenize' xs ""
+tokenize' ('(':xs) str
+        | length str == 0 = "(" : tokenize' xs ""
+        | otherwise = str : tokenize' ('(':xs) ""
+tokenize' (')':xs) str
+        | length str == 0 = ")" : tokenize' xs ""
+        | otherwise = str : tokenize' (')':xs) ""
+tokenize' (x:xs) str = tokenize' xs (str <> [x])
 
-consume :: [Char] -> [String] -> [String]
-consume [] ys = ys
-consume xs ys = parser xs ys
-
-parser :: [Char] -> [String] -> [String]
-parser (x:[]) ys = consume [] [[x]] <> ys
-parser (')':xs) ys = consume xs [")"] <> ys
-parser (x:xs) ys = parser xs [[x]] <> ys
+tokenize :: String -> [String]
+tokenize str = tokenize' str ""
 
 main :: IO ()
 main = do
-    putStrLn ((parser "(2 (3 3))" [""]))
+    let tokenizedcode = tokenize "(define x 2)\n\n( add    x 3 )"
+    print tokenizedcode
