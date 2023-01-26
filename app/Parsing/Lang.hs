@@ -2,6 +2,7 @@ module Parsing.Lang where
 
 import Text.Read
 import Data.Char
+import Data.Maybe
 
 -- ─── Tokenization ────────────────────────────────────────────────────────────────────────────────
 
@@ -10,7 +11,7 @@ data Token = OpenScope -- Opening parenthesis
         | CloseScope -- Closing parenthesis
         | Num Integer
         | Keyword String
-        deriving (Show)
+        deriving (Show, Eq)
 
 -- Parse token from string
 parseToken :: String -> Token
@@ -64,6 +65,54 @@ data Cpt = Val Integer -- Using "Val" in order to avoid ambiguity check (yes it'
         | Sym String -- Symbol
         | List [Cpt] -- The list is sort of what an expression would be in other grammars
 
+-- The following functions all work on a piece of [Token]
+
+-- Parses token
+-- Returns nothing if : OpenScope, CloseScope => Should be handled by parseCptList
+tokenToCpt :: Token -> Maybe Cpt
+-- These cases shouldn't happen
+tokenToCpt OpenScope = Nothing
+tokenToCpt CloseScope = Nothing
+-- Main cases
+tokenToCpt (Num i) = Just (Val i)
+tokenToCpt (Keyword str) = Just(Sym str)
+
+-- Parses list in between parenthesis
+-- EXPECTS : First token in list to be OpenScope
+--
+-- NOTE: Returns List even if no corresponding closing parenthesis is found
+--       this will potentially be an issue
+-- NOTE: Will need way of parsing "initial" list (ie: list without parenthesis)
+--
+-- Args : Input token list -> OpenScope count -> CloseScope count -> Output
+parseTokenList :: [Token] -> [Cpt]
+parseTokenList [] = []
+parseTokenList (CloseScope:xs) = [] -- Normally shouldn't happen
+parseTokenList (OpenScope:xs) = sublist : parseTokenList newList
+        where   oldList = OpenScope:xs
+                sublist = List (parseTokenList oldList)
+                -- +2 because it's index of CloseScope, and we want the element after
+                newList = take (getCloseScope oldList + 2) oldList
+
+-- Gets CORRESPONDING closing parenthesis
+-- This function takes into account any intermediate opening parenthesis
+--
+-- Args : Input list -> Opening Count -> Closing Count -> Index -> Output
+getCloseScope' :: [Token] -> Int -> Int -> Int -> Int
+getCloseScope' [] _ _ i = i
+getCloseScope' (OpenScope:xs) openCount closeCount i =
+        getCloseScope' xs (openCount + 1) closeCount (i + 1)
+getCloseScope' (CloseScope:xs) openCount closeCount i
+        | openCount == closeCount + 1 = i
+        | otherwise = getCloseScope' xs openCount (closeCount + 1) (i + 1)
+getCloseScope' (_:xs) c1 c2 i = getCloseScope' xs c1 c2 (i + 1)
+        
+
+-- Utility entry point function
+-- EXPECTS : First token in list to be OpenScope
+getCloseScope :: [Token] -> Int
+getCloseScope (x:xs) = getCloseScope' xs 1 0 1 -- index starts at 1 since first element is skipped
+
 -- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
 
 isNum :: String -> Bool
@@ -81,3 +130,6 @@ getInteger _ = Nothing
 getList :: Cpt -> Maybe [Cpt]
 getList (List ls) = Just ls
 getList _ = Nothing
+
+-- Refactor ideas :
+-- Add list comprehension for list slicing in parseTokenList

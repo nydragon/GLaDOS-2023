@@ -7,7 +7,7 @@ module Parsing where
 splitOn :: (Eq a) => a -> [a] -> [[a]]
 splitOn _ [] = []
 splitOn c arr = take nextSep arr : splitOn c (drop nextSep arr)
-    where nextSep = getNextSep c arr 0 + 1 -- +1 because it's a character count
+    where nextSep = getNextSep' c arr (0 + 1) -- +1 because it's a character count
 
 -- Gets index of next occurence of separator
 getNextSep' :: (Eq a) => a -> [a] -> Int -> Int
@@ -17,5 +17,5 @@ getNextSep' t (x:xs) i
         | otherwise = getNextSep' t xs (i + 1)
 
 -- Utility entry point function
-getNextSep :: (Eq a) => a -> [a]
+getNextSep :: (Eq a) => a -> [a] -> Int
 getNextSep sep ls = getNextSep' sep ls 0
