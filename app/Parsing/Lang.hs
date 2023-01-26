@@ -10,14 +10,12 @@ data Token = OpenScope -- Opening parenthesis
         | CloseScope -- Closing parenthesis
         | Num Integer
         | Keyword String
-        | Negation -- Minus
         deriving (Show)
 
 -- Parse token from string
 parseToken :: String -> Token
 parseToken "(" = OpenScope
 parseToken ")" = CloseScope
-parseToken "-" = Negation
 parseToken input
         | isNum input == True = Num (read input :: Integer)
         | otherwise = Keyword input
@@ -40,9 +38,7 @@ tokenize' ('(':xs) str
 tokenize' (')':xs) str
         | null str = CloseScope : tokenize' xs ""
         | otherwise = (parseToken str) : tokenize' (')':xs) ""
-tokenize' ('-':xs) str
-        | null str = Negation : tokenize' xs ""
-        | otherwise = (parseToken str) : tokenize' ('-':xs) ""
+tokenize' ('-':xs) [] = tokenize' xs "-"
 tokenize' (x:xs) str = tokenize' xs (str <> [x])
 
 -- Utility entry point function
@@ -60,8 +56,28 @@ tokenizeFile path = do
         -- Return tokenization result
         return (tokenize fileStr)
 
+-- ─── Concrete Parsing Tree ───────────────────────────────────────────────────────────────────────
+
+-- Basic concrete parsing tree structure
+-- Represents the main elements of our Context Free Grammar
+data Cpt = Val Integer -- Using "Val" in order to avoid ambiguity check (yes it's ugly)
+        | Sym String -- Symbol
+        | List [Cpt] -- The list is sort of what an expression would be in other grammars
+
 -- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
 
 isNum :: String -> Bool
 isNum [] = True
 isNum (x:xs) = if isDigit x then isNum xs else False
+
+getSymbol :: Cpt -> Maybe String
+getSymbol (Sym s) = Just s
+getSymbol _ = Nothing
+
+getInteger :: Cpt -> Maybe Integer
+getInteger (Val i) = Just i
+getInteger _ = Nothing
+
+getList :: Cpt -> Maybe [Cpt]
+getList (List ls) = Just ls
+getList _ = Nothing
