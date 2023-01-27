@@ -26,7 +26,7 @@ parseToken input = case readMaybe input :: Maybe Integer of
 -- Tokens are : ' ', '\n', '(', ')'
 -- Args are : Input -> Temp Str -> Output List
 tokenize' :: String -> String -> [Token]
-tokenize' [] str = [parseToken str]
+tokenize' [] str = if null str then [] else [parseToken str]
 tokenize' (' ':xs) "" = tokenize' xs ""
 tokenize' (' ':xs) str = parseToken str : tokenize' xs ""
 tokenize' ('\n':xs) "" = tokenize' xs ""
@@ -34,7 +34,7 @@ tokenize' ('\n':xs) str = parseToken str : tokenize' xs ""
 tokenize' ('(':xs) "" = OpenScope : tokenize' xs ""
 tokenize' ('(':xs) str = parseToken str : tokenize' ('(':xs) ""
 tokenize' (')':xs) "" = CloseScope : tokenize' xs ""
-tokenize' (')':xs) str = (parseToken str) : tokenize' (')':xs) ""
+tokenize' (')':xs) str = parseToken str : tokenize' (')':xs) ""
 tokenize' (x:xs) str = tokenize' xs (str <> [x])
 
 -- Utility entry point function
@@ -86,7 +86,7 @@ parseTokenList [] = []
 parseTokenList (CloseScope:xs) = [] -- Normally shouldn't happen
 parseTokenList (OpenScope:xs) = sublist : parseTokenList newList
         where   oldList = OpenScope:xs
-                sublist = parseTokenList oldList
+                sublist = List (parseTokenList oldList)
                 index = getCloseScope oldList +2
                 -- +2 because it's index of CloseScope, and we want the element after
                 newList = [x | (x, i) <- zip oldList [0..], i >= index + 2] -- NEEDS MORE TESTING
@@ -103,7 +103,7 @@ parseTokenList (x:xs) = fromJust (tokenToCpt x) : parseTokenList xs
 --
 -- Args : Input list -> Opening Count -> Closing Count -> Index -> Output
 getCloseScope' :: [Token] -> Int -> Int -> Int -> Int
-getCloseScope' [] _ _ i = i
+getCloseScope' [] _ _ i = i - 1
 getCloseScope' (OpenScope:xs) openCount closeCount i =
         getCloseScope' xs (openCount + 1) closeCount (i + 1)
 getCloseScope' (CloseScope:xs) openCount closeCount i
