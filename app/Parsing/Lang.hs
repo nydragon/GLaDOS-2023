@@ -86,10 +86,17 @@ parseTokenList [] = []
 parseTokenList (CloseScope:xs) = [] -- Normally shouldn't happen
 parseTokenList (OpenScope:xs) = sublist : parseTokenList newList
         where   oldList = OpenScope:xs
-                sublist = List (parseTokenList oldList)
+                sublist = parseTokenList oldList
+                index = getCloseScope oldList +2
                 -- +2 because it's index of CloseScope, and we want the element after
-                newList = take (getCloseScope oldList + 2) oldList
-parseTokenList (x:xs) = fromJust (tokenToCpt x) : parseTokenList xs -- Note: If fromJust crashes, something else has gone wrong
+                newList = [x | (x, i) <- zip oldList [0..], i >= index + 2] -- NEEDS MORE TESTING
+                -- newList = take (getCloseScope oldList + 2) oldList
+parseTokenList (x:xs) = fromJust (tokenToCpt x) : parseTokenList xs
+-- Note: If fromJust crashes, something else has gone wrong
+
+-- Sublist needs to be list object but not of an array of Cpt
+--
+-- newList -> take doesn't work as planned
 
 -- Gets CORRESPONDING closing parenthesis
 -- This function takes into account any intermediate opening parenthesis
