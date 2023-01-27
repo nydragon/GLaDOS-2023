@@ -17,9 +17,9 @@ data Token = OpenScope -- Opening parenthesis
 parseToken :: String -> Token
 parseToken "(" = OpenScope
 parseToken ")" = CloseScope
-parseToken input
-        | isNum input == True = Num (read input :: Integer) -- may fail ?
-        | otherwise = Keyword input
+parseToken input = case readMaybe input :: Maybe Integer of
+        Just x -> Num x
+        Nothing -> Keyword input
 
 -- Function that tokenizes string
 --
@@ -103,7 +103,7 @@ getCloseScope' (CloseScope:xs) openCount closeCount i
         | openCount == closeCount + 1 = i
         | otherwise = getCloseScope' xs openCount (closeCount + 1) (i + 1)
 getCloseScope' (_:xs) c1 c2 i = getCloseScope' xs c1 c2 (i + 1)
-        
+
 
 -- Utility entry point function
 -- EXPECTS : First token in list to be OpenScope
