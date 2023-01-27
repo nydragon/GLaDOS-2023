@@ -16,4 +16,4 @@ main = do
     tokenizedcode <- tokenizeFile "./TestFiles/2"
 
     print tokenizedcode
-    print (getCloseScope tokenizedcode)
+    print (parseTokenList tokenizedcode)

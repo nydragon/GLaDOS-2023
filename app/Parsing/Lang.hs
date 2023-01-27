@@ -26,7 +26,8 @@ parseToken input = case readMaybe input :: Maybe Integer of
 -- Tokens are : ' ', '\n', '(', ')'
 -- Args are : Input -> Temp Str -> Output List
 tokenize' :: String -> String -> [Token]
-tokenize' [] str = if null str then [] else [parseToken str]
+tokenize' [] "" = []
+tokenize' [] str = [parseToken str]
 tokenize' (' ':xs) "" = tokenize' xs ""
 tokenize' (' ':xs) str = parseToken str : tokenize' xs ""
 tokenize' ('\n':xs) "" = tokenize' xs ""
@@ -85,11 +86,10 @@ parseTokenList :: [Token] -> [Cpt]
 parseTokenList [] = []
 parseTokenList (CloseScope:xs) = [] -- Normally shouldn't happen
 parseTokenList (OpenScope:xs) = sublist : parseTokenList newList
-        where   oldList = OpenScope:xs
-                sublist = List (parseTokenList oldList)
-                index = getCloseScope oldList +2
+        where   sublist = List (parseTokenList xs)
+                index = getCloseScope xs +2
                 -- +2 because it's index of CloseScope, and we want the element after
-                newList = [x | (x, i) <- zip oldList [0..], i >= index + 2] -- NEEDS MORE TESTING
+                newList = [x | (x, i) <- zip xs [0..], i >= index + 2] -- NEEDS MORE TESTING
                 -- newList = take (getCloseScope oldList + 2) oldList
 parseTokenList (x:xs) = fromJust (tokenToCpt x) : parseTokenList xs
 -- Note: If fromJust crashes, something else has gone wrong
