@@ -18,7 +18,7 @@ parseToken :: String -> Token
 parseToken "(" = OpenScope
 parseToken ")" = CloseScope
 parseToken input
-        | isNum input == True = Num (read input :: Integer)
+        | isNum input == True = Num (read input :: Integer) -- may fail ?
         | otherwise = Keyword input
 
 -- Function that tokenizes string
@@ -64,6 +64,7 @@ tokenizeFile path = do
 data Cpt = Val Integer -- Using "Val" in order to avoid ambiguity check (yes it's ugly)
         | Sym String -- Symbol
         | List [Cpt] -- The list is sort of what an expression would be in other grammars
+        deriving (Show)
 
 -- The following functions all work on a piece of [Token]
 
@@ -75,7 +76,7 @@ tokenToCpt OpenScope = Nothing
 tokenToCpt CloseScope = Nothing
 -- Main cases
 tokenToCpt (Num i) = Just (Val i)
-tokenToCpt (Keyword str) = Just(Sym str)
+tokenToCpt (Keyword str) = Just (Sym str)
 
 -- Parses list in between parenthesis
 -- EXPECTS : First token in list to be OpenScope
@@ -84,7 +85,7 @@ tokenToCpt (Keyword str) = Just(Sym str)
 --       this will potentially be an issue
 -- NOTE: Will need way of parsing "initial" list (ie: list without parenthesis)
 --
--- Args : Input token list -> OpenScope count -> CloseScope count -> Output
+-- Args : Tokens -> Output
 parseTokenList :: [Token] -> [Cpt]
 parseTokenList [] = []
 parseTokenList (CloseScope:xs) = [] -- Normally shouldn't happen
@@ -93,6 +94,7 @@ parseTokenList (OpenScope:xs) = sublist : parseTokenList newList
                 sublist = List (parseTokenList oldList)
                 -- +2 because it's index of CloseScope, and we want the element after
                 newList = take (getCloseScope oldList + 2) oldList
+parseTokenList (x:xs) = fromJust (tokenToCpt x) : parseTokenList xs
 
 -- Gets CORRESPONDING closing parenthesis
 -- This function takes into account any intermediate opening parenthesis

@@ -26,7 +26,7 @@ executable glados
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.
-    -- other-modules: Parsing.hs
+    other-modules: Parsing Parsing.Args Parsing.Lang
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
