@@ -27,19 +27,14 @@ parseToken input
 -- Args are : Input -> Temp Str -> Output List
 tokenize' :: String -> String -> [Token]
 tokenize' [] str = [parseToken str]
-tokenize' (' ':xs) str
-        | null str = tokenize' xs ""
-        | otherwise = parseToken str : tokenize' xs ""
-tokenize' ('\n':xs) str
-        | null str = tokenize' xs ""
-        | otherwise = parseToken str : tokenize' xs ""
-tokenize' ('(':xs) str
-        | null str = OpenScope : tokenize' xs ""
-        | otherwise = parseToken str : tokenize' ('(':xs) ""
-tokenize' (')':xs) str
-        | null str = CloseScope : tokenize' xs ""
-        | otherwise = (parseToken str) : tokenize' (')':xs) ""
-tokenize' ('-':xs) [] = tokenize' xs "-"
+tokenize' (' ':xs) "" = tokenize' xs ""
+tokenize' (' ':xs) str = parseToken str : tokenize' xs ""
+tokenize' ('\n':xs) "" = tokenize' xs ""
+tokenize' ('\n':xs) str = parseToken str : tokenize' xs ""
+tokenize' ('(':xs) "" = OpenScope : tokenize' xs ""
+tokenize' ('(':xs) str = parseToken str : tokenize' ('(':xs) ""
+tokenize' (')':xs) "" = CloseScope : tokenize' xs ""
+tokenize' (')':xs) str = (parseToken str) : tokenize' (')':xs) ""
 tokenize' (x:xs) str = tokenize' xs (str <> [x])
 
 -- Utility entry point function
