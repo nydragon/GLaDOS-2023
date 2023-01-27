@@ -26,16 +26,16 @@ parseToken input
 -- Tokens are : ' ', '\n', '(', ')'
 -- Args are : Input -> Temp Str -> Output List
 tokenize' :: String -> String -> [Token]
-tokenize' [] str = []
+tokenize' [] str = [parseToken str]
 tokenize' (' ':xs) str
         | null str = tokenize' xs ""
-        | otherwise = (parseToken str) : tokenize' xs ""
+        | otherwise = parseToken str : tokenize' xs ""
 tokenize' ('\n':xs) str
         | null str = tokenize' xs ""
-        | otherwise = (parseToken str) : tokenize' xs ""
+        | otherwise = parseToken str : tokenize' xs ""
 tokenize' ('(':xs) str
         | null str = OpenScope : tokenize' xs ""
-        | otherwise = (parseToken str) : tokenize' ('(':xs) ""
+        | otherwise = parseToken str : tokenize' ('(':xs) ""
 tokenize' (')':xs) str
         | null str = CloseScope : tokenize' xs ""
         | otherwise = (parseToken str) : tokenize' (')':xs) ""
