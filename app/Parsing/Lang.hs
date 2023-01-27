@@ -94,7 +94,7 @@ parseTokenList (OpenScope:xs) = sublist : parseTokenList newList
                 sublist = List (parseTokenList oldList)
                 -- +2 because it's index of CloseScope, and we want the element after
                 newList = take (getCloseScope oldList + 2) oldList
-parseTokenList (x:xs) = fromJust (tokenToCpt x) : parseTokenList xs
+parseTokenList (x:xs) = fromJust (tokenToCpt x) : parseTokenList xs -- Note: If fromJust crashes, something else has gone wrong
 
 -- Gets CORRESPONDING closing parenthesis
 -- This function takes into account any intermediate opening parenthesis
