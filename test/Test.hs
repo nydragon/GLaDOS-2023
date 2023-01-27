@@ -7,8 +7,8 @@ import Test.Tasty.HUnit
 
 main = defaultMain tests
 
--- tests :: TestTree
--- tests =testGroup "UnitTests"
---     [testCase "first" $
---         function 2 2 @?= 4
---     ]
+tests :: TestTree
+tests =testGroup "UnitTests"
+    [testCase "first" $
+        2+2 @?= 4
+    ]
