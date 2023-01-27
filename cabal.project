@@ -1,0 +1,2 @@
+packages : ./GLaDOS2023.cabal
+tests: True

@@ -4,7 +4,7 @@
 # Install Dependencies
 
 ```sh
-yay -S ghc cabal-install cabal-static hlint;
+yay -S ghc cabal-install cabal-static  haskell-tf-random haskell-random haskell-quickcheck haskell-quickcheck-io  haskell-hunit hlint;
 
 cabal update;
 ```
