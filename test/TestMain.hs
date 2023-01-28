@@ -1,4 +1,5 @@
 import Data.List
+import Test.Parsing
 
 -- Test framework
 import Test.Tasty
@@ -9,12 +10,6 @@ import Test.Tasty.HUnit
 
 main = defaultMain allTests
 
-testLambda :: TestTree
-testLambda = testCase "Exemple" $ do
-    2 + 2 @?= 4
-
-parsingTests :: TestTree
-parsingTests = testGroup "Parsing Tests" [testLambda]
 
 allTests :: TestTree
 allTests = testGroup "Unit Tests" [parsingTests]
