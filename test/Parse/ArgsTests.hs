@@ -1,4 +1,4 @@
-module ParseArgsTest where
+module Parse.ArgsTests where
 
 import Parsing
 import Parsing.Args
