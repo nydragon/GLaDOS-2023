@@ -1,14 +1,14 @@
 import Data.List
+
+import TokenizationTest
+
 import Test.Tasty
 import Test.Tasty.Discover
 import Test.Tasty.HUnit
 
 {-# OPTIONS_GHC -F -pgmF tasty-discover#-}
 
-main = defaultMain tests
+main = defaultMain allTests
 
-tests :: TestTree
-tests =testGroup "UnitTests"
-    [testCase "first" $
-        2+2 @?= 4
-    ]
+allTests :: TestTree
+allTests = testGroup "Unit Tests" [tokenSuite]
