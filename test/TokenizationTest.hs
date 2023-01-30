@@ -47,16 +47,20 @@ tokenToCptTests = testGroup "tokenToCpt tests" [
     testCase "Token Keyword returns Just Sym" (assertEqual [] (Just (Sym "test")) (tokenToCpt (Keyword "test")))
     ]
 
-utilityFunctionsT :: TestTree
-utilityFunctionsT = testGroup "Utility Functions Tests" [
-    testCase "isNum with integer string" (assertBool [] (isNum "123")),
-    testCase "isNum with non-integer string" (assertBool [] (not $ isNum "abc")),
-    testCase "getSymbol with symbol string" (assertEqual [] (Just "abc") (getSymbol $ Sym "abc")),
-    testCase "getSymbol with non-symbol string" (assertEqual [] Nothing (getSymbol $ Val 123)),
-    testCase "getInteger with integer value" (assertEqual [] (Just 123) (getInteger $ Val 123)),
-    testCase "getInteger with non-integer value" (assertEqual [] Nothing (getInteger $ Sym "abc")),
-    testCase "getList with list value" (assertEqual [] (Just [Val 1, Sym "abc", Val 2]) (getList $ List [Val 1, Sym "abc", Val 2])),
-    testCase "getList with non-list value" (assertEqual [] Nothing (getList $ Val 123))
+parseTokenListTests :: TestTree
+parseTokenListTests = testGroup "Tests for parseTokenList function" [
+    testCase "Empty input list" $
+        parseTokenList [] @?= [],
+    testCase "Input list starting with CloseScope" $
+        parseTokenList [CloseScope] @?= [],
+    testCase "Input list starting with OpenScope" $
+        parseTokenList [OpenScope, Num 5, CloseScope] @?= [List [Val 5]],
+    testCase "Input list with multiple nested scopes" $
+        parseTokenList [OpenScope, Num 5, OpenScope, Num 3, CloseScope, CloseScope] @?= [List [Val 5, List [Val 3]]],
+    testCase "Input list with multiple nested scopes and Keywords" $
+        parseTokenList [OpenScope, Num 5, OpenScope, Keyword "add", Num 3, CloseScope, CloseScope] @?= [List [Val 5, List [Sym "add", Val 3]]],
+    testCase "Input list with missing closing parenthesis" $
+        parseTokenList [OpenScope, Num 5, OpenScope, Num 3] @?= [List [Val 5, List [Val 3]]]
     ]
 
 -- Test cases for getCloseScope
@@ -76,6 +80,24 @@ getCloseScopeTests = testGroup "getCloseScope Tests" [
         getCloseScope [] @?= 0
     ]
 
+utilityFunctionsT :: TestTree
+utilityFunctionsT = testGroup "Utility Functions Tests" [
+    testCase "isNum with integer string" (assertBool [] (isNum "123")),
+    testCase "isNum with non-integer string" (assertBool [] (not $ isNum "abc")),
+    testCase "getSymbol with symbol string" (assertEqual [] (Just "abc") (getSymbol $ Sym "abc")),
+    testCase "getSymbol with non-symbol string" (assertEqual [] Nothing (getSymbol $ Val 123)),
+    testCase "getInteger with integer value" (assertEqual [] (Just 123) (getInteger $ Val 123)),
+    testCase "getInteger with non-integer value" (assertEqual [] Nothing (getInteger $ Sym "abc")),
+    testCase "getList with list value" (assertEqual [] (Just [Val 1, Sym "abc", Val 2]) (getList $ List [Val 1, Sym "abc", Val 2])),
+    testCase "getList with non-list value" (assertEqual [] Nothing (getList $ Val 123))
+    ]
+
 -- Test suite list
 tokenSuite :: TestTree
-tokenSuite = testGroup "Tokenization Test Suite" [parseTokenTests, tokenizeTests, tokenToCptTests, getCloseScopeTests]
+tokenSuite = testGroup "Tokenization Test Suite" [
+        parseTokenTests,
+        tokenizeTests,
+        tokenToCptTests,
+        getCloseScopeTests,
+        parseTokenListTests
+    ]
