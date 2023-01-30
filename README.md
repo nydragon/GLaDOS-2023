@@ -24,8 +24,8 @@ cabal run;
 
 # Running the tests
 
-In order to see coloured output when running the tests, please run the tests with the following commands:
+In order to see coloured output and no coverage when running the tests, please run the tests with the following commands:
 
 ```
-cabal test --test-show-details=direct
+cabal run test
 ```
