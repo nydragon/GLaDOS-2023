@@ -1,6 +1,7 @@
 import Data.List
 import ParseArgsTest
-import ParsingLangTests
+import CptTests
+import AstTests
 
 import Test.Tasty
 import Test.Tasty.Discover
@@ -13,5 +14,6 @@ main = defaultMain allTests
 allTests :: TestTree
 allTests = testGroup "Glados Unit Tests" [
         tokenSuite,
-        argsSuite
+        argsSuite,
+        astSuite
     ]

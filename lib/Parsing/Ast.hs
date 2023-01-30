@@ -8,6 +8,7 @@ data Expr = ExprList [Expr]
     | Num Integer
     | Symbole String
     | Call String [Expr] -- Will also be used for the boolean expression
+    deriving (Eq, Show)
 
 -- This function parses lists of expressions, ignoring function calls
 -- AT LEAST at first level
@@ -22,7 +23,7 @@ parseExprList (x : xs) = case x of
 -- Parses a CPT into a single Expr value
 parseExpr :: [Cpt] -> Expr
 parseExpr (Sym str : xs) = if isValidBuiltin str then
-    Call str (parseExprList xs) else ExprList (parseExprList xs)
+    Call str (parseExprList xs) else ExprList (parseExprList (Sym str : xs))
 parseExpr ls = ExprList (parseExprList ls)
 
 -- Utility function for execution

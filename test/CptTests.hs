@@ -1,4 +1,4 @@
-module ParsingLangTests where
+module CptTests where
 
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -93,7 +93,7 @@ utilityFunctionsT = testGroup "Utility Functions Tests" [
 
 -- Test suite list
 tokenSuite :: TestTree
-tokenSuite = testGroup "Parsing.Lang Test Suite" [
+tokenSuite = testGroup "Parsing.Cpt Test Suite" [
         parseTokenTests,
         tokenizeTests,
         tokenToCptTests,
