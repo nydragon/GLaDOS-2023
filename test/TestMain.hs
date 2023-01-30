@@ -15,8 +15,8 @@ main = defaultMain allTests
 
 allTests :: TestTree
 allTests = testGroup "Glados Unit Tests" [
-        tokenSuite,
         argsSuite,
-        astSuite,
-        cptSuite
+        tokenSuite,
+        cptSuite,
+        astSuite
     ]

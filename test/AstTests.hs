@@ -30,8 +30,19 @@ parseExprTests = testGroup "Tests for parseExpr and parseExprList functions" [
         parseExpr [Sym "+", Val 1, List [Sym "*", Val 2, Val 3]] @?= ExprList [Symbole "+", Num 1, ExprList [Symbole "*", Num 2, Num 3]]
     ]
 
+exprListToCallTests :: TestTree
+exprListToCallTests = testGroup "Tests for exprListToCall function" [
+    testCase "Input list is empty" $
+        exprListToCall [] @?= Nothing,
+    testCase "Input list starts with a Symbole" $
+        exprListToCall [Symbole "add", Num 3, Num 4] @?= Just (Call "add" [Num 3, Num 4]),
+    testCase "Input list does not start with a Symbole" $
+        exprListToCall [Num 3, Num 4] @?= Nothing
+    ]
+
 
 astSuite :: TestTree
 astSuite = testGroup "Parsing.Ast Test Suite" [
-        parseExprTests
+        parseExprTests,
+        exprListToCallTests
     ]
