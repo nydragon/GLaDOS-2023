@@ -9,22 +9,29 @@ data Expr = ExprList [Expr]
     | Symbole String
     | Call String [Expr] -- Will also be used for the boolean expression
 
-
 -- This function parses lists of expressions, ignoring function calls
 -- AT LEAST at first level
--- This means it will only parse function calls in sublists thanks to cptListToExpr
+-- This means it will only parse function calls in sublists thanks to parseExpr
 parseExprList :: [Cpt] -> [Expr]
 parseExprList [] = []
 parseExprList (x : xs) = case x of
     Sym str -> Symbole str : parseExprList xs
     Val i -> Num i : parseExprList xs
-    List ls -> cptListToExpr ls : parseExprList xs
+    List ls -> parseExpr ls : parseExprList xs
 
 -- Parses a CPT into a single Expr value
-cptListToExpr :: [Cpt] -> Expr
-cptListToExpr (Sym str : xs) = if isValidBuiltin str then
+parseExpr :: [Cpt] -> Expr
+parseExpr (Sym str : xs) = if isValidBuiltin str then
     Call str (parseExprList xs) else ExprList (parseExprList xs)
-cptListToExpr ls = ExprList (parseExprList ls)
+parseExpr ls = ExprList (parseExprList ls)
+
+-- Utility function for execution
+-- Converts cpt list to Expr Call
+-- IMPORTANT : Returns nothing in case of error
+exprListToCall :: [Expr] -> Maybe Expr
+exprListToCall [] = Nothing
+exprListToCall (Symbole name : xs) = Just (Call name xs)
+exprListToCall _ = Nothing
 
 -- DEFINITIONS
     -- Expression = Anything that ends up a value
@@ -42,4 +49,5 @@ isValidBuiltin "add" = True
 isValidBuiltin "sub" = True
 isValidBuiltin "div" = True
 isValidBuiltin "mul" = True
+isValidBuiltin "noop" = True
 isValidBuiltin _ = False
