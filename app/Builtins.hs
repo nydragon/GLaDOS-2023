@@ -1,6 +1,5 @@
 module Builtins where
 
-
 division :: Integer -> Integer -> Either Integer String
 division a 0 = Right "ZeroDivisionError"
 division a b = Left (div a b)
