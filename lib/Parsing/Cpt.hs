@@ -1,57 +1,7 @@
-module Parsing.Lang where
+module Parsing.Cpt where
 
-import Text.Read
-import Data.Char
+import Parsing.Token
 import Data.Maybe
-
--- ─── Tokenization ────────────────────────────────────────────────────────────────────────────────
-
--- Token Datatype
-data Token = OpenScope -- Opening parenthesis
-        | CloseScope -- Closing parenthesis
-        | Num Integer
-        | Keyword String
-        deriving (Show, Eq)
-
--- Parse token from string
-parseToken :: String -> Token
-parseToken "(" = OpenScope
-parseToken ")" = CloseScope
-parseToken input = case readMaybe input :: Maybe Integer of
-        Just x -> Num x
-        Nothing -> Keyword input
-
--- Function that tokenizes string
---
--- Tokens are : ' ', '\n', '(', ')'
--- Args are : Input -> Temp Str -> Output List
-tokenize' :: String -> String -> [Token]
-tokenize' [] "" = []
-tokenize' [] str = [parseToken str]
-tokenize' (' ':xs) "" = tokenize' xs ""
-tokenize' (' ':xs) str = parseToken str : tokenize' xs ""
-tokenize' ('\n':xs) "" = tokenize' xs ""
-tokenize' ('\n':xs) str = parseToken str : tokenize' xs ""
-tokenize' ('(':xs) "" = OpenScope : tokenize' xs ""
-tokenize' ('(':xs) str = parseToken str : tokenize' ('(':xs) ""
-tokenize' (')':xs) "" = CloseScope : tokenize' xs ""
-tokenize' (')':xs) str = parseToken str : tokenize' (')':xs) ""
-tokenize' (x:xs) str = tokenize' xs (str <> [x])
-
--- Utility entry point function
-tokenize :: String -> [Token]
-tokenize str = tokenize' str ""
-
--- Function to tokenize a given file
---
--- Args : path
-tokenizeFile :: String -> IO [Token]
-tokenizeFile path = do
-        -- Read file and Tokenize
-        fileStr <- readFile path
-
-        -- Return tokenization result
-        return (tokenize fileStr)
 
 -- ─── Concrete Parsing Tree ───────────────────────────────────────────────────────────────────────
 
@@ -122,10 +72,6 @@ getCloseScope (x:xs) = getCloseScope' xs 1 0 1 -- index starts at 1 since first 
 
 -- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
 
-isNum :: String -> Bool
-isNum [] = True
-isNum (x:xs) = if isDigit x then isNum xs else False
-
 getSymbol :: Cpt -> Maybe String
 getSymbol (Sym s) = Just s
 getSymbol _ = Nothing
@@ -137,6 +83,3 @@ getInteger _ = Nothing
 getList :: Cpt -> Maybe [Cpt]
 getList (List ls) = Just ls
 getList _ = Nothing
-
--- Refactor ideas :
--- Add list comprehension for list slicing in parseTokenList

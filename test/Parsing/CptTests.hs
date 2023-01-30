@@ -1,42 +1,10 @@
-module ParsingLangTests where
+module Parsing.CptTests where
 
 import Test.Tasty
 import Test.Tasty.HUnit
 
-import Parsing.Lang
-
-parseTokenTests :: TestTree
-parseTokenTests = testGroup "parseToken tests"
-  [ testCase "OpenScope" $ parseToken "(" @?= OpenScope
-  , testCase "CloseScope" $ parseToken ")" @?= CloseScope
-  , testCase "Num" $ parseToken "123" @?= Num 123
-  , testCase "Negative Num" $ parseToken "-123" @?= Num (-123)
-  , testCase "Keyword" $ parseToken "keyword" @?= Keyword "keyword"
-  ]
-
-tokenizeTests :: TestTree
-tokenizeTests = testGroup "tokenize tests"
-  [ testCase "tokenize' empty input" $
-        tokenize' "" "" @?= [],
-    testCase "tokenize' space" $
-        tokenize' " " "" @?= [],
-    testCase "tokenize' newline" $
-        tokenize' "\n" "" @?= [],
-    testCase "tokenize' single digit" $
-        tokenize' "1" "" @?= [Num 1],
-    testCase "tokenize' multiple digits" $
-        tokenize' "123" "" @?= [Num 123],
-    testCase "tokenize' keyword" $
-        tokenize' "keyword" "" @?= [Keyword "keyword"],
-    testCase "tokenize' open scope" $
-        tokenize' "(" "" @?= [OpenScope],
-    testCase "tokenize' close scope" $
-        tokenize' ")" "" @?= [CloseScope],
-    testCase "tokenize' mixed input" $
-        tokenize' "1 keyword ( 123 )" "" @?= [Num 1, Keyword "keyword", OpenScope, Num 123, CloseScope],
-    testCase "tokenize" $
-        tokenize "1 keyword ( 123 )" @?= [Num 1, Keyword "keyword", OpenScope, Num 123, CloseScope]
-  ]
+import Parsing.Token
+import Parsing.Cpt
 
 tokenToCptTests :: TestTree
 tokenToCptTests = testGroup "tokenToCpt tests" [
@@ -82,8 +50,6 @@ getCloseScopeTests = testGroup "getCloseScope Tests" [
 
 utilityFunctionsT :: TestTree
 utilityFunctionsT = testGroup "Utility Functions Tests" [
-    testCase "isNum with integer string" (assertBool [] (isNum "123")),
-    testCase "isNum with non-integer string" (assertBool [] (not $ isNum "abc")),
     testCase "getSymbol with symbol string" (assertEqual [] (Just "abc") (getSymbol $ Sym "abc")),
     testCase "getSymbol with non-symbol string" (assertEqual [] Nothing (getSymbol $ Val 123)),
     testCase "getInteger with integer value" (assertEqual [] (Just 123) (getInteger $ Val 123)),
@@ -93,10 +59,8 @@ utilityFunctionsT = testGroup "Utility Functions Tests" [
     ]
 
 -- Test suite list
-tokenSuite :: TestTree
-tokenSuite = testGroup "Parsing.Lang Test Suite" [
-        parseTokenTests,
-        tokenizeTests,
+cptSuite :: TestTree
+cptSuite = testGroup "Parsing.Cpt Test Suite" [
         tokenToCptTests,
         getCloseScopeTests,
         parseTokenListTests

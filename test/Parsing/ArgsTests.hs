@@ -1,4 +1,4 @@
-module ParseArgsTest where
+module Parsing.ArgsTests where
 
 import Parsing
 import Parsing.Args
@@ -12,9 +12,9 @@ parseArgsTest arr restest testName = testCase testName $ do
 
 argsSuite :: TestTree
 argsSuite = testGroup "Parsing.Args Test Suite" [
-        parseArgsTest ["binaryName", "", "", ""] (ParsedArgs False "") "No file",
-        parseArgsTest ["binaryName", "-h"] (ParsedArgs True "") "Only -h",
-        parseArgsTest ["binaryName", "test", "-h"] (ParsedArgs True "test") "File with -h",
+        parseArgsTest ["binaryName", "", ""] (ParsedArgs False "") "Empty Args",
         parseArgsTest ["binaryName"] (ParsedArgs False "") "No Args",
-        parseArgsTest ["binaryName", "filename"] (ParsedArgs False "filename") "Only filename"
+        parseArgsTest ["binaryName", "-h"] (ParsedArgs True "") "Only -h",
+        parseArgsTest ["binaryName", "filename"] (ParsedArgs False "filename") "Only filename",
+        parseArgsTest ["binaryName", "filename", "-h"] (ParsedArgs True "filename") "File with -h"
     ]

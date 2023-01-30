@@ -2,7 +2,8 @@ module Main where
 
 -- Our modules
 import Parsing
-import Parsing.Lang
+import Parsing.Token
+import Parsing.Cpt
 import Parsing.Args
 
 main :: IO ()
@@ -13,7 +14,7 @@ main = do
     -- For the time being since we don't know how to pass args with cabal
     -- we use tokenizeFile immediately
 
-    tokenizedcode <- tokenizeFile "./TestFiles/2"
+    tokenizedcode <- tokenizeFile "./TestFiles/sample1.scm"
 
     print tokenizedcode
     print (parseTokenList tokenizedcode)
