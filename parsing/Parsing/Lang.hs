@@ -60,7 +60,7 @@ tokenizeFile path = do
 data Cpt = Val Integer -- Using "Val" in order to avoid ambiguity check (yes it's ugly)
         | Sym String -- Symbol
         | List [Cpt] -- The list is sort of what an expression would be in other grammars
-        deriving (Show)
+        deriving (Show, Eq)
 
 -- The following functions all work on a piece of [Token]
 
@@ -117,6 +117,7 @@ getCloseScope' (_:xs) c1 c2 i = getCloseScope' xs c1 c2 (i + 1)
 -- Utility entry point function
 -- EXPECTS : First token in list to be OpenScope
 getCloseScope :: [Token] -> Int
+getCloseScope [] = 0
 getCloseScope (x:xs) = getCloseScope' xs 1 0 1 -- index starts at 1 since first element is skipped
 
 -- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
