@@ -11,7 +11,7 @@ parseArgsTest arr restest testName = testCase testName $ do
     restest @=? res
 
 argsSuite :: TestTree
-argsSuite = testGroup "Parser Args Test Suite" [
+argsSuite = testGroup "Parsing.Args Test Suite" [
         parseArgsTest ["binaryName", "", "", ""] (ParsedArgs False "") "No file",
         parseArgsTest ["binaryName", "-h"] (ParsedArgs True "") "Only -h",
         parseArgsTest ["binaryName", "test", "-h"] (ParsedArgs True "test") "File with -h",

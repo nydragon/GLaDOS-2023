@@ -94,7 +94,7 @@ utilityFunctionsT = testGroup "Utility Functions Tests" [
 
 -- Test suite list
 tokenSuite :: TestTree
-tokenSuite = testGroup "Tokenization Test Suite" [
+tokenSuite = testGroup "Parsing.Lang Test Suite" [
         parseTokenTests,
         tokenizeTests,
         tokenToCptTests,

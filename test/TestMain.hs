@@ -11,7 +11,7 @@ import Test.Tasty.HUnit
 main = defaultMain allTests
 
 allTests :: TestTree
-allTests = testGroup "Unit Tests" [
+allTests = testGroup "Glados Unit Tests" [
         tokenSuite,
         argsSuite
     ]
