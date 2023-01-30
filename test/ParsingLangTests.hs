@@ -3,7 +3,8 @@ module ParsingLangTests where
 import Test.Tasty
 import Test.Tasty.HUnit
 
-import Parsing.Lang
+import Parsing.Cpt
+import Parsing.Token
 
 parseTokenTests :: TestTree
 parseTokenTests = testGroup "parseToken tests"
@@ -82,8 +83,6 @@ getCloseScopeTests = testGroup "getCloseScope Tests" [
 
 utilityFunctionsT :: TestTree
 utilityFunctionsT = testGroup "Utility Functions Tests" [
-    testCase "isNum with integer string" (assertBool [] (isNum "123")),
-    testCase "isNum with non-integer string" (assertBool [] (not $ isNum "abc")),
     testCase "getSymbol with symbol string" (assertEqual [] (Just "abc") (getSymbol $ Sym "abc")),
     testCase "getSymbol with non-symbol string" (assertEqual [] Nothing (getSymbol $ Val 123)),
     testCase "getInteger with integer value" (assertEqual [] (Just 123) (getInteger $ Val 123)),

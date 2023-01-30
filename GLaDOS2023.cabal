@@ -24,7 +24,9 @@ extra-source-files:
 library
     exposed-modules:  Parsing,
         Parsing.Args,
-        Parsing.Lang
+        Parsing.Token,
+        Parsing.Ast,
+        Parsing.Cpt
     hs-source-dirs:   parsing
     build-depends:    base >= 4.14.1.0
     default-language: Haskell2010

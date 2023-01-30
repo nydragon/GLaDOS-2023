@@ -2,7 +2,8 @@ module Main where
 
 -- Our modules
 import Parsing
-import Parsing.Lang
+import Parsing.Token
+import Parsing.Cpt
 import Parsing.Args
 
 main :: IO ()
