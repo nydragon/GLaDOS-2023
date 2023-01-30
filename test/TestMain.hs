@@ -1,6 +1,6 @@
 import Data.List
 import TokenizationTest
-import ArgsTest
+import ParseArgsTest
 
 import Test.Tasty
 import Test.Tasty.Discover
