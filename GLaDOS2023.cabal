@@ -39,6 +39,7 @@ executable glados
         Parsing.AstTests,
         Parsing.ArgsTests,
         Parsing.TokenTests,
+        Exec
         Builtins
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
