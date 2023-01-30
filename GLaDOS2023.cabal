@@ -37,6 +37,8 @@ executable glados
     -- Modules included in this executable, other than Main.
     other-modules: CptTests,
         AstTests,
+        ArgsTests,
+        TokenTests,
         Builtins
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -50,6 +52,7 @@ test-suite test
     hs-source-dirs: test
     other-modules: CptTests,
         AstTests,
-        ParseArgsTest
+        ArgsTests,
+        TokenTests
     main-is: TestMain.hs
     build-depends: base >=4.14.1.0, tasty >= 1.4.3, tasty-discover >= 5.0.0, tasty-hunit >= 0.10.0.3, GLaDOS2023
