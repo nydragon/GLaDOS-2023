@@ -15,6 +15,6 @@ argsSuite = testGroup "Parsing.Args Test Suite" [
         parseArgsTest ["binaryName", "", ""] (ParsedArgs False "") "Empty Args",
         parseArgsTest ["binaryName"] (ParsedArgs False "") "No Args",
         parseArgsTest ["binaryName", "-h"] (ParsedArgs True "") "Only -h",
-        parseArgsTest ["binaryName", "filename"] (ParsedArgs False "filename") "Only filename"
-        parseArgsTest ["binaryName", "filename", "-h"] (ParsedArgs True "filename") "File with -h",
+        parseArgsTest ["binaryName", "filename"] (ParsedArgs False "filename") "Only filename",
+        parseArgsTest ["binaryName", "filename", "-h"] (ParsedArgs True "filename") "File with -h"
     ]
