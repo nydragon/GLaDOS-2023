@@ -13,5 +13,6 @@ parseArgsTest arr restest = testCase "test parse args" $ do
 argsSuite :: TestTree
 argsSuite = testGroup "Unit Tests" [
         parseArgsTest ["", "try", ""] (ParsedArgs False "try"),
-        parseArgsTest ["", "test", "-h"] (ParsedArgs True "test")
+        parseArgsTest ["", "test", "-h"] (ParsedArgs True "test"),
+        parseArgsTest [""] (ParsedArgs False "")
     ]
