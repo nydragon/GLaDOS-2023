@@ -12,8 +12,9 @@ parseArgsTest arr restest testName = testCase testName $ do
 
 argsSuite :: TestTree
 argsSuite = testGroup "Parser Args Test Suite" [
-        parseArgsTest ["", "try", ""] (ParsedArgs False "try") "Only file",
-        parseArgsTest ["", "-h"] (ParsedArgs True "") "Only -h",
-        parseArgsTest ["", "test", "-h"] (ParsedArgs True "test") "File with -h",
-        parseArgsTest [""] (ParsedArgs False "") "No Args"
+        parseArgsTest ["binaryName", "", "", ""] (ParsedArgs False "") "No file",
+        parseArgsTest ["binaryName", "-h"] (ParsedArgs True "") "Only -h",
+        parseArgsTest ["binaryName", "test", "-h"] (ParsedArgs True "test") "File with -h",
+        parseArgsTest ["binaryName"] (ParsedArgs False "") "No Args",
+        parseArgsTest ["binaryName", "filename"] (ParsedArgs False "filename") "Only filename"
     ]
