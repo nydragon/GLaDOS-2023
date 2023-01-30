@@ -35,10 +35,10 @@ executable glados
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.
-    other-modules: CptTests,
-        AstTests,
-        ArgsTests,
-        TokenTests,
+    other-modules: Parsing.CptTests,
+        Parsing.AstTests,
+        Parsing.ArgsTests,
+        Parsing.TokenTests,
         Builtins
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
