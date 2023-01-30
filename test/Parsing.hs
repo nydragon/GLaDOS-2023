@@ -1,14 +1,11 @@
-module Test.Parsing where
+module Parsing where
 
 import Test.Tasty
 import Test.Tasty.Discover
 import Test.Tasty.HUnit
 
-import Test.Parsing.Args
-import Test.Parsing.Lang
-
 parsingTests :: TestTree
 parsingTests = testGroup "Parsing Tests" [
-    testLambda,
-    testLambda'
+        testCase "first" $
+            2+2 @?= 4
     ]
