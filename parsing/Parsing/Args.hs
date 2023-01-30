@@ -8,7 +8,7 @@ import System.Exit
 data ParsedArgs = ParsedArgs {
     usage :: Bool,
     path :: String
-} deriving (Show)
+} deriving (Show, Eq)
 
 -- Args : Arg Array -> Counter -> Temp ParsedArgs -> Output
 parseArgs' :: [String] -> Int -> ParsedArgs -> IO ParsedArgs -- Maybe only seems necessary for do notation

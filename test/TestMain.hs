@@ -1,6 +1,6 @@
 import Data.List
-
 import TokenizationTest
+import ArgsTest
 
 import Test.Tasty
 import Test.Tasty.Discover
@@ -11,4 +11,7 @@ import Test.Tasty.HUnit
 main = defaultMain allTests
 
 allTests :: TestTree
-allTests = testGroup "Unit Tests" [tokenSuite]
+allTests = testGroup "Unit Tests" [
+        tokenSuite,
+        argsSuite
+    ]
