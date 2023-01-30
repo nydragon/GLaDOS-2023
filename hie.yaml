@@ -1,6 +1,6 @@
 cradle:
   cabal:
-    - path: "./parsing"
+    - path: "./lib"
       component: "lib:GLaDOS2023"
 
     - path: "./app/Main.hs"
