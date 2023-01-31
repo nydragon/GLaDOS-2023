@@ -5,7 +5,7 @@ import Test.Tasty.HUnit
 import qualified Data.Map as Map
 
 import qualified Parsing.Ast as Ast
-import Exec
+import Exec.Lookup
 
 -- Test data
 vars = (Map.empty, Map.empty)
