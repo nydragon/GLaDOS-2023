@@ -12,7 +12,9 @@ tokenToCptTests = testGroup "tokenToCpt tests" [
     testCase "Token CloseScope returns Nothing" (assertEqual [] Nothing (tokenToCpt CloseScope)),
     testCase "Token Num returns Just Val" (assertEqual [] (Just (Val 4)) (tokenToCpt (Num 4))),
     testCase "Token Negative Num returns Just Negative Val" (assertEqual [] (Just (Val (-4))) (tokenToCpt (Num (-4)))),
-    testCase "Token Keyword returns Just Sym" (assertEqual [] (Just (Sym "test")) (tokenToCpt (Keyword "test")))
+    testCase "Token Keyword returns Just Sym" (assertEqual [] (Just (Sym "test")) (tokenToCpt (Keyword "test"))),
+    testCase "Token Keyword #t returns Boolean True" (assertEqual [] (Just (Boolean True)) (tokenToCpt (Keyword "#t"))),
+    testCase "Token Keyword #f returns Boolean False" (assertEqual [] (Just (Boolean False)) (tokenToCpt (Keyword "#f")))
     ]
 
 parseTokenListTests :: TestTree

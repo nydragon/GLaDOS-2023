@@ -4,30 +4,30 @@ import Test.Tasty
 import Test.Tasty.HUnit
 
 import Parsing.Ast
-import Parsing.Cpt
+import qualified Parsing.Cpt as Cpt
 
 parseExprTests :: TestTree
 parseExprTests = testGroup "Tests for parseExpr and parseExprList functions" [
     testCase "Parse empty input list" $
         assertEqual "Lists are empty" (parseExprList []) [],
     testCase "Parse input list with single Val" $
-        parseExprList [Val 1] @?= [Num 1],
+        parseExprList [Cpt.Val 1] @?= [Num 1],
     testCase "Parse input list with single Sym" $
-        parseExprList [Sym "+"] @?= [Symbole "+"],
+        parseExprList [Cpt.Sym "+"] @?= [Symbole "+"],
     testCase "Parse input list with multiple elements" $
-        parseExprList [Sym "+", Val 1, Val 2] @?= [Symbole "+", Num 1, Num 2],
+        parseExprList [Cpt.Sym "+", Cpt.Val 1, Cpt.Val 2] @?= [Symbole "+", Num 1, Num 2],
     testCase "Parse input list with nested list" $
-        parseExprList [List [Sym "+", Val 1, Val 2]] @?= [ExprList [Symbole "+", Num 1, Num 2]],
+        parseExprList [Cpt.List [Cpt.Sym "+", Cpt.Val 1, Cpt.Val 2]] @?= [ExprList [Symbole "+", Num 1, Num 2]],
     testCase "Parse input list with nested list and multiple elements" $
-        parseExprList [Sym "+", Val 1, List [Sym "*", Val 2, Val 3]] @?= [Symbole "+", Num 1, ExprList [Symbole "*", Num 2, Num 3]],
+        parseExprList [Cpt.Sym "+", Cpt.Val 1, Cpt.List [Cpt.Sym "*", Cpt.Boolean True, Cpt.Val 3]] @?= [Symbole "+", Num 1, ExprList [Symbole "*", Boolean True, Num 3]],
     testCase "Parse input list using parseExpr with single Sym" $
-        parseExpr [Sym "+"] @?= ExprList [Symbole "+"],
+        parseExpr [Cpt.Sym "+"] @?= ExprList [Symbole "+"],
     testCase "Parse input list using parseExpr with multiple elements" $
-        parseExpr [Sym "+", Val 1, Val 2] @?= ExprList [Symbole "+", Num 1, Num 2],
+        parseExpr [Cpt.Sym "+", Cpt.Val 1, Cpt.Val 2] @?= ExprList [Symbole "+", Num 1, Num 2],
     testCase "Parse input list using parseExpr with nested list" $
-        parseExpr [List [Sym "+", Val 1, Val 2]] @?= ExprList [ExprList [Symbole "+", Num 1, Num 2]],
+        parseExpr [Cpt.List [Cpt.Sym "+", Cpt.Val 1, Cpt.Val 2]] @?= ExprList [ExprList [Symbole "+", Num 1, Num 2]],
     testCase "Parse input list using parseExpr with nested list and multiple elements" $
-        parseExpr [Sym "+", Val 1, List [Sym "*", Val 2, Val 3]] @?= ExprList [Symbole "+", Num 1, ExprList [Symbole "*", Num 2, Num 3]]
+        parseExpr [Cpt.Sym "+", Cpt.Val 1, Cpt.List [Cpt.Sym "*", Cpt.Val 2, Cpt.Val 3]] @?= ExprList [Symbole "+", Num 1, ExprList [Symbole "*", Num 2, Num 3]]
     ]
 
 exprListToCallTests :: TestTree

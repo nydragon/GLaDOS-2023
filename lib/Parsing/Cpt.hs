@@ -10,6 +10,7 @@ import Data.Maybe
 data Cpt = Val Integer -- Using "Val" in order to avoid ambiguity check (yes it's ugly)
         | Sym String -- Symbol
         | List [Cpt] -- The list is sort of what an expression would be in other grammars
+        | Boolean Bool
         deriving (Show, Eq)
 
 -- The following functions all work on a piece of [Token]
@@ -22,6 +23,8 @@ tokenToCpt OpenScope = Nothing
 tokenToCpt CloseScope = Nothing
 -- Main cases
 tokenToCpt (Num i) = Just (Val i)
+tokenToCpt (Keyword "#f") = Just (Boolean False)
+tokenToCpt (Keyword "#t") = Just (Boolean True)
 tokenToCpt (Keyword str) = Just (Sym str)
 
 -- Parses list in between parenthesis

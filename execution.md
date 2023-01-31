@@ -6,6 +6,7 @@ This document will serve the process of documenting thoughts regarding the execu
 
 - How to know when to execute lambda ?
 - Local scope variables ?
+- Should boolean literals be parsed by tokenization / cpt / ast ?
 
 ## Established
 

@@ -9,6 +9,8 @@ data Atom = Name String
     | Val Integer
     | Boolean Bool
 
+-- Function to parse a 
+
 -- Utility type synonyms
 type VarLookup = Map.Map String Atom -- Var name, var value
 type FuncLookup = Map.Map String Ast.Expr -- Function name, function body
