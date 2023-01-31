@@ -30,7 +30,10 @@ parseTokenListTests = testGroup "Tests for parseTokenList function" [
     testCase "Input list with multiple nested scopes and Keywords" $
         parseTokenList [OpenScope, Num 5, OpenScope, Keyword "add", Num 3, CloseScope, CloseScope] @?= [List [Val 5, List [Sym "add", Val 3]]],
     testCase "Input list with missing closing parenthesis" $
-        parseTokenList [OpenScope, Num 5, OpenScope, Num 3] @?= [List [Val 5, List [Val 3]]]
+        parseTokenList [OpenScope, Num 5, OpenScope, Num 3] @?= [List [Val 5, List [Val 3]]],
+    testCase "Two sublists" $
+        parseTokenList [OpenScope, Keyword "define", Keyword "x", Num 2, CloseScope, OpenScope, Keyword "+", Keyword "x", Num 3, CloseScope] @?=
+            [List [Sym "define",Sym "x",Val 2],List [Sym "+",Sym "x",Val 3]]
     ]
 
 -- Test cases for getCloseScope

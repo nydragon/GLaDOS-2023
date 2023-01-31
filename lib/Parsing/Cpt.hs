@@ -40,7 +40,7 @@ parseTokenList [] = []
 parseTokenList (CloseScope:xs) = [] -- Normally shouldn't happen
 parseTokenList (OpenScope:xs) = sublist : parseTokenList newList
         where   sublist = List (parseTokenList xs)
-                index = getCloseScope xs +2
+                index = getCloseScope xs + 1
                 -- +2 because it's index of CloseScope, and we want the element after
                 newList = [x | (x, i) <- zip xs [0..], i >= index] -- NEEDS MORE TESTING
                 -- newList = take (getCloseScope oldList + 2) oldList

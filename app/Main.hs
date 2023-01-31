@@ -18,8 +18,12 @@ main = do
     -- Tokenize
     tokenizedCode <- tokenizeFile "./TestFiles/sample1.scm"
 
+    print tokenizedCode
+
     -- Parse in cpt
     let cpt = parseTokenList(tokenizedCode)
+
+    print cpt
 
     -- Translate cpt to ast
     let ast = parseExprList cpt
