@@ -8,6 +8,7 @@ import qualified Parsing.Ast as Ast
 data Atom = Name String
     | Val Integer
     | Boolean Bool
+    deriving (Show, Eq)
 
 -- Function to parse a 
 
