@@ -1,15 +1,25 @@
 module Exec where
 
-import Parsing.Ast
+import qualified Data.Map as Map
 
--- ─── Function And Variable Structures ────────────────────────────────────────────────────────────
+import qualified Parsing.Ast as Ast
 
-type Func = (String, ExprList)
-type Variable = (String, Num)
+-- Data structure used in order to hold a value of a given type
+data Atom = Name String
+    | Val Integer
+    | Boolean Bool
 
--- ─── Function Lookup ─────────────────────────────────────────────────────────────────────────────
+-- Utility type synonyms
+type VarLookup = Map String Atom -- Var name, var value
+type FuncLookup = Map String ExprList -- Function name, function body
 
-lookupFunc 
+-- ─── Function And Var Lookup ─────────────────────────────────────────────────────────────────────
+
+lookupVar :: String -> VarLookup -> Maybe Atom
+lookupVar name variables = lookup name variables
+
+lookupFunc :: String -> FuncLookup -> Maybe ExprList
+lookupFunc name functions = lookup name functions
 
 -- ─── Main Function ───────────────────────────────────────────────────────────────────────────────
 
@@ -18,9 +28,9 @@ lookupFunc
 -- This function implements EXCEPTION HANDLING, hence the IO ()
 --
 -- Args : input ast -> Functions -> Variables
-run' :: [Ast] -> [[Func]] -> 
+run' :: [Ast.Ast] -> [[Func]] -> 
 
 -- Entry point function
-run :: [Ast] -> IO ()
+run :: [Ast.Ast] -> IO ()
 run [] = return ()
-run (Call sym ls : xs) = 
+run (Call sym ls : xs) = -- 
