@@ -12,7 +12,7 @@ data Atom = Name String
 -- Utility type synonyms
 type VarLookup = Map.Map String Atom -- Var name, var value
 type FuncLookup = Map.Map String Ast.Expr -- Function name, function body
-type Registry = (VarLookup, FuncLookup) -- The registry is just a tuple of two maps
+type Lookup = (VarLookup, FuncLookup) -- The Lookup is just a tuple of two maps
 
 -- ─── Function And Var Lookup ─────────────────────────────────────────────────────────────────────
 
@@ -26,12 +26,12 @@ lookupFunc :: String -> FuncLookup -> Maybe Ast.Expr
 lookupFunc = Map.lookup
 
 -- To check if name is already defined
-isNameDefined :: String -> Registry -> Bool
+isNameDefined :: String -> Lookup -> Bool
 isNameDefined name (vars, funcs) = Map.member name vars || Map.member name funcs
 
 -- Defines a variable
 -- Returns Nothing if name is already used
-defineVar :: String -> Atom -> Registry -> Maybe Registry
+defineVar :: String -> Atom -> Lookup -> Maybe Lookup
 defineVar name val (vars, funcs) = if isNameDefined name reg then Nothing else Just newReg
     where
         reg = (vars, funcs)
@@ -39,8 +39,8 @@ defineVar name val (vars, funcs) = if isNameDefined name reg then Nothing else J
 
 -- Defines a function
 -- Returns Nothing if name is alreadt used
--- Args: function name -> Function body -> Registry
-defineFunc :: String -> Ast.Expr -> Registry -> Maybe Registry
+-- Args: function name -> Function body -> Lookup
+defineFunc :: String -> Ast.Expr -> Lookup -> Maybe Lookup
 defineFunc name (Ast.ExprList ls) (vars, funcs) = if isNameDefined name reg then Nothing else Just newReg
     where
         reg = (vars, funcs)
