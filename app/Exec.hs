@@ -10,23 +10,24 @@ data Atom = Name String
     | Boolean Bool
 
 -- Utility type synonyms
-type VarLookup = Map String Atom -- Var name, var value
-type FuncLookup = Map String ExprList -- Function name, function body
+type VarLookup = Map.Map String Atom -- Var name, var value
+type FuncLookup = Map.Map String Ast.Expr -- Function name, function body
 type Registry = (VarLookup, FuncLookup) -- The registry is just a tuple of two maps
 
 -- ─── Function And Var Lookup ─────────────────────────────────────────────────────────────────────
 
 -- Get definitions
 lookupVar :: String -> VarLookup -> Maybe Atom
-lookupVar name variables = lookup name variables
+lookupVar = Map.lookup
 
 -- Get definitions
-lookupFunc :: String -> FuncLookup -> Maybe ExprList
-lookupFunc name functions = lookup name functions
+-- Returns an ExprList representing body of function
+lookupFunc :: String -> FuncLookup -> Maybe Ast.Expr
+lookupFunc = Map.lookup
 
 -- To check if name is already defined
 isNameDefined :: String -> Registry -> Bool
-isNameDefined name (vars, funcs) = member name vars || member name funcs
+isNameDefined name (vars, funcs) = Map.member name vars || Map.member name funcs
 
 -- Defines a variable
 -- Returns Nothing if name is already used
@@ -34,27 +35,18 @@ defineVar :: String -> Atom -> Registry -> Maybe Registry
 defineVar name val (vars, funcs) = if isNameDefined name reg then Nothing else Just newReg
     where
         reg = (vars, funcs)
-        newReg = (insert name val vars, funcs)
+        newReg = (Map.insert name val vars, funcs)
 
 -- Defines a function
 -- Returns Nothing if name is alreadt used
-defineFunc :: String -> ExprList -> Registry -> Maybe Registry
-defineFunc name def (vars, funcs) = if isNameDefined name reg then Nothing else Just newReg
+-- Args: function name -> Function body -> Registry
+defineFunc :: String -> Ast.Expr -> Registry -> Maybe Registry
+defineFunc name (Ast.ExprList ls) (vars, funcs) = if isNameDefined name reg then Nothing else Just newReg
     where
         reg = (vars, funcs)
-        newReg = (vars, insert name def funcs)
+        def = Ast.ExprList ls
+        newReg = (vars, Map.insert name def funcs)
+defineFunc _ _ _ = Nothing -- Invalid function body (nor ExprList)
 
 
 -- ─── Main Function ───────────────────────────────────────────────────────────────────────────────
-
--- This is the main function used in order to evaluate an Aast
---
--- This function implements EXCEPTION HANDLING, hence the IO ()
---
--- Args : input ast -> Functions -> Variables
-run' :: [Ast.Ast] -> [[Func]] -> 
-
--- Entry point function
-run :: [Ast.Ast] -> IO ()
-run [] = return ()
-run (Call sym ls : xs) = -- 
