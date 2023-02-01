@@ -53,5 +53,6 @@ isValidBuiltin "add" = True
 isValidBuiltin "sub" = True
 isValidBuiltin "div" = True
 isValidBuiltin "mul" = True
+isValidBuiltin "println" = True
 isValidBuiltin "noop" = True -- Should be useful in the future, will return list of args
 isValidBuiltin _ = False

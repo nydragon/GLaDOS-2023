@@ -32,7 +32,6 @@ tokenToCpt (Keyword str) = Just (Sym str)
 --
 -- NOTE: Returns List even if no corresponding closing parenthesis is found
 --       this will potentially be an issue
--- NOTE: Will need way of parsing "initial" list (ie: list without parenthesis)
 --
 -- Args : Tokens -> Output
 parseTokenList :: [Token] -> [Cpt]

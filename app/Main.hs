@@ -6,6 +6,7 @@ import Parsing.Token
 import Parsing.Cpt
 import Parsing.Ast
 import Parsing.Args
+import Exec
 
 main :: IO ()
 main = do
@@ -16,12 +17,12 @@ main = do
     -- we use tokenizeFile immediately
 
     -- Tokenize
-    tokenizedCode <- tokenizeFile "./TestFiles/sample1.scm"
+    tokenizedCode <- tokenizeFile "./TestFiles/hello_world.scm"
 
     print tokenizedCode
 
     -- Parse in cpt
-    let cpt = parseTokenList(tokenizedCode)
+    let cpt = parseTokenList tokenizedCode
 
     print cpt
 
@@ -29,3 +30,7 @@ main = do
     let ast = parseExprList cpt
 
     print ast
+
+    run ast
+
+    return ()

@@ -14,6 +14,10 @@ type VarLookup = Map.Map String Atom -- Var name, var value
 type FuncLookup = Map.Map String Ast.Expr -- Function name, function body
 type Lookup = (VarLookup, FuncLookup) -- The Lookup is just a tuple of two maps
 
+-- Instantiate empty lookup struct
+emptyLookup :: Lookup
+emptyLookup = (Map.empty, Map.empty)
+
 -- ─── Function And Var Lookup ─────────────────────────────────────────────────────────────────────
 
 -- Get definitions
