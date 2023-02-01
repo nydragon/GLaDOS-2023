@@ -14,7 +14,7 @@ main = do
     -- For the time being since we don't know how to pass args with cabal
     -- we use tokenizeFile immediately
 
-    tokenizedcode <- tokenizeFile "./TestFiles/sample1.scm"
+    tokenizedcode <- tokenizeFile "./TestFolder/TestFiles/sample1.scm"
 
     print tokenizedcode
     print (parseTokenList tokenizedcode)
