@@ -4,11 +4,15 @@ import System.Console.GetOpt
 import System.IO ( hPutStrLn, stderr )
 import Data.Maybe (fromMaybe)
 
+
+-- to access: (key name) (var name)
+-- for example with Record called A we want to access field "file"
+-- let filename = file A
 data Options = Options {
-    file    :: Maybe FilePath,
-    help    :: Bool,
-    debug   :: Bool
-} deriving  Show
+    file  :: Maybe FilePath,
+    help  :: Bool,
+    debug :: Bool
+} deriving  (Show, Eq)
 
 defaultOptions :: Options
 defaultOptions = Options {
@@ -16,7 +20,6 @@ defaultOptions = Options {
     help       = False,
     debug      = False
 }
-
 
 options :: [OptDescr (Options -> Options)]
 options =
@@ -29,7 +32,7 @@ options =
 parse :: [String] -> IO (Options, [String])
 parse argv =
     case getOpt Permute options argv of
-        (o,n,[]  ) -> do
+        (o,n,[]) -> do
             if "-h" `elem` argv
                 then do 
                     hPutStrLn stderr (usageInfo header options)
