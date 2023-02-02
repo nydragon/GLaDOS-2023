@@ -8,20 +8,20 @@ import Data.Maybe (fromMaybe)
 -- to access: (key name) (var name)
 -- for example with Record called A we want to access field "file"
 -- let filename = file A
-data Options = Options {
+data Args = Args {
     file  :: Maybe FilePath,
     help  :: Bool,
     debug :: Bool
 } deriving  (Show, Eq)
 
-defaultOptions :: Options
-defaultOptions = Options {
+defaultOptions :: Args
+defaultOptions = Args {
     file       = Nothing,
     help       = False,
     debug      = False
 }
 
-options :: [OptDescr (Options -> Options)]
+options :: [OptDescr (Args -> Args)]
 options =
     [
         Option ['f'] ["file"]  (OptArg ((\ f opts -> opts { file = Just f }) . fromMaybe "stdin") "FILE") "The FILE that is to be executed.",
@@ -29,7 +29,7 @@ options =
         Option ['d'] ["debug"] (NoArg (\ opts -> opts { debug = True })) "Enter debug mode"
     ]
 
-parse :: [String] -> IO (Options, [String])
+parse :: [String] -> IO (Args, [String])
 parse argv =
     case getOpt Permute options argv of
         (o,n,[]) -> do
