@@ -6,31 +6,23 @@ import Parsing.Token
 import Parsing.Cpt
 import Parsing.Ast
 import Parsing.Args
-import Exec
+import System.Console.GetOpt
+
+import System.Environment
+import System.Exit
+import Data.Maybe (fromMaybe)
+
+getFileName :: [String] -> Maybe FilePath -> String
+getFileName [] b = fromMaybe "stdin" b
+getFileName (x:xs) b = x
 
 main :: IO ()
 main = do
-    -- Parse args
-    parsedArgs <- parseArgs
+    -- Parsing arguments
+    (res, fls) <- getArgs >>= parse
 
-    -- For the time being since we don't know how to pass args with cabal
-    -- we use tokenizeFile immediately
-
-    -- Tokenize
-    tokenizedCode <- tokenizeFile "./TestFiles/hello_world.scm"
-
-    print tokenizedCode
-
-    -- Parse in cpt
-    let cpt = parseTokenList tokenizedCode
-
-    print cpt
-
-    -- Translate cpt to ast
-    let ast = parseExprList cpt
-
-    print ast
-
-    run ast
-
-    return ()
+    let fileName = getFileName fls (file res)
+    print ("Execute file: " ++  fileName)
+    if (==) fileName "stdin"
+        then exitSuccess -- interactive
+        else exitSuccess -- normal
