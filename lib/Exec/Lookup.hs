@@ -9,10 +9,19 @@ data Atom = Name String
     | Boolean Bool
     deriving (Show, Eq)
 
+
 -- Utility type synonyms
-type VarLookup = Map.Map String Atom -- Var name, var value
-type FuncLookup = Map.Map String Ast.Expr -- Function name, function body
-type Lookup = (VarLookup, FuncLookup) -- The Lookup is just a tuple of two maps
+
+-- Represents a function
+-- Contains: Args List [String], and definition ExprList
+type Function = ([String], Ast.Expr)
+
+-- Variable registry
+type VarLookup = Map.Map String Atom
+-- Function registry
+type FuncLookup = Map.Map String Function
+
+type Lookup = (VarLookup, FuncLookup)
 
 -- Instantiate empty lookup struct
 emptyLookup :: Lookup
@@ -26,7 +35,7 @@ lookupVar = Map.lookup
 
 -- Get definitions
 -- Returns an ExprList representing body of function
-lookupFunc :: String -> FuncLookup -> Maybe Ast.Expr
+lookupFunc :: String -> FuncLookup -> Maybe Function
 lookupFunc = Map.lookup
 
 -- To check if name is already defined
@@ -43,11 +52,11 @@ defineVar name val (vars, funcs) = if isNameDefined name reg then Nothing else J
 
 -- Defines a function
 -- Returns Nothing if name is alreadt used
--- Args: function name -> Function body -> Lookup
-defineFunc :: String -> Ast.Expr -> Lookup -> Maybe Lookup
-defineFunc name (Ast.ExprList ls) (vars, funcs) = if isNameDefined name reg then Nothing else Just newReg
+-- Args: function name -> Function args -> Function body -> Lookup
+defineFunc :: String -> [String] -> Ast.Expr -> Lookup -> Maybe Lookup
+defineFunc name args (Ast.ExprList ls) (vars, funcs) = if isNameDefined name reg then Nothing else Just newReg
     where
         reg = (vars, funcs)
         def = Ast.ExprList ls
-        newReg = (vars, Map.insert name def funcs)
-defineFunc _ _ _ = Nothing -- Invalid function body (nor ExprList)
+        newReg = (vars, Map.insert name (args, def) funcs)
+defineFunc _ _ _ _ = Nothing -- Invalid function body (nor ExprList)
