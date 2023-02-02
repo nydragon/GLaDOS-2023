@@ -1,9 +1,8 @@
-
 all: clean
 	@cabal run glados -- $(ARGS)
 
 test: clean
-	@cabal run test
+	@cabal test --test-show-details=direct
 
 clean:
 	@rm -f *.tix;
