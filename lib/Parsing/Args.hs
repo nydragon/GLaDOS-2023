@@ -1,30 +1,41 @@
 module Parsing.Args where
+import System.Exit ( exitSuccess )
+import System.Console.GetOpt
+import System.IO ( hPutStrLn, stderr )
+import Data.Maybe (fromMaybe)
 
-import System.Environment
-import System.Exit
+data Options = Options {
+    file    :: Maybe FilePath,
+    help    :: Bool,
+    debug   :: Bool
+} deriving  Show
 
--- ParsedArgs structure
--- Boolean true if flag found
-data ParsedArgs = ParsedArgs {
-    usage :: Bool,
-    path :: String
-} deriving (Show, Eq)
+defaultOptions :: Options
+defaultOptions = Options {
+    file       = Nothing,
+    help       = False,
+    debug      = False
+}
 
--- Args : Arg Array -> Counter -> Temp ParsedArgs -> Output
-parseArgs' :: [String] -> Int -> ParsedArgs -> IO ParsedArgs -- Maybe only seems necessary for do notation
 
--- Positional args
-parseArgs' (x:xs) 0 args = parseArgs' xs 1 args
-parseArgs' ("-h":xs) c args = parseArgs' xs (c + 1) (args { usage = True })
-parseArgs' (x:xs) 1 args = parseArgs' xs 2 (args { path = x })
-parseArgs' _ 2 args = return args -- max args
--- Flags go here
-parseArgs' (x:xs) c args = parseArgs' xs (c + 1) args
--- End condition
-parseArgs' [] _ args = return args
+options :: [OptDescr (Options -> Options)]
+options =
+    [
+        Option ['f'] ["file"]  (OptArg ((\ f opts -> opts { file = Just f }) . fromMaybe "stdin") "FILE") "The FILE that is to be executed.",
+        Option ['h'] ["help"] (NoArg (\ opts -> opts { help = True })) "Display this message.",
+        Option ['d'] ["debug"] (NoArg (\ opts -> opts { debug = True })) "Enter debug mode"
+    ]
 
--- Utility entry point function
---
--- Returns parsed file path
-parseArgs :: IO ParsedArgs
-parseArgs = getArgs >>= (\args -> parseArgs' args 0 (ParsedArgs False "")) -- skip binary name
+parse :: [String] -> IO (Options, [String])
+parse argv =
+    case getOpt Permute options argv of
+        (o,n,[]  ) -> do
+            if "-h" `elem` argv
+                then do 
+                    hPutStrLn stderr (usageInfo header options)
+                    exitSuccess
+                else
+                    return (foldl (flip id) defaultOptions o, n)
+        (_,_,errs) -> ioError (userError (concat errs ++ usageInfo header options))
+    where header = "Usage: glados [...options] < file.scm"
+
