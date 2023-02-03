@@ -75,9 +75,9 @@ getTypeName :: Typeable a => a -> String
 getTypeName = show . typeOf
 
 -- Returns boolean if Expr is atomic. This means it cannot be further reduced.
+-- Note: Sym is not atomic as it needs to be reduced to a value
 isAtomic :: Ast.Expr -> Bool
 isAtomic (Ast.Num _) = True
 isAtomic (Ast.Boolean _) = True
-isAtomic (Ast.Symbole _) = True -- Not sure about this one
 isAtomic Ast.Null = True
 isAtomic _ = False
