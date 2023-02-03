@@ -33,7 +33,7 @@ printBuiltin ls reg = print (head ls) >> return output
 
 divBuiltin :: [Ast.Expr] -> Lookup -> IO RetVal
 divBuiltin (Ast.Num a : Ast.Num b : _) reg = if b == 0 then throwIO NullDivision else return output
-    where   output = RetVal reg (Just  $ Val (div a b))
+    where   output = RetVal reg (Just  $ Ast.Num (div a b))
 divBuiltin (Ast.Num a : x : xs) _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName x)
 
 modulo :: Integer -> Integer -> Either Integer String

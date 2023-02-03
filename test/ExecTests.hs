@@ -9,15 +9,15 @@ import Exec.Lookup
 
 -- Test data
 vars = (Map.empty, Map.empty)
-newVar = (Map.fromList [("x", Val 1)], Map.empty)
+newVar = (Map.fromList [("x", Ast.Num 1)], Map.empty)
 
 testLookupVar :: TestTree
 testLookupVar = testGroup "Test lookupVar"
     [
         testCase "Returns the value of a defined variable" $
-            (lookupVar "x" $ Map.fromList [("x", Val 3)]) @?= (Just $ Val 3),
+            (lookupVar "x" $ Map.fromList [("x", Ast.Num 3)]) @?= (Just $ Ast.Num 3),
         testCase "Returns Nothing if variable is not defined" $
-            (lookupVar "y" $ Map.fromList [("x", Val 3)]) @?= Nothing
+            (lookupVar "y" $ Map.fromList [("x", Ast.Num 3)]) @?= Nothing
     ]
 
 -- Note : Will need to add tests to avoid passing integers as function names
@@ -38,11 +38,11 @@ testIsNameDefined :: TestTree
 testIsNameDefined = testGroup "Test isNameDefined"
     [
         testCase "Returns True if name is defined as a variable" $
-            isNameDefined "x" (Map.fromList [("x", Val 3)], Map.empty) @?= True,
+            isNameDefined "x" (Map.fromList [("x", Ast.Num 3)], Map.empty) @?= True,
         testCase "Returns True if name is defined as a function" $
             isNameDefined "add" input1 @?= True,
         testCase "Returns False if name is not defined" $
-            isNameDefined "y" (Map.fromList [("x", Val 3)], Map.empty) @?= False
+            isNameDefined "y" (Map.fromList [("x", Ast.Num 3)], Map.empty) @?= False
     ]
         where   input1 = (Map.empty, Map.fromList [("add", (["1", "2"], Ast.ExprList [Ast.Symbole "+", Ast.Num 1, Ast.Num 2]))])
 
@@ -50,9 +50,9 @@ testIsNameDefined = testGroup "Test isNameDefined"
 testDefineVar :: TestTree
 testDefineVar = testGroup "defineVar tests"
   [ testCase "Should return Nothing if name already exists" $
-      Nothing @=? defineVar "x" (Val 1) newVar
+      Nothing @=? defineVar "x" (Ast.Num 1) newVar
   , testCase "Should add variable if name doesn't exist" $
-      Just newVar @=? defineVar "x" (Val 1) vars
+      Just newVar @=? defineVar "x" (Ast.Num 1) vars
   ]
 
 -- Tests for defineFunc

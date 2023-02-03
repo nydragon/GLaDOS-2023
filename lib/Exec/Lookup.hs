@@ -5,12 +5,6 @@ import Data.Typeable
 
 import qualified Parsing.Ast as Ast
 
--- Data structure used in order to hold a value of a given type
-data Atom = Name String
-    | Val Integer
-    | Boolean Bool
-    deriving (Show, Eq)
-
 -- Utility type synonyms
 
 -- Represents a function
@@ -18,14 +12,14 @@ data Atom = Name String
 type Function = ([String], Ast.Expr)
 
 -- Variable registry
-type VarLookup = Map.Map String Atom
+type VarLookup = Map.Map String Ast.Expr
 -- Function registry
 type FuncLookup = Map.Map String Function
 
 type Lookup = (VarLookup, FuncLookup)
 
 -- Data structure used as main function return type
-data RetVal = RetVal Lookup (Maybe Atom)
+data RetVal = RetVal Lookup (Maybe Ast.Expr)
 
 -- Instantiate empty lookup struct
 emptyLookup :: Lookup
@@ -34,7 +28,7 @@ emptyLookup = (Map.empty, Map.empty)
 -- ─── Function And Var Lookup ─────────────────────────────────────────────────────────────────────
 
 -- Get definitions
-lookupVar :: String -> VarLookup -> Maybe Atom
+lookupVar :: String -> VarLookup -> Maybe Ast.Expr
 lookupVar = Map.lookup
 
 -- Get definitions
@@ -48,7 +42,7 @@ isNameDefined name (vars, funcs) = Map.member name vars || Map.member name funcs
 
 -- Defines a variable
 -- Returns Nothing if name is already used
-defineVar :: String -> Atom -> Lookup -> Maybe Lookup
+defineVar :: String -> Ast.Expr -> Lookup -> Maybe Lookup
 defineVar name val (vars, funcs) = if isNameDefined name reg then Nothing else Just newReg
     where
         reg = (vars, funcs)
