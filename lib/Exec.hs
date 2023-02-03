@@ -17,6 +17,11 @@ execFunc (Ast.Call func ls) reg
     | otherwise = throwIO NotYetImplemented
     where   call = Ast.Call func ls
 
+-- Evaluate expression
+-- Returns result of expression
+-- Can be used for function calls, atoms, lists
+
+
 -- ─── Main Function ───────────────────────────────────────────────────────────────────────────────
 
 -- Runs a given list of expressions

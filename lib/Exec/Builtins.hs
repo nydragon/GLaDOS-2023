@@ -5,6 +5,14 @@ import qualified Parsing.Ast as Ast
 import Control.Exception (throwIO)
 import Exec.RuntimeException
 
+-- Function declarations should use the same prototype :
+-- [Ast.Expr] -> Lookup -> IO RetVal
+--
+-- The first list is a list of all arguments
+-- Lookup is the registry
+--
+-- Returns RetVal
+
 -- ─── Builtin Execution ───────────────────────────────────────────────────────────────────────────
 
 -- Executes an Expr.Call that has been confirmed to be a builtin function
@@ -18,12 +26,14 @@ execBuiltin _ _ = throwIO UndefinedBehaviour -- Builtin not found
 
 -- ─── Builtin Implementations ─────────────────────────────────────────────────────────────────────
 
-printBuiltin :: [Ast.Expr] -> Lookup -> IO Lookup
-printBuiltin ls reg = print (head ls) >> return reg
+printBuiltin :: [Ast.Expr] -> Lookup -> IO RetVal
+printBuiltin ls reg = print (head ls) >> return output
+    where   output = RetVal reg Nothing
 
-division :: Integer -> Integer -> Either Integer String
-division a 0 = Right "ZeroDivisionError"
-division a b = Left (div a b)
+div :: [Ast.Expr] -> Lookup -> IO RetVal
+div (Ast.Num a : Ast.Num b : _) reg = if b == 0 then throwIO NullDivision else return output
+    where   output = RetVal reg (Just  $ Val (a / b))
+div (Ast.Num a : x : xs) _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName x)
 
 modulo :: Integer -> Integer -> Either Integer String
 modulo a 0 = Right "ZeroDivisionError"

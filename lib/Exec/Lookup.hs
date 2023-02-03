@@ -1,6 +1,8 @@
 module Exec.Lookup where
 
 import qualified Data.Map as Map
+import Data.Typeable
+
 import qualified Parsing.Ast as Ast
 
 -- Data structure used in order to hold a value of a given type
@@ -8,7 +10,6 @@ data Atom = Name String
     | Val Integer
     | Boolean Bool
     deriving (Show, Eq)
-
 
 -- Utility type synonyms
 
@@ -22,6 +23,9 @@ type VarLookup = Map.Map String Atom
 type FuncLookup = Map.Map String Function
 
 type Lookup = (VarLookup, FuncLookup)
+
+-- Data structure used as main function return type
+data RetVal = RetVal Lookup (Maybe Atom)
 
 -- Instantiate empty lookup struct
 emptyLookup :: Lookup
@@ -67,3 +71,9 @@ defineFunc name args (Ast.ExprList ls) (vars, funcs) = if isNameDefined name reg
         def = Ast.ExprList ls
         newReg = (vars, Map.insert name (args, def) funcs)
 defineFunc _ _ _ _ = Nothing -- Invalid function body (nor ExprList)
+
+-- ─── Utility ─────────────────────────────────────────────────────────────────────────────────────
+
+-- Get string representation of type name
+getTypeName :: Typeable a => a -> String
+getTypeName = show . typeOf
