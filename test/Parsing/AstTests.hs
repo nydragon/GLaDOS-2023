@@ -13,31 +13,33 @@ variedList = [Cpt.Sym "test", Cpt.Val 1, Cpt.Val 2]
 singleCall = [Cpt.List [Cpt.Sym "+", Cpt.Val 1, Cpt.Val 2]]
 
 -- Note: We don't care that these are invalid arguments at this stage of testing
-listWithCall = [Cpt.Sym "+", Cpt.Val 1, Cpt.List [Cpt.Sym "*", Cpt.Boolean True, Cpt.Val 3]]
+listWithCall = [Cpt.Sym "+", Cpt.Val 1, Cpt.List [Cpt.Sym "*", Cpt.Boolean True, Cpt.Val 3]] -- is this valid
 nestedList = [Cpt.List [Cpt.Sym "test", Cpt.Val 1, Cpt.Val 2]]
+nestedCall = [Cpt.List [Cpt.Sym "test", Cpt.List [Cpt.Sym "+", Cpt.Val 1, Cpt.Val 2]]]
 
 -- Assertion values
 -- (What we test against)
 singleValAssert = [Num 1]
 singleSymAssert = [Symbole "test"]
-variedListAssert = [Symbole "+", Num 1, Num 2]
+variedListAssert = [Symbole "test", Num 1, Num 2]
 singleCallAssert = [Call "+" [Num 1, Num 2]]
-listWithCallAssert = [Symbole "+", Num 1, ExprList [Symbole "*", Boolean True, Num 3]]
+listWithCallAssert = [Symbole "+",Num 1,Call "*" [Boolean True,Num 3]]
 nestedListAssert = ExprList [ExprList [Symbole "test", Num 1, Num 2]]
+nestedCallAssert = ExprList [ExprList [Symbole "test", Call "+" [Num 1, Num 2]]]
 
 parseExprListTests :: TestTree
 parseExprListTests = testGroup "Tests for parseExprList" [
-    testCase "Parse empty input list" $
+    testCase "Parse empty expr list" $
         assertEqual "Lists are empty" (parseExprList []) [],
-    testCase "Parse input list with single Val" $
+    testCase "Parse expr list with single Val" $
         parseExprList singleVal @?= singleValAssert,
-    testCase "Parse input list with single Sym" $
+    testCase "Parse expr list with single Sym" $
         parseExprList singleSym @?= singleSymAssert,
-    testCase "Parse input list with multiple atom elements" $
+    testCase "Parse expr list with multiple atom elements" $
         parseExprList variedList @?= variedListAssert,
-    testCase "Parse input list with single funtion call" $
+    testCase "Parse expr list with single funtion call" $
         parseExprList singleCall @?= singleCallAssert,
-    testCase "Parse input list with nested list and multiple elements" $
+    testCase "Parse expr list with nested call and multiple elements" $
         parseExprList listWithCall @?= listWithCallAssert
     ]
 
@@ -50,7 +52,7 @@ parseExprTests = testGroup "Tests for parseExpr" [
     testCase "Parse input list with nested list" $
         parseExpr nestedList @?= nestedListAssert,
     testCase "Parse input list with nested call" $
-        parseExpr listWithCall @?= ExprList listWithCallAssert
+        parseExpr nestedCall @?= nestedCallAssert
     ]
 
 exprListToCallTests :: TestTree
