@@ -49,10 +49,10 @@ exprListToCall _ = Nothing
 isValidBuiltin :: String -> Bool
 isValidBuiltin "define" = True
 isValidBuiltin "lambda" = True
-isValidBuiltin "add" = True
-isValidBuiltin "sub" = True
-isValidBuiltin "div" = True
-isValidBuiltin "mul" = True
+isValidBuiltin "+" = True
+isValidBuiltin "-" = True
+isValidBuiltin "/" = True
+isValidBuiltin "*" = True
 isValidBuiltin "println" = True
 isValidBuiltin "noop" = True -- Should be useful in the future, will return list of args
 isValidBuiltin _ = False

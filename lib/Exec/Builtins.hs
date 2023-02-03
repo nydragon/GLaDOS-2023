@@ -21,6 +21,7 @@ import Exec.RuntimeException
 execBuiltin :: Ast.Expr -> Lookup -> IO RetVal
 execBuiltin (Ast.Call func ls) reg = case func of
     "println" -> printBuiltin ls reg
+    "/" -> divBuiltin ls reg
     _ -> throwIO NotYetImplemented
 execBuiltin _ _ = throwIO UndefinedBehaviour -- Builtin not found
 
@@ -30,10 +31,10 @@ printBuiltin :: [Ast.Expr] -> Lookup -> IO RetVal
 printBuiltin ls reg = print (head ls) >> return output
     where   output = RetVal reg Nothing
 
-div :: [Ast.Expr] -> Lookup -> IO RetVal
-div (Ast.Num a : Ast.Num b : _) reg = if b == 0 then throwIO NullDivision else return output
-    where   output = RetVal reg (Just  $ Val (a / b))
-div (Ast.Num a : x : xs) _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName x)
+divBuiltin :: [Ast.Expr] -> Lookup -> IO RetVal
+divBuiltin (Ast.Num a : Ast.Num b : _) reg = if b == 0 then throwIO NullDivision else return output
+    where   output = RetVal reg (Just  $ Val (div a b))
+divBuiltin (Ast.Num a : x : xs) _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName x)
 
 modulo :: Integer -> Integer -> Either Integer String
 modulo a 0 = Right "ZeroDivisionError"
