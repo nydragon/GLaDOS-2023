@@ -12,7 +12,9 @@ tokenToCptTests = testGroup "tokenToCpt tests" [
     testCase "Token CloseScope returns Nothing" (assertEqual [] Nothing (tokenToCpt CloseScope)),
     testCase "Token Num returns Just Val" (assertEqual [] (Just (Val 4)) (tokenToCpt (Num 4))),
     testCase "Token Negative Num returns Just Negative Val" (assertEqual [] (Just (Val (-4))) (tokenToCpt (Num (-4)))),
-    testCase "Token Keyword returns Just Sym" (assertEqual [] (Just (Sym "test")) (tokenToCpt (Keyword "test")))
+    testCase "Token Keyword returns Just Sym" (assertEqual [] (Just (Sym "test")) (tokenToCpt (Keyword "test"))),
+    testCase "Token Keyword #t returns Boolean True" (assertEqual [] (Just (Boolean True)) (tokenToCpt (Keyword "#t"))),
+    testCase "Token Keyword #f returns Boolean False" (assertEqual [] (Just (Boolean False)) (tokenToCpt (Keyword "#f")))
     ]
 
 parseTokenListTests :: TestTree
@@ -28,7 +30,10 @@ parseTokenListTests = testGroup "Tests for parseTokenList function" [
     testCase "Input list with multiple nested scopes and Keywords" $
         parseTokenList [OpenScope, Num 5, OpenScope, Keyword "add", Num 3, CloseScope, CloseScope] @?= [List [Val 5, List [Sym "add", Val 3]]],
     testCase "Input list with missing closing parenthesis" $
-        parseTokenList [OpenScope, Num 5, OpenScope, Num 3] @?= [List [Val 5, List [Val 3]]]
+        parseTokenList [OpenScope, Num 5, OpenScope, Num 3] @?= [List [Val 5, List [Val 3]]],
+    testCase "Two sublists" $
+        parseTokenList [OpenScope, Keyword "define", Keyword "x", Num 2, CloseScope, OpenScope, Keyword "+", Keyword "x", Num 3, CloseScope] @?=
+            [List [Sym "define",Sym "x",Val 2],List [Sym "+",Sym "x",Val 3]]
     ]
 
 -- Test cases for getCloseScope

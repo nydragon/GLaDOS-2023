@@ -29,3 +29,9 @@ In order to see coloured output and no coverage when running the tests, please r
 ```
 cabal run test
 ```
+
+# Bonus ideas :
+
+- Fully featured REPL
+- Exception stack tracing
+- Exception line tracing

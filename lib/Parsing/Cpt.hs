@@ -10,6 +10,7 @@ import Data.Maybe
 data Cpt = Val Integer -- Using "Val" in order to avoid ambiguity check (yes it's ugly)
         | Sym String -- Symbol
         | List [Cpt] -- The list is sort of what an expression would be in other grammars
+        | Boolean Bool
         deriving (Show, Eq)
 
 -- The following functions all work on a piece of [Token]
@@ -22,6 +23,8 @@ tokenToCpt OpenScope = Nothing
 tokenToCpt CloseScope = Nothing
 -- Main cases
 tokenToCpt (Num i) = Just (Val i)
+tokenToCpt (Keyword "#f") = Just (Boolean False)
+tokenToCpt (Keyword "#t") = Just (Boolean True)
 tokenToCpt (Keyword str) = Just (Sym str)
 
 -- Parses list in between parenthesis
@@ -29,7 +32,6 @@ tokenToCpt (Keyword str) = Just (Sym str)
 --
 -- NOTE: Returns List even if no corresponding closing parenthesis is found
 --       this will potentially be an issue
--- NOTE: Will need way of parsing "initial" list (ie: list without parenthesis)
 --
 -- Args : Tokens -> Output
 parseTokenList :: [Token] -> [Cpt]
@@ -37,7 +39,7 @@ parseTokenList [] = []
 parseTokenList (CloseScope:xs) = [] -- Normally shouldn't happen
 parseTokenList (OpenScope:xs) = sublist : parseTokenList newList
         where   sublist = List (parseTokenList xs)
-                index = getCloseScope xs +2
+                index = getCloseScope xs + 1
                 -- +2 because it's index of CloseScope, and we want the element after
                 newList = [x | (x, i) <- zip xs [0..], i >= index] -- NEEDS MORE TESTING
                 -- newList = take (getCloseScope oldList + 2) oldList

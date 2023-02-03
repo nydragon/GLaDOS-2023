@@ -26,9 +26,13 @@ library
         Parsing.Args,
         Parsing.Token,
         Parsing.Ast,
-        Parsing.Cpt
+        Parsing.Cpt,
+        Exec,
+        Exec.RuntimeException,
+        Exec.Lookup,
+        Exec.Builtins
     hs-source-dirs:   lib
-    build-depends:    base >= 4.14.1.0
+    build-depends:    base >= 4.14.1.0, containers
     default-language: Haskell2010
 
 executable glados
@@ -39,10 +43,10 @@ executable glados
         Parsing.AstTests,
         Parsing.ArgsTests,
         Parsing.TokenTests,
-        Builtins
+        ExecTests
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
-    build-depends:    base  >= 4.14.1.0, tasty >= 1.4.3, tasty-discover >= 5.0.0, tasty-hunit >= 0.10.0.3, GLaDOS2023
+    build-depends:    base  >= 4.14.1.0, tasty >= 1.4.3, tasty-discover >= 5.0.0, tasty-hunit >= 0.10.0.3, containers, GLaDOS2023
     hs-source-dirs:   app test
     default-language: Haskell2010
 
@@ -53,8 +57,9 @@ test-suite test
     other-modules: Parsing.ArgsTests,
         Parsing.TokenTests,
         Parsing.CptTests,
-        Parsing.AstTests
-        ParsingTests
+        Parsing.AstTests,
+        ParsingTests,
+        ExecTests
 
     main-is: TestMain.hs
-    build-depends: base >=4.14.1.0, tasty >= 1.4.3, tasty-discover >= 5.0.0, tasty-hunit >= 0.10.0.3, GLaDOS2023
+    build-depends: base >=4.14.1.0, tasty >= 1.4.3, tasty-discover >= 5.0.0, tasty-hunit >= 0.10.0.3, GLaDOS2023, containers

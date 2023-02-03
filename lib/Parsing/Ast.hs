@@ -1,11 +1,12 @@
 module Parsing.Ast where
 
-import Parsing.Cpt
+import qualified Parsing.Cpt as Cpt
 
 -- ─── Abstract Syntaxe Tree ───────────────────────────────────────────────────────────────────────
 
 data Expr = ExprList [Expr]
     | Num Integer
+    | Boolean Bool
     | Symbole String
     | Call String [Expr] -- Will also be used for the boolean expression
     deriving (Eq, Show)
@@ -13,17 +14,19 @@ data Expr = ExprList [Expr]
 -- This function parses lists of expressions, ignoring function calls
 -- AT LEAST at first level
 -- This means it will only parse function calls in sublists thanks to parseExpr
-parseExprList :: [Cpt] -> [Expr]
+parseExprList :: [Cpt.Cpt] -> [Expr]
 parseExprList [] = []
 parseExprList (x : xs) = case x of
-    Sym str -> Symbole str : parseExprList xs
-    Val i -> Num i : parseExprList xs
-    List ls -> parseExpr ls : parseExprList xs
+    Cpt.Sym str -> Symbole str : parseExprList xs
+    Cpt.Val i -> Num i : parseExprList xs
+    Cpt.List ls -> parseExpr ls : parseExprList xs
+    Cpt.Boolean b -> Boolean b : parseExprList xs
 
--- Parses a CPT into a single Expr value
-parseExpr :: [Cpt] -> Expr
-parseExpr (Sym str : xs) = if isValidBuiltin str then
-    Call str (parseExprList xs) else ExprList (parseExprList (Sym str : xs))
+-- Parses a CPT list into a single Expr value
+parseExpr :: [Cpt.Cpt] -> Expr
+parseExpr (Cpt.Sym str : xs) = if isValidBuiltin str then
+    Call str (parseExprList xs) else ExprList (parseExprList original)
+    where original = Cpt.Sym str : xs
 parseExpr ls = ExprList (parseExprList ls)
 
 -- Utility function for execution
@@ -46,9 +49,10 @@ exprListToCall _ = Nothing
 isValidBuiltin :: String -> Bool
 isValidBuiltin "define" = True
 isValidBuiltin "lambda" = True
-isValidBuiltin "add" = True
-isValidBuiltin "sub" = True
-isValidBuiltin "div" = True
-isValidBuiltin "mul" = True
-isValidBuiltin "noop" = True
+isValidBuiltin "+" = True
+isValidBuiltin "-" = True
+isValidBuiltin "/" = True
+isValidBuiltin "*" = True
+isValidBuiltin "println" = True
+isValidBuiltin "noop" = True -- Should be useful in the future, will return list of args
 isValidBuiltin _ = False
