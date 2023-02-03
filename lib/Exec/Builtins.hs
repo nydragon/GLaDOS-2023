@@ -18,10 +18,10 @@ import Exec.RuntimeException
 -- Executes an Expr.Call that has been confirmed to be a builtin function
 --
 -- args : Expr.Call -> Lookup
-execBuiltin :: Ast.Expr -> Lookup -> IO Lookup
+execBuiltin :: Ast.Expr -> Lookup -> IO RetVal
 execBuiltin (Ast.Call func ls) reg = case func of
     "println" -> printBuiltin ls reg
-    _ -> return reg
+    _ -> throwIO NotYetImplemented
 execBuiltin _ _ = throwIO UndefinedBehaviour -- Builtin not found
 
 -- ─── Builtin Implementations ─────────────────────────────────────────────────────────────────────

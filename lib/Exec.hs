@@ -11,10 +11,10 @@ import Exec.Builtins
 
 -- Executes a given function
 -- Args : Expr.Call -> Lookup
-execFunc :: Ast.Expr -> Lookup -> IO Lookup
+execFunc :: Ast.Expr -> Lookup -> IO RetVal
 execFunc (Ast.Call func ls) reg
-    | Ast.isValidBuiltin func = execBuiltin call reg
-    | otherwise = throwIO NotYetImplemented
+    | Ast.isValidBuiltin func = execBuiltin call reg    -- if Builtin
+    | otherwise = throwIO NotYetImplemented             -- else
     where   call = Ast.Call func ls
 
 -- Evaluate expression
