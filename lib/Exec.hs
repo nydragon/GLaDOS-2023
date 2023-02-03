@@ -21,6 +21,7 @@ execFunc (Ast.Call func ls) reg
 
 -- Runs a given list of expressions
 --
+-- Args : List of expressions (expected to be functions) -> Lookup
 -- Expects all base expressions to be valid function calls
 run' :: [Ast.Expr] -> Lookup -> IO Lookup
 run' [] reg = return reg -- Returns lookup

@@ -10,7 +10,6 @@ import Exec.Lookup
 -- Test data
 vars = (Map.empty, Map.empty)
 newVar = (Map.fromList [("x", Val 1)], Map.empty)
-newFunc = (Map.empty, Map.fromList [("f", Ast.ExprList [Ast.Num 1])])
 
 testLookupVar :: TestTree
 testLookupVar = testGroup "Test lookupVar"
@@ -21,27 +20,31 @@ testLookupVar = testGroup "Test lookupVar"
             (lookupVar "y" $ Map.fromList [("x", Val 3)]) @?= Nothing
     ]
 
+-- Note : Will need to add tests to avoid passing integers as function names
 testLookupFunc :: TestTree
 testLookupFunc = testGroup "Test lookupFunc"
     [
         testCase "Returns the body of a defined function" $
-            (lookupFunc "add" $ Map.fromList [("add", Ast.ExprList [Ast.Symbole "+", Ast.Num 1, Ast.Num 2])])
-                @?= (Just $ Ast.ExprList [Ast.Symbole "+", Ast.Num 1, Ast.Num 2]),
+            assertEqual "Incorrect body for 'add'" assert1
+            (lookupFunc "add" input1),
         testCase "Returns Nothing if function is not defined" $
-            (lookupFunc "subtract" $ Map.fromList [("add", Ast.ExprList [Ast.Symbole "+", Ast.Num 1, Ast.Num 2])])
-                @?= Nothing
+            assertEqual "Incorrect result for 'subtract'" Nothing
+            (lookupFunc "subtract" Map.empty)
     ]
+        where   input1 = Map.fromList [("add", (["1", "2"], Ast.ExprList [Ast.Symbole "+", Ast.Num 1, Ast.Num 2]))]
+                assert1 = Just $ (["1", "2"], Ast.ExprList [Ast.Symbole "+", Ast.Num 1, Ast.Num 2])
 
 testIsNameDefined :: TestTree
 testIsNameDefined = testGroup "Test isNameDefined"
     [
         testCase "Returns True if name is defined as a variable" $
-            (isNameDefined "x" (Map.fromList [("x", Val 3)], Map.fromList [])) @?= True,
+            isNameDefined "x" (Map.fromList [("x", Val 3)], Map.empty) @?= True,
         testCase "Returns True if name is defined as a function" $
-            (isNameDefined "add" (Map.fromList [], Map.fromList [("add", Ast.ExprList [Ast.Symbole "+", Ast.Num 1, Ast.Num 2])])) @?= True,
+            isNameDefined "add" input1 @?= True,
         testCase "Returns False if name is not defined" $
-            (isNameDefined "y" (Map.fromList [("x", Val 3)], Map.fromList [])) @?= False
+            isNameDefined "y" (Map.fromList [("x", Val 3)], Map.empty) @?= False
     ]
+        where   input1 = (Map.empty, Map.fromList [("add", (["1", "2"], Ast.ExprList [Ast.Symbole "+", Ast.Num 1, Ast.Num 2]))])
 
 -- Tests for defineVar
 testDefineVar :: TestTree
@@ -56,12 +59,14 @@ testDefineVar = testGroup "defineVar tests"
 testDefineFunc :: TestTree
 testDefineFunc = testGroup "defineFunc tests"
   [ testCase "Should return Nothing if name already exists" $
-      Nothing @=? defineFunc "f" (Ast.ExprList [Ast.Num 1]) newFunc
+      Nothing @=? defineFunc "add" ["a", "b"] (Ast.ExprList []) lookup
   , testCase "Should return Nothing if body is not ExprList" $
-      Nothing @=? defineFunc "f" (Ast.Num 1) vars
+      Nothing @=? defineFunc "f" ["a", "b"] (Ast.Num 1) lookup
   , testCase "Should add function if name doesn't exist and body is ExprList" $
-      Just newFunc @=? defineFunc "f" (Ast.ExprList [Ast.Num 1]) vars
+      Just expectedLookup @=? defineFunc "sub" ["a", "b"] (Ast.ExprList [Ast.Symbole "+", Ast.Num 1, Ast.Num 2]) lookup
   ]
+    where   lookup = (Map.empty, Map.fromList [("add", (["1", "2"], Ast.ExprList [Ast.Symbole "+", Ast.Num 1, Ast.Num 2]))])
+            expectedLookup = (Map.empty, Map.fromList [("sub", (["a", "b"], Ast.ExprList [Ast.Symbole "+", Ast.Num 1, Ast.Num 2])), ("add", (["1", "2"], Ast.ExprList [Ast.Symbole "+", Ast.Num 1, Ast.Num 2]))])
 
 execSuite :: TestTree
 execSuite = testGroup "Execution Suite Tests" [

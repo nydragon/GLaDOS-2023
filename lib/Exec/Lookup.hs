@@ -54,7 +54,7 @@ defineVar name val (vars, funcs) = if isNameDefined name reg then Nothing else J
 removeVar :: String -> Lookup -> Lookup
 removeVar name (vars, funcs) = newReg
     where
-        newVars = Map.delete name vars 
+        newVars = Map.delete name vars
         newReg = (newVars, funcs)
 
 -- Defines a function
