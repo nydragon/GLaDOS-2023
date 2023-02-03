@@ -1,7 +1,6 @@
 cabal-version:      2.4
 name:               GLaDOS2023
 version:            0.1.0.0
-
 -- A short (one-line) description of the package.
 -- synopsis:
 
@@ -22,14 +21,45 @@ extra-source-files:
     CHANGELOG.md
     README.md
 
+library
+    exposed-modules:  Parsing,
+        Parsing.Args,
+        Parsing.Token,
+        Parsing.Ast,
+        Parsing.Cpt,
+        Exec,
+        Exec.RuntimeException,
+        Exec.Lookup,
+        Exec.Builtins
+    hs-source-dirs:   lib
+    build-depends:    base >= 4.14.1.0, containers
+    default-language: Haskell2010
+
 executable glados
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.
-    -- other-modules:
-
+    other-modules: Parsing.CptTests,
+        Parsing.AstTests,
+        Parsing.ArgsTests,
+        Parsing.TokenTests,
+        ExecTests
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
-    build-depends:    base >= 4.14.1.0
-    hs-source-dirs:   app
+    build-depends:    base  >= 4.14.1.0, tasty >= 1.4.3, tasty-discover >= 5.0.0, tasty-hunit >= 0.10.0.3, containers, GLaDOS2023
+    hs-source-dirs:   app test
     default-language: Haskell2010
+
+test-suite test
+    default-language: Haskell2010
+    type: exitcode-stdio-1.0
+    hs-source-dirs: test
+    other-modules: Parsing.ArgsTests,
+        Parsing.TokenTests,
+        Parsing.CptTests,
+        Parsing.AstTests,
+        ParsingTests,
+        ExecTests
+
+    main-is: TestMain.hs
+    build-depends: base >=4.14.1.0, tasty >= 1.4.3, tasty-discover >= 5.0.0, tasty-hunit >= 0.10.0.3, GLaDOS2023, containers
