@@ -6,28 +6,51 @@ import Test.Tasty.HUnit
 import Parsing.Ast
 import qualified Parsing.Cpt as Cpt
 
-parseExprTests :: TestTree
-parseExprTests = testGroup "Tests for parseExpr and parseExprList functions" [
+-- Input values
+singleVal = [Cpt.Val 1]
+singleSym = [Cpt.Sym "test"]
+variedList = [Cpt.Sym "test", Cpt.Val 1, Cpt.Val 2]
+singleCall = [Cpt.List [Cpt.Sym "+", Cpt.Val 1, Cpt.Val 2]]
+
+-- Note: We don't care that these are invalid arguments at this stage of testing
+listWithCall = [Cpt.Sym "+", Cpt.Val 1, Cpt.List [Cpt.Sym "*", Cpt.Boolean True, Cpt.Val 3]]
+nestedList = [Cpt.List [Cpt.Sym "test", Cpt.Val 1, Cpt.Val 2]]
+
+-- Assertion values
+-- (What we test against)
+singleValAssert = [Num 1]
+singleSymAssert = [Symbole "test"]
+variedListAssert = [Symbole "+", Num 1, Num 2]
+singleCallAssert = [Call "+" [Num 1, Num 2]]
+listWithCallAssert = [Symbole "+", Num 1, ExprList [Symbole "*", Boolean True, Num 3]]
+nestedListAssert = ExprList [ExprList [Symbole "test", Num 1, Num 2]]
+
+parseExprListTests :: TestTree
+parseExprListTests = testGroup "Tests for parseExprList" [
     testCase "Parse empty input list" $
         assertEqual "Lists are empty" (parseExprList []) [],
     testCase "Parse input list with single Val" $
-        parseExprList [Cpt.Val 1] @?= [Num 1],
+        parseExprList singleVal @?= singleValAssert,
     testCase "Parse input list with single Sym" $
-        parseExprList [Cpt.Sym "+"] @?= [Symbole "+"],
-    testCase "Parse input list with multiple elements" $
-        parseExprList [Cpt.Sym "+", Cpt.Val 1, Cpt.Val 2] @?= [Symbole "+", Num 1, Num 2],
-    testCase "Parse input list with nested list" $
-        parseExprList [Cpt.List [Cpt.Sym "+", Cpt.Val 1, Cpt.Val 2]] @?= [ExprList [Symbole "+", Num 1, Num 2]],
+        parseExprList singleSym @?= singleSymAssert,
+    testCase "Parse input list with multiple atom elements" $
+        parseExprList variedList @?= variedListAssert,
+    testCase "Parse input list with single funtion call" $
+        parseExprList singleCall @?= singleCallAssert,
     testCase "Parse input list with nested list and multiple elements" $
-        parseExprList [Cpt.Sym "+", Cpt.Val 1, Cpt.List [Cpt.Sym "*", Cpt.Boolean True, Cpt.Val 3]] @?= [Symbole "+", Num 1, ExprList [Symbole "*", Boolean True, Num 3]],
-    testCase "Parse input list using parseExpr with single Sym" $
-        parseExpr [Cpt.Sym "+"] @?= ExprList [Symbole "+"],
-    testCase "Parse input list using parseExpr with multiple elements" $
-        parseExpr [Cpt.Sym "+", Cpt.Val 1, Cpt.Val 2] @?= ExprList [Symbole "+", Num 1, Num 2],
-    testCase "Parse input list using parseExpr with nested list" $
-        parseExpr [Cpt.List [Cpt.Sym "+", Cpt.Val 1, Cpt.Val 2]] @?= ExprList [ExprList [Symbole "+", Num 1, Num 2]],
-    testCase "Parse input list using parseExpr with nested list and multiple elements" $
-        parseExpr [Cpt.Sym "+", Cpt.Val 1, Cpt.List [Cpt.Sym "*", Cpt.Val 2, Cpt.Val 3]] @?= ExprList [Symbole "+", Num 1, ExprList [Symbole "*", Num 2, Num 3]]
+        parseExprList listWithCall @?= listWithCallAssert
+    ]
+
+parseExprTests :: TestTree
+parseExprTests = testGroup "Tests for parseExpr" [
+    testCase "Parse input list with single Sym" $
+        parseExpr singleSym @?= ExprList singleSymAssert,
+    testCase "Parse input list with multiple elements" $
+        parseExpr variedList @?= ExprList variedListAssert,
+    testCase "Parse input list with nested list" $
+        parseExpr nestedList @?= nestedListAssert,
+    testCase "Parse input list with nested call" $
+        parseExpr listWithCall @?= ExprList listWithCallAssert
     ]
 
 exprListToCallTests :: TestTree
@@ -43,6 +66,7 @@ exprListToCallTests = testGroup "Tests for exprListToCall function" [
 
 astSuite :: TestTree
 astSuite = testGroup "Parsing.Ast Test Suite" [
+        parseExprListTests,
         parseExprTests,
         exprListToCallTests
     ]

@@ -28,6 +28,7 @@ runFile filename = do
     -- Parse AST
     let ast = parseExprList cpt
 
+    -- Run
     run ast
 
     return ()
