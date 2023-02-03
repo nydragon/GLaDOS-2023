@@ -9,6 +9,7 @@ data Expr = ExprList [Expr]
     | Boolean Bool
     | Symbole String
     | Call String [Expr] -- Will also be used for the boolean expression
+    | Null -- Instead of using Maybe Expr
     deriving (Eq, Show)
 
 -- This function parses lists of expressions, ignoring function calls

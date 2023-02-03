@@ -30,7 +30,7 @@ runFile filename = do
     let ast = parseExprList cpt
 
     -- Run
-    run ast
+    -- run ast
 
     return ()
 

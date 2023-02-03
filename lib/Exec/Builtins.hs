@@ -6,10 +6,10 @@ import Control.Exception (throwIO)
 import Exec.RuntimeException
 
 -- Function declarations should use the same prototype :
--- [Ast.Expr] -> Lookup -> IO RetVal
+-- [Ast.Expr] -> Registry -> IO RetVal
 --
 -- The first list is a list of all arguments
--- Lookup is the registry
+-- Registry is the registry
 --
 -- Returns RetVal
 
@@ -17,8 +17,8 @@ import Exec.RuntimeException
 
 -- Executes an Expr.Call that has been confirmed to be a builtin function
 --
--- args : Expr.Call -> Lookup
-execBuiltin :: Ast.Expr -> Lookup -> IO RetVal
+-- args : Expr.Call -> Registry
+execBuiltin :: Ast.Expr -> Registry -> IO RetVal
 execBuiltin (Ast.Call func ls) reg = case func of
     "println" -> printBuiltin ls reg
     "/" -> divBuiltin ls reg
@@ -27,13 +27,13 @@ execBuiltin _ _ = throwIO UndefinedBehaviour -- Builtin not found
 
 -- ─── Builtin Implementations ─────────────────────────────────────────────────────────────────────
 
-printBuiltin :: [Ast.Expr] -> Lookup -> IO RetVal
+printBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
 printBuiltin ls reg = print (head ls) >> return output
-    where   output = RetVal reg Nothing
+    where   output = RetVal reg Ast.Null
 
-divBuiltin :: [Ast.Expr] -> Lookup -> IO RetVal
+divBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
 divBuiltin (Ast.Num a : Ast.Num b : _) reg = if b == 0 then throwIO NullDivision else return output
-    where   output = RetVal reg (Just  $ Ast.Num (div a b))
+    where   output = RetVal reg $ Ast.Num (div a b)
 divBuiltin (Ast.Num a : x : xs) _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName x)
 
 modulo :: Integer -> Integer -> Either Integer String
