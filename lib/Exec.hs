@@ -33,8 +33,9 @@ isAtomicExpressionList = all isAtomicExpression
 -- Executes function call
 -- Note: Arguments do not need to have been reduced, execFunc takes care of it
 execFunc :: String -> [Ast.Expr] -> Registry -> IO RetVal
+execFunc f args _ | not $ isAtomicExpressionList args = throwIO $ NonAtomicFunctionArgs f args
 execFunc funcName argValues reg
-  | Ast.isValidBuiltin funcName && isAtomicExpressionList argValues = execBuiltin (Ast.Call funcName argValues) reg
+  | Ast.isValidBuiltin funcName = execBuiltin (Ast.Call funcName argValues) reg
   | otherwise = case lookupFunc funcName (snd reg) of
       Nothing -> throwIO $ InvalidFunctionCall funcName
       Just (argNames, def) -> case def of

@@ -3,6 +3,7 @@
 module Exec.RuntimeException where
 
 import Control.Exception
+import qualified Parsing.Ast as Ast
 
 -- Runtime exception data type
 --
@@ -27,3 +28,9 @@ instance Show RuntimeException where
   show NotYetImplemented = "OH MAXI BEBOU"
   show (InvalidArgument a b c) = "Argument " ++ show a ++ " invalid: expected '" ++ b ++ "' but received '" ++ c ++ "'."
   show NullDivision = "Did you not pay attention in math class?"
+
+data InternalException
+  = NonAtomicFunctionArgs String [Ast.Expr]
+  deriving (Show, Eq)
+
+instance Exception InternalException
