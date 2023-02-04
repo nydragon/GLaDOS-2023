@@ -35,7 +35,9 @@ tokenizeTests = testGroup "tokenize tests"
     testCase "tokenize' mixed input" $
         tokenize' "1 keyword ( 123 )" "" @?= [Num 1, Keyword "keyword", OpenScope, Num 123, CloseScope],
     testCase "tokenize" $
-        tokenize "1 keyword ( 123 )" @?= [Num 1, Keyword "keyword", OpenScope, Num 123, CloseScope]
+        tokenize "1 keyword ( 123 )" @?= [Num 1, Keyword "keyword", OpenScope, Num 123, CloseScope],
+    testCase "tokenize" $
+        tokenize "(define x 2)\n(+ 3 x)" @?= [OpenScope, Keyword "define", Keyword "x", Num 2, CloseScope, OpenScope, Keyword "+", Num 3, Keyword "x", CloseScope]
   ]
 
 tokenSuite :: TestTree

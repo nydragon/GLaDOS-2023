@@ -3,9 +3,10 @@
 
 # Install Dependencies
 
-```sh
-yay -S ghc cabal-install cabal-static  haskell-tf-random haskell-random haskell-quickcheck haskell-quickcheck-io  haskell-hunit hlint;
 
+Install cabal by installing GHCUP or another method described on the [Haskell Website](https://www.haskell.org/).
+
+```sh
 cabal update;
 ```
 
@@ -19,13 +20,29 @@ haskell.haskell
 # Run project
 
 ```sh
-cabal run;
+cabal run glados -- file.scm;
+```
+
+or
+
+```sh
+make ARGS="file.scm"
 ```
 
 # Running the tests
 
-In order to see coloured output and no coverage when running the tests, please run the tests with the following commands:
+In order to see coloured output and no coverage when running the tests, please run the tests with one of the following commands:
 
-```
+```sh
 cabal run test
 ```
+
+```sh
+make test
+```
+
+# Bonus ideas :
+
+- Fully featured REPL
+- Exception stack tracing
+- Exception line tracing
