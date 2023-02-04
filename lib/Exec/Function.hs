@@ -7,6 +7,12 @@ import qualified Parsing.Ast as Ast
 import Exec.Registry
 import Exec.RuntimeException
 
+-- IMPORTANT : This file must NOT be imported in Exec module. (Cyclic Dependencies)
+
+-- ─── Definition And Getting ──────────────────────────────────────────────────────────────────────
+
+-- THIS IS TO BE CALLED FROM THE BUILTINS MODULE
+
 -- Defines a function
 -- Returns Nothing if name is alreadt used
 --
@@ -28,6 +34,8 @@ definefunc _ _ = throwIO $ InvalidFunctionDefinition "<Unknown Function Name>"
 -- Returns an ExprList representing body of function
 lookupFunc :: String -> FuncRegistry -> Maybe Function
 lookupFunc = Map.lookup
+
+-- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
 
 -- Checks if argument list is valid (only symboles)
 isArgumentList :: [Ast.Expr] -> Bool

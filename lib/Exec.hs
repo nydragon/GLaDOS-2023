@@ -6,13 +6,12 @@ import qualified Parsing.Ast as Ast
 import Exec.RuntimeException
 import Exec.Builtins
 
--- ─── Execute Function ────────────────────────────────────────────────────────────────────────────
+-- ─── Function Execution ──────────────────────────────────────────────────────────────────────────
 
 -- Bind all arguments to their values in preparation of a function call
 bindArgs :: [String] -> [Ast.Expr] -> Registry -> IO Registry
-bindArgs (x : xs) (y : ys) (v, f)= bindArgs xs ys 
+bindArgs (x : xs) (y : ys) (v, f)= bindArgs xs ys
     where   updatedReg = (v, )
-
 
 -- Executes function call
 -- Note: Arguments do not need to have been reduced, execFunc takes care of it
