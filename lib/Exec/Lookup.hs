@@ -45,14 +45,6 @@ lookupFunc = Map.lookup
 isNameDefined :: String -> Registry -> Bool
 isNameDefined name (vars, funcs) = Map.member name vars || Map.member name funcs
 
--- Defines a variable
--- Returns Nothing if name is already used
-defineVar :: String -> Ast.Expr -> Registry -> Maybe Registry
-defineVar name val (vars, funcs) = if isNameDefined name reg then Nothing else Just newReg
-    where
-        reg = (vars, funcs)
-        newReg = (Map.insert name val vars, funcs)
-
 -- Remove a variable definition
 removeVar :: String -> Registry -> Registry
 removeVar name (vars, funcs) = newReg
@@ -60,9 +52,18 @@ removeVar name (vars, funcs) = newReg
         newVars = Map.delete name vars
         newReg = (newVars, funcs)
 
+-- Defines a variable
+-- Returns Nothing if name is already used
+defineVar :: [Ast.Expr] -> Registry -> IO RetVal
+definevar ((Sym varName : xs) : (expr : xs) : xs) (v, f) =
+    where   ret = RetVal (Map.insert varName (exal ), f) Ast.Null
+
 -- Defines a function
 -- Returns Nothing if name is alreadt used
--- (define (add a b) (+ a b))
+--
+-- Args : define args -> registry
+-- Note : Returns retval as define is a function (returns NULL)
+-- EXPECTS : Args to contain two sublists (hence big pattern match)
 defineFunc :: [Ast.Expr] -> Registry -> IO RetVal
 defineFunc (Ast.ExprList (Ast.Symbole n : args) : Ast.ExprList def : _) (v, f) =
     if isArgumentList args then
