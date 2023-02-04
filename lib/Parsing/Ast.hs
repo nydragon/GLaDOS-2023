@@ -12,6 +12,8 @@ data Expr = ExprList [Expr]
     | Null -- Instead of using Maybe Expr
     deriving (Eq, Show)
 
+-- ─── Parsing ─────────────────────────────────────────────────────────────────────────────────────
+
 -- This function parses lists of expressions, ignoring function calls
 -- AT LEAST at first level
 -- This means it will only parse function calls in sublists thanks to parseExpr
@@ -30,6 +32,8 @@ parseExpr (Cpt.Sym str : xs) = if isValidBuiltin str then
     where original = Cpt.Sym str : xs
 parseExpr ls = ExprList (parseExprList ls)
 
+-- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
+
 -- Utility function for execution
 -- Converts cpt list to Expr Call
 -- IMPORTANT : Returns nothing in case of error
@@ -37,14 +41,6 @@ exprListToCall :: [Expr] -> Maybe Expr
 exprListToCall [] = Nothing
 exprListToCall (Symbole name : xs) = Just (Call name xs)
 exprListToCall _ = Nothing
-
--- DEFINITIONS
-    -- Expression = Anything that ends up a value
-    -- Function Call = When first element of list is symbol
-
--- NOTES
-    -- DID NOT implement ternary (if else) statement for the time being
-    -- At execution : if list is deemed to be a function call, create function to convert it
 
 -- This is where we put builtins
 isValidBuiltin :: String -> Bool
@@ -57,3 +53,15 @@ isValidBuiltin "*" = True
 isValidBuiltin "println" = True
 isValidBuiltin "noop" = True -- Should be useful in the future, will return list of args
 isValidBuiltin _ = False
+
+-- Returns boolean if Expr is atomic. This means it cannot be further reduced.
+-- Note: Sym is not atomic as it needs to be reduced to a value
+isAtomic :: Expr -> Bool
+isAtomic (Num _) = True
+isAtomic (Boolean _) = True
+isAtomic Null = True
+isAtomic _ = False
+
+-- Checks if list is atomic
+isListAtomic :: [Expr] -> Bool
+isListAtomic = foldr ((&&) . isAtomic) True

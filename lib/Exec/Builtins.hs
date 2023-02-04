@@ -1,9 +1,11 @@
 module Exec.Builtins where
 
-import Exec.Lookup
-import qualified Parsing.Ast as Ast
 import Control.Exception (throwIO)
+import Data.Typeable
+
+import qualified Parsing.Ast as Ast
 import Exec.RuntimeException
+import Exec.Registry
 
 -- Function declarations should use the same prototype :
 -- [Ast.Expr] -> Registry -> IO RetVal
@@ -52,3 +54,10 @@ add a b = a + b
 
 lt :: (Ord a) => a -> a -> Bool
 lt a b = a < b
+
+-- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
+
+-- Get string representation of type name
+-- This will most likely have to be moved
+getTypeName :: Typeable a => a -> String
+getTypeName = show . typeOf

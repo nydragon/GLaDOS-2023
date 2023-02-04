@@ -3,7 +3,6 @@ module Exec where
 import Control.Exception
 
 import qualified Parsing.Ast as Ast
-import Exec.Lookup
 import Exec.RuntimeException
 import Exec.Builtins
 
@@ -27,7 +26,7 @@ execFunc funcName args reg
     -- Args reduced to atomic form
     where   atomicArgs = eval args
             atomicCallArgs = eval cArgs
-            oldReg = reg    -- Reg without function variables bound
+            oldReg = reg    -- This won't work as it would ignore subsequent defines
             newReg = 
 
 -- Syntactic sugar to convert Ast.Call to args for execFunc
