@@ -32,6 +32,10 @@ instance Show RuntimeException where
 
 data InternalException
   = NonAtomicFunctionArgs String [Ast.Expr]
-  deriving (Show, Eq)
+  deriving (Eq)
 
 instance Exception InternalException
+
+instance Show InternalException where
+  show :: InternalException -> String
+  show (NonAtomicFunctionArgs a b) = "Function " ++ a ++ ": args are not Atoms\n " ++ show b
