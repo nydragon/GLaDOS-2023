@@ -13,10 +13,11 @@ data RuntimeException
   | InvalidFunctionDefinition String
   | UndefinedBehaviour -- Pretty much for anything that shouldn't ever happen
   | NotYetImplemented
-  | -- args: argument index, expected type, got type
-    InvalidArgument Integer String String
+  -- args: argument index, expected type, got type
+  | InvalidArgument Integer String String
   | NullDivision
   | FatalError -- For stuff that shouldn't happen
+  | AlreadyDefined
   deriving (Eq)
 
 instance Exception RuntimeException
