@@ -5,13 +5,18 @@ import Control.Exception
 import qualified Parsing.Ast as Ast
 import Exec.RuntimeException
 import Exec.Builtins
+import Exec.Eval
 
 -- ─── Function Execution ──────────────────────────────────────────────────────────────────────────
 
 -- Bind all arguments to their values in preparation of a function call
 bindArgs :: [String] -> [Ast.Expr] -> Registry -> IO Registry
-bindArgs (x : xs) (y : ys) (v, f)= bindArgs xs ys
-    where   updatedReg = (v, )
+bindArgs names values reg = ret
+    where
+        -- Required in order to use original defineVar
+        inputExprList = Ast.ExprList [(Ast.ExprList [Ast.Sym x | x <- names]), (Ast.ExprList values)]
+        defineRet = defineVar inputExprList reg
+        ret = fst <$> defineRet -- Gets IO a from IO (a, b)
 
 -- Executes function call
 -- Note: Arguments do not need to have been reduced, execFunc takes care of it
@@ -21,12 +26,11 @@ execFunc funcName args reg
     | case lookupFunc funcName of
         Nothing -> throwIO $ InvalidFunctionCall funcName
         Just (args, def) -> case def of
-            Ast.Call cName cArgs -> execCall (Ast.Call cName atomicCallArgs) (bindArgs)
+            Ast.Call cName cArgs -> bindArgs cName >>= execCall (Ast.Call cName atomicCallArgs)
     -- Args reduced to atomic form
     where   atomicArgs = eval args
             atomicCallArgs = eval cArgs
             oldReg = reg    -- This won't work as it would ignore subsequent defines
-            newReg = 
 
 -- Syntactic sugar to convert Ast.Call to args for execFunc
 --
@@ -34,10 +38,3 @@ execFunc funcName args reg
 execCall :: Ast.Expr -> Registry -> IO RetVal
 execCall (Ast.Call n args) reg = execFunc n args
 execCall _ _ = throwIO $ InvalidFunctionCall "<Unknown Function Name>"
-
--- ─── Evaluate Expression ─────────────────────────────────────────────────────────────────────────
-
--- Evaluates a given expression into an atom
-eval :: [Ast.Expr] -> Registry -> IO RetVal
-eval (Call func ls : xs) reg = -- INPUT SHOULDN'T BE LIST
--- LIST NEEDS TO BE CHECKED IF FUNCTION CALL

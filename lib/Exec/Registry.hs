@@ -24,3 +24,9 @@ emptyRegistry = (Map.empty, Map.empty)
 
 -- Data structure used as main function return type
 data RetVal = RetVal Registry Ast.Expr
+
+-- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
+
+-- To check if name is already defined
+isNameDefined :: String -> Registry -> Bool
+isNameDefined name (vars, funcs) = Map.member name vars || Map.member name funcs

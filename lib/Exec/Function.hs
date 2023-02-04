@@ -42,7 +42,3 @@ isArgumentList :: [Ast.Expr] -> Bool
 isArgumentList [] = True
 isArgumentList (Ast.Symbole _ : xs) = isArgumentList xs
 isArgumentList _ = False
-
--- To check if name is already defined
-isNameDefined :: String -> Registry -> Bool
-isNameDefined name (vars, funcs) = Map.member name vars || Map.member name funcs

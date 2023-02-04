@@ -18,6 +18,8 @@ data RuntimeException
   | FatalError -- For stuff that shouldn't happen
   deriving (Eq)
 
+instance Exception RuntimeException
+
 instance Show RuntimeException where
   show :: RuntimeException -> String
   show (InvalidFunctionCall a) = a ++ " is an invalid function call."
