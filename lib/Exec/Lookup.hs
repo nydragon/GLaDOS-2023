@@ -2,11 +2,14 @@ module Exec.Lookup where
 
 import qualified Data.Map as Map
 import Data.Typeable
+import Control.Exception
+import Data.Maybe
 
 import qualified Parsing.Ast as Ast
+import Exec.RuntimeException
 
 -- Represents a function
--- Contains: Args List [String], and definition ExprList
+-- Contains: Args List [String], and definition Ast.Call
 type Function = ([String], Ast.Expr)
 -- Function registry
 type FuncRegistry = Map.Map String Function
@@ -59,14 +62,17 @@ removeVar name (vars, funcs) = newReg
 
 -- Defines a function
 -- Returns Nothing if name is alreadt used
--- Args: function name -> Function args -> Function body -> Registry
-defineFunc :: String -> [String] -> Ast.Expr -> Registry -> Maybe Registry
-defineFunc name args (Ast.ExprList ls) (vars, funcs) = if isNameDefined name reg then Nothing else Just newReg
-    where
-        reg = (vars, funcs)
-        def = Ast.ExprList ls
-        newReg = (vars, Map.insert name (args, def) funcs)
-defineFunc _ _ _ _ = Nothing -- Invalid function body (nor ExprList)
+-- (define (add a b) (+ a b))
+defineFunc :: [Ast.Expr] -> Registry -> IO RetVal
+defineFunc (Ast.ExprList (Ast.Symbole n : args) : Ast.ExprList def : _) (v, f) =
+    if isArgumentList args then
+        case Ast.exprListToCall def of
+            Nothing -> throwIO $ InvalidFunctionDefinition n
+            -- Updated function registry and return Null
+            Just x -> return $ RetVal (v, Map.insert n (argNameStr, x) f) Ast.Null
+    else throwIO $ InvalidFunctionDefinition n
+        where   argNameStr = [str | Ast.Symbole str <- args]
+definefunc _ _ = throwIO $ InvalidFunctionDefinition "<Unknown Function Name>"
 
 -- ─── Utility ─────────────────────────────────────────────────────────────────────────────────────
 
@@ -81,3 +87,11 @@ isAtomic (Ast.Num _) = True
 isAtomic (Ast.Boolean _) = True
 isAtomic Ast.Null = True
 isAtomic _ = False
+
+isListAtomic :: [Ast.Expr] -> Bool
+isListAtomic = foldr ((&&) . isAtomic) True
+
+isArgumentList :: [Ast.Expr] -> Bool
+isArgumentList [] = True
+isArgumentList (Ast.Symbole _ : xs) = True && isArgumentList xs
+isArgumentList _ = False

@@ -7,49 +7,39 @@ import Exec.Lookup
 import Exec.RuntimeException
 import Exec.Builtins
 
--- ─── Evaluate Given Expression ───────────────────────────────────────────────────────────────────
+-- ─── Execute Function ────────────────────────────────────────────────────────────────────────────
+
+-- Bind all arguments to their values in preparation of a function call
+bindArgs :: [String] -> [Ast.Expr] -> Registry -> IO Registry
+bindArgs (x : xs) (y : ys) (v, f)= bindArgs xs ys 
+    where   updatedReg = (v, )
 
 
+-- Executes function call
+-- Note: Arguments do not need to have been reduced, execFunc takes care of it
+execFunc :: String -> [Ast.Expr] -> Registry -> IO RetVal
+execFunc funcName args reg
+    | isValidBuiltin funcName = execBuiltin atomicArgs
+    | case lookupFunc funcName of
+        Nothing -> throwIO $ InvalidFunctionCall funcName
+        Just (args, def) -> case def of
+            Ast.Call cName cArgs -> execCall (Ast.Call cName atomicCallArgs) (bindArgs)
+    -- Args reduced to atomic form
+    where   atomicArgs = eval args
+            atomicCallArgs = eval cArgs
+            oldReg = reg    -- Reg without function variables bound
+            newReg = 
 
--- ─── Evaluate List Of Expressions ────────────────────────────────────────────────────────────────
-
--- evalExprList :: [Ast.Expr] -> IO [Ast.Exor]
-
--- ─── Old ─────────────────────────────────────────────────────────────────────────────────────────
-
--- Runs a given list of expressions
+-- Syntactic sugar to convert Ast.Call to args for execFunc
 --
--- Args : List of expressions (expected to be functions) -> Lookup
--- Expects all base expressions to be valid function calls
--- run' :: [Ast.Expr] -> Lookup -> IO RetVal
--- run' [] reg = return $ RetVal reg Nothing -- Returns lookup
--- -- Recursive call on run' using registry returned by the function execution of
--- run' (Ast.Call func ls:xs) reg = do
---     -- Pattern match reg and retval
---     RetVal reg funcRes <- execFunc call reg
+-- Will throw exception if not Ast.Call
+execCall :: Ast.Expr -> Registry -> IO RetVal
+execCall (Ast.Call n args) reg = execFunc n args
+execCall _ _ = throwIO $ InvalidFunctionCall "<Unknown Function Name>"
 
---     -- Run sublist
---     run' xs reg
---     where   call = Ast.Call func ls
--- run' (Ast.ExprList ls:xs) reg = case Ast.exprListToCall ls of
---     Just x -> execFunc x reg
---     Nothing -> throwIO (InvalidFunctionCall "PLACEHOLDER")
---         >>= run' xs
+-- ─── Evaluate Expression ─────────────────────────────────────────────────────────────────────────
 
--- -- Entry point function
--- run :: [Ast.Expr] -> IO RetVal
--- run ls = run' ls emptyLookup
-
--- ─── Function Execution ──────────────────────────────────────────────────────────────────────────
-
--- Executes a given function
--- Args : Expr.Call -> Lookup
--- execFunc :: Ast.Expr -> Lookup -> IO RetVal
--- execFunc (Ast.Call func ls) reg
---     | Ast.isValidBuiltin func = execBuiltin call reg    -- if Builtin
---     | otherwise = throwIO NotYetImplemented             -- else
---     where   call = Ast.Call func ls
-
--- Evaluate expression
--- Returns result of expression
--- Can be used for function calls, atoms, lists
+-- Evaluates a given expression into an atom
+eval :: [Ast.Expr] -> Registry -> IO RetVal
+eval (Call func ls : xs) reg = -- INPUT SHOULDN'T BE LIST
+-- LIST NEEDS TO BE CHECKED IF FUNCTION CALL
