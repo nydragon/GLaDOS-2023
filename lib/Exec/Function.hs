@@ -31,7 +31,7 @@ defineFunc (Ast.ExprList (Ast.Symbole n : args) : Ast.ExprList def : _) (v, f) =
 definefunc _ _ = throwIO $ InvalidFunctionDefinition "<Unknown Function Name>"
 
 -- Get definitions
--- Returns an ExprList representing body of function
+-- Returns Maybe Function representing (arg names, body function call)
 lookupFunc :: String -> FuncRegistry -> Maybe Function
 lookupFunc = Map.lookup
 
