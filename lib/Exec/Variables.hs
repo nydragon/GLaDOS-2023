@@ -30,9 +30,12 @@ removeVars (x : xs) (vars, funcs) = removeVars xs newReg
 -- Returns Nothing if name is already used
 defineVar :: [Ast.Expr] -> Registry -> IO RetVal
 defineVar (Ast.ExprList (Ast.Symbole varName : xs) : Ast.ExprList (expr : ys) : _) (v, f) =
-    if isNameDefined varName (v, f)
-        then throwIO AlreadyDefined
-        else return ret
+    -- if isNameDefined varName (v, f)
+    --     then throwIO AlreadyDefined
+    --     else
+    -- According to chez it is possible to redefine variablesx
+
+    return ret
     where
             updatedRegistry = Map.insert varName expr v
             ret = RetVal (updatedRegistry, f) Ast.Null
