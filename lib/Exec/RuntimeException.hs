@@ -13,8 +13,9 @@ data RuntimeException
   | InvalidFunctionDefinition String
   | UndefinedBehaviour -- Pretty much for anything that shouldn't ever happen
   | NotYetImplemented
-  -- args: argument index, expected type, got type
-  | InvalidArgument Integer String String
+  | -- args: argument index, expected type, got type
+    InvalidArgument Integer String String
+  | InvalidArgumentCount String
   | NullDivision
   | FatalError -- For stuff that shouldn't happen
   | AlreadyDefined
@@ -28,6 +29,7 @@ instance Show RuntimeException where
   show UndefinedBehaviour = "This is undefined."
   show NotYetImplemented = "OH MAXI BEBOU"
   show (InvalidArgument a b c) = "Argument " ++ show a ++ " invalid: expected '" ++ b ++ "' but received '" ++ c ++ "'."
+  show (InvalidArgumentCount fn) = "Function " ++ fn ++ ": Invalid arg count."
   show NullDivision = "Did you not pay attention in math class?"
 
 data InternalException

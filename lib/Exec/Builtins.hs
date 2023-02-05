@@ -2,10 +2,9 @@ module Exec.Builtins where
 
 import Control.Exception (throwIO)
 import Data.Typeable
-
-import qualified Parsing.Ast as Ast
-import Exec.RuntimeException
 import Exec.Registry
+import Exec.RuntimeException
+import qualified Parsing.Ast as Ast
 
 -- Function declarations should use the same prototype :
 -- [Ast.Expr] -> Registry -> IO RetVal
@@ -22,38 +21,60 @@ import Exec.Registry
 -- args : Expr.Call -> Registry
 execBuiltin :: Ast.Expr -> Registry -> IO RetVal
 execBuiltin (Ast.Call func ls) reg = case func of
-    "println" -> printBuiltin ls reg
-    "/" -> divBuiltin ls reg
-    _ -> throwIO NotYetImplemented
+  "println" -> printBuiltin ls reg
+  "/" -> divBuiltin ls reg
+  "%" -> modulo ls reg
+  "*" -> multiply ls reg
+  "-" -> subBuiltin ls reg
+  "+" -> add ls reg
+  "<" -> lt ls reg
+  _ -> throwIO NotYetImplemented
 execBuiltin _ _ = throwIO UndefinedBehaviour -- Builtin not found
 
 -- ─── Builtin Implementations ─────────────────────────────────────────────────────────────────────
 
 printBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
 printBuiltin ls reg = print (head ls) >> return output
-    where   output = RetVal reg Ast.Null
+  where
+    output = RetVal reg Ast.Null
 
 divBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
-divBuiltin (Ast.Num a : Ast.Num b : _) reg = if b == 0 then throwIO NullDivision else return output
-    where   output = RetVal reg $ Ast.Num (div a b)
-divBuiltin (Ast.Num a : x : xs) _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName x)
+divBuiltin [Ast.Num a, Ast.Num 0] reg = throwIO NullDivision
+divBuiltin [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Num (div a b)
+divBuiltin [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
+divBuiltin [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
+divBuiltin _ _ = throwIO $ InvalidArgumentCount "/"
 
-modulo :: Integer -> Integer -> Either Integer String
-modulo a 0 = Right "ZeroDivisionError"
-modulo a b = Left (mod a b)
+modulo :: [Ast.Expr] -> Registry -> IO RetVal
+modulo [Ast.Num a, Ast.Num 0] reg = throwIO NullDivision
+modulo [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Num (mod a b)
+modulo [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
+modulo [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
+modulo _ _ = throwIO $ InvalidArgumentCount "%"
 
-multiply :: Integer -> Integer -> Integer
-multiply a b = a * b
+multiply :: [Ast.Expr] -> Registry -> IO RetVal
+multiply [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Num ((*) a b)
+multiply [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
+multiply [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
+multiply _ _ = throwIO $ InvalidArgumentCount "*"
 
-substract :: Integer -> Integer -> Integer
-substract a b = a - b
+subBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
+subBuiltin [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Num ((-) a b)
+subBuiltin [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
+subBuiltin [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
+subBuiltin _ _ = throwIO $ InvalidArgumentCount "-"
 
-add :: Integer -> Integer ->   Integer
+add :: [Ast.Expr] -> Registry -> IO RetVal
+add [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Num ((+) a b)
+add [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
+add [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
+add _ _ = throwIO $ InvalidArgumentCount "+"
 
-add a b = a + b
-
-lt :: (Ord a) => a -> a -> Bool
-lt a b = a < b
+lt :: [Ast.Expr] -> Registry -> IO RetVal
+lt [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Boolean ((<=) a b)
+lt [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
+lt [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
+lt _ _ = throwIO $ InvalidArgumentCount "<"
 
 -- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
 
