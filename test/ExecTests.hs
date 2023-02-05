@@ -15,9 +15,9 @@ testLookupVar :: TestTree
 testLookupVar = testGroup "Test lookupVar"
     [
         testCase "Returns the value of a defined variable" $
-            (lookupVar "x" $ Map.fromList [("x", Ast.Num 3)]) @?= (Just $ Ast.Num 3),
+            lookupVar "x" $ Map.fromList [("x", Ast.Num 3)] @?= Just ( Ast.Num 3),
         testCase "Returns Nothing if variable is not defined" $
-            (lookupVar "y" $ Map.fromList [("x", Ast.Num 3)]) @?= Nothing
+            lookupVar "y" $ Map.fromList [("x", Ast.Num 3)] @?= Nothing
     ]
 
 -- Note : Will need to add tests to avoid passing integers as function names
