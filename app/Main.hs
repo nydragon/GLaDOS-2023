@@ -3,17 +3,17 @@ module Main where
 -- Our modules
 
 import Data.Maybe (fromMaybe)
-import Exec
-import Exec.Eval
-import Exec.InteractivePrompt
-import Parsing
-import Parsing.Args
-import Parsing.Ast
-import Parsing.Cpt
-import Parsing.Token
-import System.Console.GetOpt
-import System.Environment
-import System.Exit
+import Exec ()
+import Exec.Eval (eval)
+import Exec.Registry (RetVal (RetVal), emptyRegistry)
+import Parsing ()
+import Parsing.Args (Args (file), parse)
+import Parsing.Ast (parseExprList)
+import Parsing.Cpt (parseTokenList)
+import Parsing.Token (tokenizeFile)
+import System.Console.GetOpt ()
+import System.Environment (getArgs)
+import System.Exit (exitSuccess)
 
 getFileName :: [String] -> Maybe FilePath -> String
 getFileName [] b = fromMaybe "stdin" b
@@ -29,6 +29,12 @@ runFile filename = do
 
   -- Parse AST
   let ast = parseExprList cpt
+
+  let reg = emptyRegistry
+
+  (RetVal d v) <- eval (head ast) reg
+
+  print v
   -- Run
   -- run ast
 
