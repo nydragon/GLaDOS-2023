@@ -1,11 +1,14 @@
 module Exec.InteractivePrompt where
 
 import Data.List ()
-import System.Exit ( exitSuccess )
-import System.IO ( hFlush, stdout )
-import Parsing.Token ( tokenize )
-import Parsing.Cpt ( parseTokenList )
-import Parsing.Ast ( parseExprList )
+import Exec.Eval
+import Exec.Registry
+import Parsing.Ast (parseExprList)
+import qualified Parsing.Ast as Ast
+import Parsing.Cpt (parseTokenList)
+import Parsing.Token (tokenize)
+import System.Exit (exitSuccess)
+import System.IO (hFlush, stdout)
 
 -- Function that counts the character received as argument
 -- Returns the number of times this character appears in a string
@@ -16,6 +19,12 @@ countChar char = length . filter (== char)
 -- Returns a boolean
 occurenceBrackets :: Int -> Int -> Bool
 occurenceBrackets num_open num_close = num_open == num_close && num_open /= 0
+
+recurse :: [String] -> Int -> Int -> IO String
+recurse inputs 0 close = print "Open with a bracket." >> getInput [] 0
+recurse inputs open close
+  | open == close = return $ concat inputs
+  | otherwise = getInput inputs (open - close)
 
 -- Recursive function that receives input
 -- Reads input, triggers program exit, terminates after good format, recursive if bad
@@ -30,34 +39,30 @@ getInput inputs openBrackets = do
     then exitSuccess
     else do
       let num_open = countChar '(' input
-      if (openBrackets + num_open) == 0
-        then do
-          print "Open with a bracket."
-          getInput [] 0
-        else do
-          let num_close = countChar ')' input
-          if (openBrackets + num_open) == num_close
-            then return $ concat (inputs <> [input ++ "\n"])
-            else do
-              getInput (inputs <> [input ++ "\n"]) ((openBrackets + num_open) - num_close)
+      let num_close = countChar ')' input
+
+      recurse (inputs <> [input ++ "\n"]) (openBrackets + num_open) num_close
+
+loop :: Registry -> IO ()
+loop reg = do
+  -- Parse AST
+  ast <- parseExprList . parseTokenList . tokenize <$> getInput [] 0
+
+  -- Run
+  (RetVal newReg _) <- eval (Ast.ExprList ast) reg
+
+  loop newReg
 
 interactiveMode :: IO ()
 interactiveMode = do
-    putStrLn "*** BONUS GLADOS ***"
+  putStrLn "*** BONUS GLADOS ***"
 
-    tokens <- tokenize <$> getInput [] 0
+  -- Run
+  loop emptyRegistry
 
-    -- Parse CPT
-    let cpt = parseTokenList tokens
-
-    -- Parse AST
-    let ast = parseExprList cpt
-
-    -- Run
-    putStrLn "NOT IMPLEMENTED"
-    return ()
+  return ()
 
 -- Fonction main
---  Affiche entrée "input" au bon format
+--  Affiche entrée "input"bon au  format
 -- get the return of the "checkBrackets" function
 -- which gives the correct test format with true occurance '(' == ')'

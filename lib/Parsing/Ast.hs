@@ -1,15 +1,32 @@
+{-# LANGUAGE InstanceSigs #-}
+
 module Parsing.Ast where
 
 import qualified Parsing.Cpt as Cpt
 
 -- ─── Abstract Syntaxe Tree ───────────────────────────────────────────────────────────────────────
 
-data Expr = ExprList [Expr]
-    | Num Integer
-    | Boolean Bool
-    | Symbole String
-    | Call String [Expr] -- Will also be used for the boolean expression
-    deriving (Eq, Show)
+data Expr
+  = ExprList [Expr]
+  | Num Integer
+  | Boolean Bool
+  | Symbole String
+  | Call String [Expr] -- Will also be used for the boolean expression
+  | Null -- Instead of using Maybe Expr
+  deriving (Eq)
+
+instance Show Expr where
+  show :: Expr -> String
+  show (Boolean a)
+    | a = "#t"
+    | otherwise = "#f"
+  show (ExprList ls) = show ls
+  show (Num n) = show n
+  show (Symbole s) = show s
+  show (Call _ _) = "#<procedure>"
+  show Null = "Null"
+
+-- ─── Parsing ─────────────────────────────────────────────────────────────────────────────────────
 
 -- This function parses lists of expressions, ignoring function calls
 -- AT LEAST at first level
@@ -17,17 +34,22 @@ data Expr = ExprList [Expr]
 parseExprList :: [Cpt.Cpt] -> [Expr]
 parseExprList [] = []
 parseExprList (x : xs) = case x of
-    Cpt.Sym str -> Symbole str : parseExprList xs
-    Cpt.Val i -> Num i : parseExprList xs
-    Cpt.List ls -> parseExpr ls : parseExprList xs
-    Cpt.Boolean b -> Boolean b : parseExprList xs
+  Cpt.Sym str -> Symbole str : parseExprList xs
+  Cpt.Val i -> Num i : parseExprList xs
+  Cpt.List ls -> parseExpr ls : parseExprList xs
+  Cpt.Boolean b -> Boolean b : parseExprList xs
 
 -- Parses a CPT list into a single Expr value
 parseExpr :: [Cpt.Cpt] -> Expr
-parseExpr (Cpt.Sym str : xs) = if isValidBuiltin str then
-    Call str (parseExprList xs) else ExprList (parseExprList original)
-    where original = Cpt.Sym str : xs
+parseExpr (Cpt.Sym str : xs) =
+  if isValidBuiltin str
+    then Call str (parseExprList xs)
+    else ExprList (parseExprList original)
+  where
+    original = Cpt.Sym str : xs
 parseExpr ls = ExprList (parseExprList ls)
+
+-- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
 
 -- Utility function for execution
 -- Converts cpt list to Expr Call
@@ -37,14 +59,6 @@ exprListToCall [] = Nothing
 exprListToCall (Symbole name : xs) = Just (Call name xs)
 exprListToCall _ = Nothing
 
--- DEFINITIONS
-    -- Expression = Anything that ends up a value
-    -- Function Call = When first element of list is symbol
-
--- NOTES
-    -- DID NOT implement ternary (if else) statement for the time being
-    -- At execution : if list is deemed to be a function call, create function to convert it
-
 -- This is where we put builtins
 isValidBuiltin :: String -> Bool
 isValidBuiltin "define" = True
@@ -53,6 +67,23 @@ isValidBuiltin "+" = True
 isValidBuiltin "-" = True
 isValidBuiltin "/" = True
 isValidBuiltin "*" = True
+isValidBuiltin "%" = True
+isValidBuiltin "<" = True
+isValidBuiltin "if" = True
 isValidBuiltin "println" = True
+isValidBuiltin "print" = True
+isValidBuiltin "eq?" = True
 isValidBuiltin "noop" = True -- Should be useful in the future, will return list of args
 isValidBuiltin _ = False
+
+-- Returns boolean if Expr is atomic. This means it cannot be further reduced.
+-- Note: Sym is not atomic as it needs to be reduced to a value
+isAtomic :: Expr -> Bool
+isAtomic (Num _) = True
+isAtomic (Boolean _) = True
+isAtomic Null = True
+isAtomic _ = False
+
+-- Checks if list is atomic
+isListAtomic :: [Expr] -> Bool
+isListAtomic = foldr ((&&) . isAtomic) True
