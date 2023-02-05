@@ -13,7 +13,7 @@ main = do
   loop =<< getFiles
 
 getFiles :: IO [String]
-getFiles = map takeBaseName . filter (`notElem` [".", ".."]) <$> getDirectoryContents "./IntegrationTestFolder/TestFiles/"
+getFiles = map takeBaseName . filter (`notElem` [".", ".."]) <$> getDirectoryContents "./integrationTests/integrationTestFolder/TestFiles/"
 
 printOk :: IO ()
 printOk =
@@ -39,7 +39,7 @@ printRes False True (ExitFailure n) = printError >> putStr "\t" >> printOk >> pu
 
 test :: String -> (ExitCode, String, String) -> IO ()
 test fn (ex, out, err) = do
-  solvedStr <- readFile ("./IntegrationTestFolder/TestFilesSolved/" ++ fn ++ ".scm")
+  solvedStr <- readFile ("./integrationTests/integrationTestFolder/TestFilesSolved/" ++ fn ++ ".scm")
   printRes (solvedStr == out) (isInfixOf "error" fn) ex
 
 getOutput :: String -> IO ()
@@ -51,7 +51,7 @@ getOutput fn =
         "glados",
         "echo-args",
         "--",
-        ("./IntegrationTestFolder/TestFiles/" ++ fn ++ ".scm")
+        ("./integrationTests/integrationTestFolder/TestFiles/" ++ fn ++ ".scm")
       ]
       ""
 
