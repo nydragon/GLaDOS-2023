@@ -1,6 +1,9 @@
 name: "pre-release"
 
-on: push
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   pre-release:
@@ -8,10 +11,10 @@ jobs:
     runs-on: "ubuntu-latest"
 
     steps:
-      # ...
       - name: "Build & test"
         run: |
-          echo "done!"
+          cabal build glados;
+          find .  -wholename "*glados/glados" -exec cp {} . \;;
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -19,3 +22,5 @@ jobs:
           automatic_release_tag: "latest"
           prerelease: true
           title: "Development Build"
+          files: |
+            ./glados
