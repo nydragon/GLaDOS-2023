@@ -47,7 +47,6 @@ jobs:
 
       - name: "Build & test"
         run: |
-          cabal update;
           cabal build glados;
           find .  -wholename "*glados/glados" -exec cp {} . \;;
 
