@@ -20,7 +20,7 @@ getFileName :: [String] -> Maybe FilePath -> String
 getFileName [] b = fromMaybe "stdin" b
 getFileName (x : xs) b = x
 
-runFile :: String -> IO String
+runFile :: String -> IO ()
 runFile filename = do
   -- Tokenize
   tokens <- tokenizeFile filename
@@ -34,10 +34,8 @@ runFile filename = do
   let reg = emptyRegistry
 
   evalTree ast reg
-  -- Run
-  -- run ast
 
-  return ""
+  return ()
 
 evalTree :: [Expr] -> Registry -> IO String
 evalTree [x] reg = do

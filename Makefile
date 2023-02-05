@@ -6,7 +6,7 @@ test: clean
 
 build: clean
 	@rm -rf ./dist-newstyle
-	@make all
+	@cabal build glados
 	@find .  -wholename "*glados/glados" -exec cp {} . \;
 
 integration-test: clean

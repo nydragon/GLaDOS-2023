@@ -6,6 +6,9 @@ import System.IO ( hFlush, stdout )
 import Parsing.Token ( tokenize )
 import Parsing.Cpt ( parseTokenList )
 import Parsing.Ast ( parseExprList )
+import Exec.Registry
+import Exec.Eval
+import qualified Parsing.Ast as Ast
 
 -- Function that counts the character received as argument
 -- Returns the number of times this character appears in a string
@@ -41,20 +44,25 @@ getInput inputs openBrackets = do
             else do
               getInput (inputs <> [input ++ "\n"]) ((openBrackets + num_open) - num_close)
 
+
+loop :: Registry -> IO ()
+loop reg = do
+
+    -- Parse AST
+  ast <- parseExprList . parseTokenList  .  tokenize <$> getInput [] 0
+
+    -- Run
+  (RetVal newReg _) <- eval (Ast.ExprList ast) reg
+  
+  loop newReg
+
 interactiveMode :: IO ()
 interactiveMode = do
     putStrLn "*** BONUS GLADOS ***"
 
-    tokens <- tokenize <$> getInput [] 0
-
-    -- Parse CPT
-    let cpt = parseTokenList tokens
-
-    -- Parse AST
-    let ast = parseExprList cpt
-
     -- Run
-    putStrLn "NOT IMPLEMENTED"
+    loop emptyRegistry
+
     return ()
 
 -- Fonction main
