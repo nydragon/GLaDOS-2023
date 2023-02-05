@@ -46,12 +46,8 @@ getOutput :: String -> IO ()
 getOutput fn =
   test fn
     =<< readProcessWithExitCode
-      "cabal"
-      [ "run",
-        "glados",
-        "echo-args",
-        "--",
-        ("./IntegrationTestFolder/TestFiles/" ++ fn ++ ".scm")
+      "./glados"
+      [ ("./IntegrationTestFolder/TestFiles/" ++ fn ++ ".scm")
       ]
       ""
 

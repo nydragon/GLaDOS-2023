@@ -1,3 +1,5 @@
+{-# LANGUAGE InstanceSigs #-}
+
 module Parsing.Ast where
 
 import qualified Parsing.Cpt as Cpt
@@ -11,13 +13,18 @@ data Expr
   | Symbole String
   | Call String [Expr] -- Will also be used for the boolean expression
   | Null -- Instead of using Maybe Expr
-  deriving (Eq, Show)
+  deriving (Eq)
 
--- instance Show Expr where
---   show :: Expr -> String
---   show (Boolean a)
---     | a = "#t"
---     | otherwise = "#f"
+instance Show Expr where
+  show :: Expr -> String
+  show (Boolean a)
+    | a = "#t"
+    | otherwise = "#f"
+  show (ExprList ls) = show ls
+  show (Num n) = show n
+  show (Symbole s) = show s
+  show (Call s e) = show s ++ show e
+  show Null = "Null"
 
 -- ─── Parsing ─────────────────────────────────────────────────────────────────────────────────────
 

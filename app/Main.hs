@@ -14,12 +14,13 @@ import Parsing.Token (tokenizeFile)
 import System.Console.GetOpt ()
 import System.Environment (getArgs)
 import System.Exit (exitSuccess)
+import Exec.InteractivePrompt
 
 getFileName :: [String] -> Maybe FilePath -> String
 getFileName [] b = fromMaybe "stdin" b
 getFileName (x : xs) b = x
 
-runFile :: String -> IO ()
+runFile :: String -> IO String
 runFile filename = do
   -- Tokenize
   tokens <- tokenizeFile filename
@@ -38,15 +39,15 @@ runFile filename = do
   -- Run
   -- run ast
 
-  return ()
+  return (show v)
 
 main :: IO ()
-main =
-  do
-    -- Parsing arguments
-    (res, fls) <- getArgs >>= parse
+main = do
+  -- Parsing arguments
+  (res, fls) <- getArgs >>= parse
 
-    let fileName = getFileName fls (file res)
-    if (==) fileName "stdin"
-      then interactiveMode -- interactive
-      else runFile fileName -- normal
+  let fileName = getFileName fls (file res)
+  if (==) fileName "stdin"
+    then interactiveMode -- interactive
+    else runFile fileName -- normal
+  return ()
