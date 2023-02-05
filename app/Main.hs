@@ -5,10 +5,10 @@ module Main where
 import Data.Maybe (fromMaybe)
 import Exec ()
 import Exec.Eval (eval)
-import Exec.Registry (RetVal (RetVal), emptyRegistry)
+import Exec.Registry (Registry, RetVal (RetVal), emptyRegistry)
 import Parsing ()
 import Parsing.Args (Args (file), parse)
-import Parsing.Ast (parseExprList)
+import Parsing.Ast (Expr, parseExprList)
 import Parsing.Cpt (parseTokenList)
 import Parsing.Token (tokenizeFile)
 import System.Console.GetOpt ()
@@ -33,13 +33,19 @@ runFile filename = do
 
   let reg = emptyRegistry
 
-  (RetVal d v) <- eval (head ast) reg
-
-  print v
+  putStrLn <$> evalTree ast reg
   -- Run
   -- run ast
 
+  return ""
+
+evalTree :: [Expr] -> Registry -> IO String
+evalTree [x] reg = do
+  (RetVal reg v) <- eval x reg
   return (show v)
+evalTree (x : xs) reg = do
+  (RetVal reg v) <- eval x reg
+  evalTree xs reg
 
 main :: IO ()
 main = do
