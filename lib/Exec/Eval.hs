@@ -53,10 +53,10 @@ eval (Ast.Call fn args) reg = do
     case b of
         Ast.ExprList c -> execCall (Ast.Call fn c) a
         _ -> throwIO FatalError
-
 eval (Ast.Symbole s) (v, f) = case lookupVar s v of
   Nothing -> return $ RetVal (v, f) (Ast.Symbole s)
   Just x -> return $ RetVal (v, f) x
+eval x reg = return $ RetVal reg x
 
 -- Dunno what either of these comments are about
 -- INPUT SHOULDN'T BE LIST

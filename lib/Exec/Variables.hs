@@ -34,5 +34,5 @@ defineVar (Ast.ExprList (Ast.Symbole varName : xs) : Ast.ExprList (expr : ys) : 
         then throwIO AlreadyDefined
         else return ret
     where
-            updatedRegistry = Map.insert varName expr v
-            ret = RetVal (updatedRegistry, f) Ast.Null
+        updatedRegistry = Map.insert varName expr v
+        ret = RetVal (updatedRegistry, f) Ast.Null
