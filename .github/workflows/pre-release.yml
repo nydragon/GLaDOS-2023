@@ -2,7 +2,7 @@ name: "Automatic Release"
 
 on:
   push:
-    branches: [41-create-an-automatic-release-action]
+    branches: [main]
 
 jobs:
   build:
