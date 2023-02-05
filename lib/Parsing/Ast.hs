@@ -1,5 +1,3 @@
-{-# LANGUAGE InstanceSigs #-}
-
 module Parsing.Ast where
 
 import qualified Parsing.Cpt as Cpt
@@ -15,11 +13,11 @@ data Expr
   | Null -- Instead of using Maybe Expr
   deriving (Eq)
 
-instance Show Expr where
-  show :: Expr -> String
-  show (Boolean a)
-    | a = "#t"
-    | otherwise = "#f"
+-- instance Show Expr where
+--   show :: Expr -> String
+--   show (Boolean a)
+--     | a = "#t"
+--     | otherwise = "#f"
 
 -- ─── Parsing ─────────────────────────────────────────────────────────────────────────────────────
 
