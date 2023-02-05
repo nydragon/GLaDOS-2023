@@ -1,11 +1,11 @@
 import Data.List
 
-import ParsingTests
-import ExecTests
-
 import Test.Tasty
 import Test.Tasty.Discover
 import Test.Tasty.HUnit
+
+import ParsingTests
+import ExecTests
 
 {-# OPTIONS_GHC -F -pgmF tasty-discover#-}
 
