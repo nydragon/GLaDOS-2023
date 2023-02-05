@@ -15,7 +15,7 @@ listTokenizeTests = [
         ("open scope", "(", [OpenScope]),
         ("close Scope", ")", [CloseScope]),
         ("1 keyword ( 123 )", "1 keyword ( 123 )", [Num 1, Keyword "keyword", OpenScope, Num 123, CloseScope]),
-        ("(define x 2)\n(+ 3 x)", "(define x 2)\n(+ 3 x)", [OpenScope, Keyword "define", Keyword "x", Num 2, CloseScope, OpenScope, Keyword "+", Num 3, Keyword "x", CloseScope])
+        ("(define x 2)\\n(+ 3 x)", "(define x 2)\n(+ 3 x)", [OpenScope, Keyword "define", Keyword "x", Num 2, CloseScope, OpenScope, Keyword "+", Num 3, Keyword "x", CloseScope])
     ]
 
 parseTokenTests :: TestTree
@@ -28,13 +28,17 @@ parseTokenTests = testGroup "parseToken tests"
   ]
 
 tokenizeTests :: (String, String, [Token]) -> TestTree
-tokenizeTests (name, input, output) = testCase ("Test Tokenize: " ++ name)  $
+tokenizeTests (name, input, output) = testCase ("Test Tokenize " ++ name)  $
         tokenize input @?= output
+
+tokenize'Tests :: (String, String, [Token]) -> TestTree
+tokenize'Tests (name, input, output) = testCase ("Test Tokenize' " ++ name)  $
+        tokenize' input "" @?= output
 
 loop :: [(String, String, [Token])] -> [TestTree]
 loop [] = []
-loop (x:[]) = [tokenizeTests x]
-loop (x:xs) = (tokenizeTests x: loop xs)
+loop (x:[]) = [tokenize'Tests x, tokenizeTests x]
+loop (x:xs) = (tokenize'Tests x:tokenizeTests x: loop xs)
 
 tokenizeSuite :: TestTree
 tokenizeSuite = testGroup "tokenize tests" (loop listTokenizeTests)
