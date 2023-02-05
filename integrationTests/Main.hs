@@ -4,9 +4,9 @@ import Test
 
 main :: IO ()
 main = do
-  putStrLn "Integration Test:\t\t\tOutput\tExit Status\n"
+  putStrLn "Integration Test:\n\nOutput\tStatus\tName\n"
   loop =<< getFiles
 
 loop :: [String] -> IO ()
 loop [] = putStr ""
-loop (x : xs) = putStr ("Test glados with: " ++ x ++ ".scm\t\t") >> getOutput x >> loop xs
+loop (x : xs) = getOutput x >> loop xs

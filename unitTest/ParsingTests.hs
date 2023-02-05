@@ -8,7 +8,6 @@ import Parsing.ArgsTests
 import Parsing.AstTests
 import Parsing.TokenTests
 
-
 parsingSuite :: TestTree
 parsingSuite = testGroup "Parsing Suite Tests" [
         argsSuite,
