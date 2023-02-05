@@ -6,6 +6,9 @@ build: clean
 	@cabal build glados
 	@find .  -wholename "*glados/glados" -exec cp {} . \;
 
+tests: clean
+	@cabal test --test-show-details=direct
+
 unitTest: clean
 	@cabal run unitTest --test-show-details=direct
 
@@ -16,4 +19,4 @@ integration-test: clean
 clean:
 	@rm -f *.tix
 
-.PHONY: all test integrationTest unitTest clean
+.PHONY: all build tests integrationTest unitTest clean
