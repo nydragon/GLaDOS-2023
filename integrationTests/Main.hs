@@ -13,7 +13,7 @@ main = do
   loop =<< getFiles
 
 getFiles :: IO [String]
-getFiles = map takeBaseName . filter (`notElem` [".", ".."]) <$> getDirectoryContents "./IntegrationTestFolder/TestFiles/"
+getFiles = map takeBaseName . filter (isSuffixOf ".scm") <$> filter (`notElem` [".", ".."]) <$> getDirectoryContents "./IntegrationTests/"
 
 printOk :: IO ()
 printOk =
@@ -39,7 +39,9 @@ printRes False True (ExitFailure n) = printError >> putStr "\t" >> printOk >> pu
 
 test :: String -> (ExitCode, String, String) -> IO ()
 test fn (ex, out, err) = do
-  solvedStr <- readFile ("./IntegrationTestFolder/TestFilesSolved/" ++ fn ++ ".scm")
+  solvedStr <- readFile ("./IntegrationTests/" ++ fn ++ ".scm.slv")
+  print solvedStr
+  print out
   printRes (solvedStr == out) (isInfixOf "error" fn) ex
 
 getOutput :: String -> IO ()
@@ -47,10 +49,10 @@ getOutput fn =
   test fn
     =<< readProcessWithExitCode
       "./glados"
-      [ ("./IntegrationTestFolder/TestFiles/" ++ fn ++ ".scm")
+      [ ("./IntegrationTests/" ++ fn ++ ".scm")
       ]
       ""
 
 loop :: [String] -> IO ()
 loop [] = putStr ""
-loop (x : xs) = putStr ("Test glados with: " ++ x ++ ".scm\t\t") >> getOutput x >> loop xs
+loop (x : xs) = putStr ("Test glados with: " ++ x ++ "\t\t") >> getOutput x >> loop xs
