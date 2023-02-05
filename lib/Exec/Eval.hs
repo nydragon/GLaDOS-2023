@@ -46,10 +46,14 @@ evalExprList ls reg = utilConvert $ evalExprList' ls reg
 -- Note : Redirects evalutation to evalExprList if Ast.Expr
 eval :: Ast.Expr -> Registry -> IO RetVal
 eval (Ast.ExprList ls) reg = evalExprList ls reg
-eval (Ast.Call fn args) reg = execCall call reg
-  where
-    reducedArgs = eval (Ast.ExprList args) reg
-    call = Ast.Call fn args
+eval (Ast.Call fn args) reg = do
+    -- Pattern match return of eval of args
+    RetVal a b <- eval (Ast.ExprList args) reg
+
+    case b of
+        Ast.ExprList c -> execCall (Ast.Call fn c) a
+        _ -> throwIO FatalError
+
 eval (Ast.Symbole s) (v, f) = case lookupVar s v of
   Nothing -> return $ RetVal (v, f) (Ast.Symbole s)
   Just x -> return $ RetVal (v, f) x
