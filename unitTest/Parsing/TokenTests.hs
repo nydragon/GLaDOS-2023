@@ -27,21 +27,21 @@ parseTokenTests = testGroup "parseToken tests"
   , testCase "Keyword" $ parseToken "keyword" @?= Keyword "keyword"
   ]
 
-tokenizeTests :: (String, String, [Token]) -> TestTree
-tokenizeTests (name, input, output) = testCase ("Test Tokenize " ++ name)  $
+tokenizeTest :: (String, String, [Token]) -> TestTree
+tokenizeTest (name, input, output) = testCase ("Test Tokenize " ++ name)  $
         tokenize input @?= output
 
-tokenize'Tests :: (String, String, [Token]) -> TestTree
-tokenize'Tests (name, input, output) = testCase ("Test Tokenize' " ++ name)  $
+tokenize'Test :: (String, String, [Token]) -> TestTree
+tokenize'Test (name, input, output) = testCase ("Test Tokenize' " ++ name)  $
         tokenize' input "" @?= output
 
-loop :: [(String, String, [Token])] -> [TestTree]
-loop [] = []
-loop (x:[]) = [tokenize'Tests x, tokenizeTests x]
-loop (x:xs) = (tokenize'Tests x:tokenizeTests x: loop xs)
+tokenizeLoop :: [(String, String, [Token])] -> [TestTree]
+tokenizeLoop [] = []
+tokenizeLoop (x:[]) = [tokenize'Test x, tokenizeTest x]
+tokenizeLoop (x:xs) = (tokenize'Test x:tokenizeTest x: tokenizeLoop xs)
 
 tokenizeSuite :: TestTree
-tokenizeSuite = testGroup "tokenize tests" (loop listTokenizeTests)
+tokenizeSuite = testGroup "tokenize tests" (tokenizeLoop listTokenizeTests)
 
 tokenSuite :: TestTree
 tokenSuite = testGroup "Parsing.Token Test Suite" [

@@ -1,9 +1,10 @@
 module Parsing.ArgsTests where
 
-import Parsing ()
-import Parsing.Args (Args (..), parse)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@=?))
+
+import Parsing ()
+import Parsing.Args (Args (..), parse)
 
 parseArgsTest :: String -> [String] -> Args -> [String] -> TestTree
 parseArgsTest testName arr restest nonargs = testCase testName $ do
