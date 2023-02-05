@@ -1,21 +1,19 @@
 name: "pre-release"
 
 on:
-  push
-  # push:
-  #   branches:
-  #     - main
+  workflow_run:
+    workflows: ["Haskell CI"]
+    types: [completed]
+    branches: [main]
 
 jobs:
   pre-release:
     name: "Pre Release"
     runs-on: "ubuntu-latest"
-
     steps:
-      - name: "Build & test"
-        run: |
-          cabal build glados;
-          find .  -wholename "*glados/glados" -exec cp {} . \;;
+      - uses: actions/download-artifact@v2
+        with:
+          name: glados
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
