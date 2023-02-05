@@ -12,6 +12,7 @@ import Exec
 import System.Environment
 import System.Exit
 import Data.Maybe (fromMaybe)
+import Exec.InteractivePrompt
 
 getFileName :: [String] -> Maybe FilePath -> String
 getFileName [] b = fromMaybe "stdin" b
@@ -42,5 +43,5 @@ main = do
     let fileName = getFileName fls (file res)
     print ("Execute file: " ++  fileName)
     if (==) fileName "stdin"
-        then exitSuccess -- interactive
+        then interactiveMode -- interactive
         else runFile fileName -- normal
