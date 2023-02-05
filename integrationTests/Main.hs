@@ -11,7 +11,7 @@ main :: IO()
 main = loop =<< getFiles
 
 getFiles :: IO[String]
-getFiles = map takeBaseName.filter(`notElem` [".", ".."]) <$> getDirectoryContents "./TestFolder/TestFiles/"
+getFiles = map takeBaseName.filter(`notElem` [".", ".."]) <$> getDirectoryContents "./IntegrationTestFolder/TestFiles/"
 
 printOk :: IO()
 printOk = setSGR [SetColor Foreground Vivid Green] >>
@@ -22,32 +22,46 @@ printError = setSGR [SetColor Foreground Vivid Red] >>
     putStrLn ("Error") >> setSGR [Reset]
 
 printRes :: Bool -> Bool -> ExitCode -> IO()
-printSucces True False ExitSuccess =
+printRes True False ExitSuccess =
     putStr ("\tOutPut: ") >> printOk >>
     putStr ("\tExit Status: ") >> printOk
-printRes False False ExitSuccess =
-    putStr ("\tOutPut: ") >> printError >>
-    putStr ("\tExit Status: ") >> printOk
-printRes False True ExitSuccess =
-    putStr ("\tOutPut: ") >> printError >>
+printRes True False (ExitFailure n) =
+    putStr ("\tOutPut: ") >> printOk >>
     putStr ("\tExit Status: ") >> printError
 printRes True True ExitSuccess =
     putStr ("\tOutPut: ") >> printOk >>
     putStr("\tExit Status: ") >> printError
+printRes True True (ExitFailure n) =
+    putStr ("\tOutPut: ") >> printOk >>
+    putStr("\tExit Status: ") >> printOk
+printRes False False ExitSuccess =
+    putStr ("\tOutPut: ") >> printError >>
+    putStr ("\tExit Status: ") >> printOk
+printRes False False (ExitFailure n) =
+    putStr ("\tOutPut: ") >> printError >>
+    putStr ("\tExit Status: ") >> printError
+printRes False True ExitSuccess =
+    putStr ("\tOutPut: ") >> printError >>
+    putStr ("\tExit Status: ") >> printError
+printRes False True (ExitFailure n) =
+    putStr ("\tOutPut: ") >> printError >>
+    putStr ("\tExit Status: ") >> printOk
+
 
 test :: String -> (ExitCode, String, String) -> IO()
 test x (ex, out, err) = do
-    solvedStr <- readFile ("./TestFolder/TestFilesSolved/" ++ x ++ ".scm")
+    print out
+    solvedStr <- readFile ("./IntegrationTestFolder/TestFilesSolved/" ++ x ++ ".scm")
     printRes (solvedStr == out) (isInfixOf "error" x) ex
 
 
 getOutput :: String -> IO()
 getOutput x = test x =<< readProcessWithExitCode "cabal" ["run", "glados",
-    "echo-args", "--", ("./TestFolder/TestFiles/" ++ x ++ ".scm")] ""
+    "echo-args", "--", ("./IntegrationTestFolder/TestFiles/" ++ x ++ ".scm")] ""
 
 loop :: [String] -> IO()
 loop [] = putStr ""
-loop (x:[]) = getOutput x
+loop (x:[]) = putStrLn ("\nTest glados with: " ++ x ++ ".scm") >> getOutput x
 loop (x:xs) = putStrLn ("\nTest glados with: " ++ x ++ ".scm") >>  getOutput x >> loop xs
 
 
