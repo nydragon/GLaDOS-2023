@@ -1,13 +1,44 @@
-name: "pre-release"
+name: "Automatic Release"
 
 on:
-  workflow_run:
-    workflows: ["Haskell CI"]
-    types: [completed]
+  push:
     branches: [main]
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-haskell@v1
+        with:
+          ghc-version: "8.10.3"
+          cabal-version: "2.4"
+
+      - name: Cache
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-cabal
+        with:
+          path: ~/.cabal
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: "Build & test"
+        run: |
+          cabal update
+          cabal build glados;
+          find .  -wholename "*glados/glados" -exec cp {} . \;;
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: glados
+          path: ./glados
+
   pre-release:
+    needs: build
     name: "Pre Release"
     runs-on: "ubuntu-latest"
     steps:
