@@ -1,84 +1,60 @@
 module Main where
 
+import Data.List
+import System.Console.ANSI
 import System.Directory
+import System.Exit
 import System.FilePath
 import System.Process
-import System.Console.ANSI
-import System.Exit
-import Data.List
 
-main :: IO()
-main = loop =<< getFiles
+main :: IO ()
+main = do
+  putStrLn "Integration Test:\t\t\tOutput\tExit Status\n"
+  loop =<< getFiles
 
-getFiles :: IO[String]
-getFiles = map takeBaseName.filter(`notElem` [".", ".."]) <$> getDirectoryContents "./IntegrationTestFolder/TestFiles/"
+getFiles :: IO [String]
+getFiles = map takeBaseName . filter (`notElem` [".", ".."]) <$> getDirectoryContents "./IntegrationTestFolder/TestFiles/"
 
-printOk :: IO()
-printOk = setSGR [SetColor Foreground Vivid Green] >>
-    putStrLn ("OK") >> setSGR [Reset]
+printOk :: IO ()
+printOk =
+  setSGR [SetColor Foreground Vivid Green]
+    >> putStr ("OK")
+    >> setSGR [Reset]
 
-printError :: IO()
-printError = setSGR [SetColor Foreground Vivid Red] >>
-    putStrLn ("Error") >> setSGR [Reset]
+printError :: IO ()
+printError =
+  setSGR [SetColor Foreground Vivid Red]
+    >> putStr ("Error")
+    >> setSGR [Reset]
 
-printRes :: Bool -> Bool -> ExitCode -> IO()
-printRes True False ExitSuccess =
-    putStr ("\tOutPut: ") >> printOk >>
-    putStr ("\tExit Status: ") >> printOk
-printRes True False (ExitFailure n) =
-    putStr ("\tOutPut: ") >> printOk >>
-    putStr ("\tExit Status: ") >> printError
-printRes True True ExitSuccess =
-    putStr ("\tOutPut: ") >> printOk >>
-    putStr("\tExit Status: ") >> printError
-printRes True True (ExitFailure n) =
-    putStr ("\tOutPut: ") >> printOk >>
-    putStr("\tExit Status: ") >> printOk
-printRes False False ExitSuccess =
-    putStr ("\tOutPut: ") >> printError >>
-    putStr ("\tExit Status: ") >> printOk
-printRes False False (ExitFailure n) =
-    putStr ("\tOutPut: ") >> printError >>
-    putStr ("\tExit Status: ") >> printError
-printRes False True ExitSuccess =
-    putStr ("\tOutPut: ") >> printError >>
-    putStr ("\tExit Status: ") >> printError
-printRes False True (ExitFailure n) =
-    putStr ("\tOutPut: ") >> printError >>
-    putStr ("\tExit Status: ") >> printOk
+printRes :: Bool -> Bool -> ExitCode -> IO ()
+printRes True False ExitSuccess = printOk >> putStr "\t" >> printOk >> putStr "\n"
+printRes True False (ExitFailure n) = printOk >> putStr "\t" >> printError >> putStr "\n"
+printRes True True ExitSuccess = printOk >> putStr "\t" >> printError >> putStr "\n"
+printRes True True (ExitFailure n) = printOk >> putStr "\t" >> printOk >> putStr "\n"
+printRes False False ExitSuccess = printError >> putStr "\t" >> printOk >> putStr "\n"
+printRes False False (ExitFailure n) = printError >> putStr "\t" >> printError >> putStr "\n"
+printRes False True ExitSuccess = printError >> putStr "\t" >> printError >> putStr "\n"
+printRes False True (ExitFailure n) = printError >> putStr "\t" >> printOk >> putStr "\n"
 
+test :: String -> (ExitCode, String, String) -> IO ()
+test fn (ex, out, err) = do
+  solvedStr <- readFile ("./IntegrationTestFolder/TestFilesSolved/" ++ fn ++ ".scm")
+  printRes (solvedStr == out) (isInfixOf "error" fn) ex
 
-test :: String -> (ExitCode, String, String) -> IO()
-test x (ex, out, err) = do
-    print out
-    solvedStr <- readFile ("./IntegrationTestFolder/TestFilesSolved/" ++ x ++ ".scm")
-    printRes (solvedStr == out) (isInfixOf "error" x) ex
+getOutput :: String -> IO ()
+getOutput fn =
+  test fn
+    =<< readProcessWithExitCode
+      "cabal"
+      [ "run",
+        "glados",
+        "echo-args",
+        "--",
+        ("./IntegrationTestFolder/TestFiles/" ++ fn ++ ".scm")
+      ]
+      ""
 
-
-getOutput :: String -> IO()
-getOutput x = test x =<< readProcessWithExitCode "cabal" ["run", "glados",
-    "echo-args", "--", ("./IntegrationTestFolder/TestFiles/" ++ x ++ ".scm")] ""
-
-loop :: [String] -> IO()
+loop :: [String] -> IO ()
 loop [] = putStr ""
-loop (x:[]) = putStrLn ("\nTest glados with: " ++ x ++ ".scm") >> getOutput x
-loop (x:xs) = putStrLn ("\nTest glados with: " ++ x ++ ".scm") >>  getOutput x >> loop xs
-
-
--- integrationSuite :: TestTree
--- integrationSuite = testGroup "Parsing Suite Tests" loop =<< getFiles
-
--- testfile :: String -> TestTree
--- testfile path = testCaseSteps "test " $ \step -> do
---     step "Preparing..."
---     print path
---     -- let f = "TestFolder/TestFilesSolved/" ++ path
---     -- solvedStr <- readFile f
---     -- print solvedStr
---     gladosStr <- readProcess "cabal run gLaDOS echo-args -- " [path]
---     step "Compare"
---     -- print gladosStr
-
--- loop :: [String] -> [TestTree]
--- loop (x:[]) = [testfile x]
--- loop (x:xs) = loop xs ++ [testfile x]
+loop (x : xs) = putStr ("Test glados with: " ++ x ++ ".scm\t\t") >> getOutput x >> loop xs
