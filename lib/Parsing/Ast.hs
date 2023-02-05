@@ -11,7 +11,7 @@ data Expr
   | Symbole String
   | Call String [Expr] -- Will also be used for the boolean expression
   | Null -- Instead of using Maybe Expr
-  deriving (Eq)
+  deriving (Eq, Show)
 
 -- instance Show Expr where
 --   show :: Expr -> String
