@@ -23,7 +23,7 @@ instance Show Expr where
   show (ExprList ls) = show ls
   show (Num n) = show n
   show (Symbole s) = show s
-  show (Call s e) = show s ++ show e
+  show (Call _ _) = "#<procedure>"
   show Null = "Null"
 
 -- ─── Parsing ─────────────────────────────────────────────────────────────────────────────────────
@@ -67,7 +67,12 @@ isValidBuiltin "+" = True
 isValidBuiltin "-" = True
 isValidBuiltin "/" = True
 isValidBuiltin "*" = True
+isValidBuiltin "%" = True
+isValidBuiltin "<" = True
+isValidBuiltin "if" = True
 isValidBuiltin "println" = True
+isValidBuiltin "print" = True
+isValidBuiltin "eq?" = True
 isValidBuiltin "noop" = True -- Should be useful in the future, will return list of args
 isValidBuiltin _ = False
 

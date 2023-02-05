@@ -33,7 +33,7 @@ runFile filename = do
 
   let reg = emptyRegistry
 
-  putStrLn <$> evalTree ast reg
+  evalTree ast reg
   -- Run
   -- run ast
 
