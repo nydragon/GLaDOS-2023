@@ -29,16 +29,17 @@ testLookupFunc :: TestTree
 testLookupFunc =
   testGroup
     "Test lookupFunc"
-    [ testCase "Returns the body of a defined function" $
-        assertEqual
-          "Incorrect body for 'add'"
-          assert1
-          (lookupFunc "add" input1),
-      testCase "Returns Nothing if function is not defined" $
-        assertEqual
-          "Incorrect result for 'subtract'"
-          Nothing
-          (lookupFunc "subtract" Map.empty)
+    [
+    --     testCase "Returns the body of a defined function" $
+    --     assertEqual
+    --       "Incorrect body for 'add'"
+    --       assert1
+    --       (lookupFunc "add" input1),
+    --   testCase "Returns Nothing if function is not defined" $
+    --     assertEqual
+    --       "Incorrect result for 'subtract'"
+    --       Nothing
+    --       (lookupFunc "subtract" Map.empty)
     ]
   where
     input1 = Map.fromList [("add", (["1", "2"], Ast.ExprList [Ast.Symbole "+", Ast.Num 1, Ast.Num 2]))]

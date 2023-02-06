@@ -133,5 +133,5 @@ getTypeName = show . typeOf
 -- Utility function to distinguish between variable definition and function definition
 -- Args : [Expr] of args -> Registry
 distinguishDefine :: [Ast.Expr] -> Registry -> IO RetVal
-distinguishDefine [Ast.Symbole s, Ast.ExprList (Ast.Symbole "lambda" : xs)] reg = defineFunc [Ast.Symbole s, Ast.ExprList (Ast.Symbole "lambda" : xs)] reg
+distinguishDefine [Ast.Symbole s, Ast.Call "lambda" [Ast.ExprList args, body]] reg = defineFunc [Ast.Symbole s, Ast.Call "lambda" [Ast.ExprList args, body]] reg
 distinguishDefine args reg = defineVar args reg

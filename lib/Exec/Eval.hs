@@ -53,7 +53,7 @@ evalExprList ls reg = utilConvert $ evalExprList' ls reg
 -- Evaluates a given expression into an atom
 -- Note : Redirects evalutation to evalExprList if Ast.Expr
 eval :: Ast.Expr -> Registry -> IO RetVal
-eval (Ast.ExprList (Ast.ExprList [Ast.Symbole "lambda", Ast.ExprList args, Ast.ExprList body] : argValues)) reg = evalLambda args body argValues reg
+eval (Ast.ExprList (Ast.Call "lambda" [Ast.ExprList args, body] : argValues)) reg = evalLambda args body argValues reg
 eval (Ast.ExprList ls) reg = evalExprList ls reg
 eval (Ast.Call "define" args) reg = execCall (Ast.Call "define" args) reg
 eval (Ast.Call fn args) reg = do
@@ -87,18 +87,19 @@ execFunc funcName argValues reg
   | Ast.isValidBuiltin funcName = execBuiltin (Ast.Call funcName argValues) reg
   | otherwise = case lookupFunc funcName (snd reg) of
       Nothing -> throwIO $ InvalidFunctionCall funcName
-      Just (Ast.ExprList [Ast.Symbole "lambda", Ast.ExprList args, Ast.ExprList body]) -> evalLambda  args body argValues reg
+      Just (Ast.ExprList [Ast.ExprList args, body]) -> evalLambda  args body argValues reg
+      _ -> throwIO FatalError
 
-makeLambda :: [Ast.Expr] -> [Ast.Expr] -> [Ast.Expr] -> Ast.Expr
-makeLambda args body argValues = Ast.ExprList (Ast.ExprList [Ast.Symbole "lambda", Ast.ExprList args, Ast.ExprList body] : argValues)
+makeLambda :: [Ast.Expr] -> Ast.Expr -> [Ast.Expr] -> Ast.Expr
+makeLambda args body argValues = Ast.ExprList (Ast.ExprList [Ast.Symbole "lambda", Ast.ExprList args, body] : argValues)
 
-evalLambda :: [Ast.Expr] -> [Ast.Expr] -> [Ast.Expr] -> Registry -> IO RetVal
+evalLambda :: [Ast.Expr] -> Ast.Expr -> [Ast.Expr] -> Registry -> IO RetVal
 evalLambda args body argValues = evalLambda' (makeLambda args body argValues)
 
 evalLambda' :: Ast.Expr -> Registry -> IO RetVal
-evalLambda' (Ast.ExprList (Ast.ExprList [Ast.Symbole "lambda", Ast.ExprList args, Ast.ExprList body] : argValues)) reg = do
+evalLambda' (Ast.ExprList (Ast.ExprList [Ast.Symbole "lambda", Ast.ExprList args, body] : argValues)) reg = do
     tempReg <- bindArgs (toString args) argValues reg
-    (RetVal a v) <- eval (Ast.ExprList body) tempReg
+    (RetVal a v) <- eval body tempReg
     return (RetVal reg v)
 evalLambda' a _ = throwIO $ InvalidFunctionCall "lambda"
 

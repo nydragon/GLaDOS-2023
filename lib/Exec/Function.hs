@@ -21,8 +21,8 @@ import Debug.Trace
 -- Note : Returns retval as define is a function (returns NULL)
 -- EXPECTS : Args to contain two sublists (hence big pattern match)
 defineFunc :: [Ast.Expr] -> Registry -> IO RetVal
-defineFunc [Ast.Symbole n, Ast.ExprList body] (v, f) = return $ RetVal (v, newReg) Ast.Null
-    where newReg = Map.insert n (Ast.ExprList body) f
+defineFunc [Ast.Symbole n, Ast.Call "lambda" d] (v, f) = return $ RetVal (v, newReg) Ast.Null
+    where newReg = Map.insert n (Ast.ExprList d) f
 definefunc _ _ = throwIO $ InvalidFunctionDefinition "<Unknown Function Name>"
 
 -- Get definitions
