@@ -5,6 +5,7 @@ import Data.Typeable
 import Exec.Registry
 import Exec.RuntimeException
 import qualified Parsing.Ast as Ast
+import Exec.Variables
 
 -- Function declarations should use the same prototype :
 -- [Ast.Expr] -> Registry -> IO RetVal
@@ -31,6 +32,7 @@ execBuiltin (Ast.Call func ls) reg = case func of
   "<" -> lt ls reg
   "eq?" -> eq ls reg
   "if" -> ifBuiltin ls reg
+  "define" -> defineVar ls reg
   _ -> throwIO NotYetImplemented
 execBuiltin _ _ = throwIO UndefinedBehaviour -- Builtin not found
 

@@ -1,6 +1,8 @@
 module Exec where
 
 import Control.Exception (throwIO)
+import Debug.Trace
+
 import Exec.Builtins (execBuiltin)
 import Exec.Function (lookupFunc)
 import Exec.Registry (Registry, RetVal (..))
@@ -25,7 +27,7 @@ isAtomicExpression :: Ast.Expr -> Bool
 isAtomicExpression (Ast.Num n) = True
 isAtomicExpression (Ast.Boolean n) = True
 isAtomicExpression Ast.Null = True
-isAtomicExpression _ = False
+isAtomicExpression (Ast.Symbole _) = True
 
 isAtomicExpressionList :: [Ast.Expr] -> Bool
 isAtomicExpressionList = all isAtomicExpression

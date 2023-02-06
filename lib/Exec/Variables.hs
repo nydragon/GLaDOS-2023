@@ -29,10 +29,13 @@ removeVars (x : xs) (vars, funcs) = removeVars xs newReg
 -- Defines a variable
 -- Returns Nothing if name is already used
 defineVar :: [Ast.Expr] -> Registry -> IO RetVal
-defineVar (Ast.ExprList (Ast.Symbole varName : xs) : Ast.ExprList (expr : ys) : _) (v, f) =
+-- Note : For the time being, there is no check in "atomicity" being done for the binding of variable
+    -- If this doesn't cause any issues, it would allow us to bind EVERYTHING to variables
+defineVar (Ast.Symbole varName : x : xs) (v, f) =
     if isNameDefined varName (v, f)
         then throwIO AlreadyDefined
         else return ret
     where
-        updatedRegistry = Map.insert varName expr v
+        updatedRegistry = Map.insert varName x v
         ret = RetVal (updatedRegistry, f) Ast.Null
+defineVar _ reg = throwIO $ InvalidFunctionCall "define (var)"
