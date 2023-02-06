@@ -67,3 +67,6 @@ eval x reg = return $ RetVal reg x
 -- Dunno what either of these comments are about
 -- INPUT SHOULDN'T BE LIST
 -- LIST NEEDS TO BE CHECKED IF FUNCTION CALL
+
+-- WHERE TO PICK UP FROM
+-- evalExprList is parsing builtin function calls as functions when doing function declaration
