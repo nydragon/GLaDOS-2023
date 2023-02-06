@@ -10,7 +10,7 @@ import Debug.Trace
 
 -- Get definitions
 lookupVar :: String -> VarRegistry -> Maybe Ast.Expr
-lookupVar n reg = trace ("In lookup var : " ++ show reg) Map.lookup n reg
+lookupVar = Map.lookup
 
 -- Remove a variable definition
 removeVar :: String -> Registry -> Registry
