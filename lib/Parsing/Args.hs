@@ -34,7 +34,7 @@ parse argv =
     case getOpt Permute options argv of
         (o,n,[]) -> do
             if "-h" `elem` argv
-                then do 
+                then do
                     hPutStrLn stderr (usageInfo header options)
                     exitSuccess
                 else
