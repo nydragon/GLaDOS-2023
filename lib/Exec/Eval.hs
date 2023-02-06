@@ -17,24 +17,29 @@ import Debug.Trace
 
 utilConvert :: IO (Registry, [Ast.Expr]) -> IO RetVal
 utilConvert og = do
-  (reg, ls) <- og
+    (reg, ls) <- og
 
-  return $ RetVal reg (Ast.ExprList ls)
+    return $ RetVal reg (Ast.ExprList ls)
 
 -- Special eval function for Ast.List
 evalExprList' :: [Ast.Expr] -> Registry -> IO (Registry, [Ast.Expr])
 evalExprList' [] reg = return (reg, [])
 evalExprList' (x : xs) reg = do
-  RetVal evalReg evalOutput <- eval x reg
+    RetVal evalReg evalOutput <- eval x reg
 
-  (recursiveReg, exprList) <- evalExprList' xs evalReg
+    (recursiveReg, exprList) <- evalExprList' xs evalReg
 
-  return (recursiveReg, evalOutput : exprList)
+    return (recursiveReg, evalOutput : exprList)
 
 -- This function first checks if expression list is valid
 evalExprList :: [Ast.Expr] -> Registry -> IO RetVal
-evalExprList (Ast.Symbole s : xs) (v, f) = case lookupFunc s f of
-    Nothing -> utilConvert $ evalExprList' (Ast.Symbole s : xs) reg -- If not valid function call
+evalExprList (Ast.Symbole s : xs) (v, f) = trace ("s is : " ++ s) $ case lookupFunc s f of
+    Nothing -> if Ast.isValidBuiltin s then
+        case Ast.exprListToCall exprList of
+            Nothing -> throwIO FatalError
+            Just call -> eval call reg
+        else
+            utilConvert $ evalExprList' (Ast.Symbole s : xs) reg -- If not valid function call
     Just _ -> case Ast.exprListToCall exprList of
         Nothing -> throwIO FatalError
         Just call -> eval call reg
