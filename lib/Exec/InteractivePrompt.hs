@@ -18,7 +18,7 @@ countChar char = length . filter (== char)
 recurse :: [String] -> Int -> Int -> IO String
 recurse inputs 0 close = print "Open with a bracket." >> getInput [] 0
 recurse inputs _ _
-  | "\ESC" `isInfixOf` last inputs = exitSuccess 
+  | "\ESC" `isInfixOf` last inputs = exitSuccess
 recurse inputs open close
   | open == close = return $ concat inputs
   | otherwise = getInput inputs (open - close)

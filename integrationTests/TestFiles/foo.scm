@@ -1,2 +1,2 @@
-(define foo 21)
-(* foo 2)
+(define foo 21)(
+(print(* foo 2))

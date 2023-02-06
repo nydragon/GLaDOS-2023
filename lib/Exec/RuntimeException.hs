@@ -13,12 +13,13 @@ data RuntimeException
   | InvalidFunctionDefinition String
   | UndefinedBehaviour -- Pretty much for anything that shouldn't ever happen
   | NotYetImplemented
-  | -- args: argument index, expected type, got type
-    InvalidArgument Integer String String
+  -- args: argument index, expected type, got type
+  | InvalidArgument Integer String String
   | InvalidArgumentCount String
   | NullDivision
   | FatalError -- For stuff that shouldn't happen
   | AlreadyDefined
+  | InvalidLambda Ast.Expr
   deriving (Eq)
 
 instance Exception RuntimeException
@@ -31,6 +32,10 @@ instance Show RuntimeException where
   show (InvalidArgument a b c) = "InvalidArgument: argument " ++ show a ++ ", expected '" ++ b ++ "' but received '" ++ c ++ "'."
   show (InvalidArgumentCount fn) = "InvalidArgumentCount: Function " ++ fn ++ " received an invalid amount of arguments."
   show NullDivision = "NullDivision: Did you not pay attention in math class?"
+  show FatalError = "FatalError"
+  show AlreadyDefined = "AlreadyDefined"
+  show (InvalidLambda e) = "InvalidLambda: " ++ show e
+  show _ = "oh oh"
 
 data InternalException
   = NonAtomicFunctionArgs String [Ast.Expr]

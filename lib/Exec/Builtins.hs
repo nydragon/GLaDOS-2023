@@ -5,6 +5,9 @@ import Data.Typeable
 import Exec.Registry
 import Exec.RuntimeException
 import qualified Parsing.Ast as Ast
+import Exec.Variables
+import Exec.Function
+import Debug.Trace
 
 -- Function declarations should use the same prototype :
 -- [Ast.Expr] -> Registry -> IO RetVal
@@ -29,8 +32,12 @@ execBuiltin (Ast.Call func ls) reg = case func of
   "-" -> subBuiltin ls reg
   "+" -> add ls reg
   "<" -> lt ls reg
+  "<=" -> lte ls reg
+  ">" -> gt ls reg
+  ">=" -> gte ls reg
   "eq?" -> eq ls reg
   "if" -> ifBuiltin ls reg
+  "define" -> distinguishDefine ls reg
   _ -> throwIO NotYetImplemented
 execBuiltin _ _ = throwIO UndefinedBehaviour -- Builtin not found
 
@@ -76,13 +83,31 @@ add :: [Ast.Expr] -> Registry -> IO RetVal
 add [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Num ((+) a b)
 add [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
 add [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
-add _ _ = throwIO $ InvalidArgumentCount "+"
+add arg _ = trace ("Args are s: " ++ show arg) throwIO (InvalidArgumentCount "+")
 
 lt :: [Ast.Expr] -> Registry -> IO RetVal
 lt [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Boolean ((<) a b)
 lt [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
 lt [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
 lt _ _ = throwIO $ InvalidArgumentCount "<"
+
+lte :: [Ast.Expr] -> Registry -> IO RetVal
+lte [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Boolean ((<=) a b)
+lte [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
+lte [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
+lte _ _ = throwIO $ InvalidArgumentCount "<="
+
+gt :: [Ast.Expr] -> Registry -> IO RetVal
+gt [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Boolean ((>) a b)
+gt [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
+gt [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
+gt _ _ = throwIO $ InvalidArgumentCount ">"
+
+gte :: [Ast.Expr] -> Registry -> IO RetVal
+gte [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Boolean ((>=) a b)
+gte [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
+gte [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
+gte _ _ = throwIO $ InvalidArgumentCount ">="
 
 eq :: [Ast.Expr] -> Registry -> IO RetVal
 eq [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Boolean ((==) a b)
@@ -104,3 +129,9 @@ ifBuiltin _ _ = throwIO $ InvalidArgumentCount "eq"
 -- This will most likely have to be moved
 getTypeName :: Typeable a => a -> String
 getTypeName = show . typeOf
+
+-- Utility function to distinguish between variable definition and function definition
+-- Args : [Expr] of args -> Registry
+distinguishDefine :: [Ast.Expr] -> Registry -> IO RetVal
+distinguishDefine [Ast.Symbole s, Ast.Call "lambda" [Ast.ExprList args, body]] reg = defineFunc [Ast.Symbole s, Ast.Call "lambda" [Ast.ExprList args, body]] reg
+distinguishDefine args reg = defineVar args reg

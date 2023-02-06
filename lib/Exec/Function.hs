@@ -6,6 +6,7 @@ import Control.Exception
 import qualified Parsing.Ast as Ast
 import Exec.Registry
 import Exec.RuntimeException
+import Debug.Trace
 
 -- IMPORTANT : This file must NOT be imported in Exec module. (Cyclic Dependencies)
 
@@ -20,14 +21,8 @@ import Exec.RuntimeException
 -- Note : Returns retval as define is a function (returns NULL)
 -- EXPECTS : Args to contain two sublists (hence big pattern match)
 defineFunc :: [Ast.Expr] -> Registry -> IO RetVal
-defineFunc (Ast.ExprList (Ast.Symbole n : args) : Ast.ExprList def : _) (v, f) =
-    if isArgumentList args then
-        case Ast.exprListToCall def of
-            Nothing -> throwIO $ InvalidFunctionDefinition n
-            -- Updated function registry and return Null
-            Just x -> return $ RetVal (v, Map.insert n (argNameStr, x) f) Ast.Null
-    else throwIO $ InvalidFunctionDefinition n
-        where   argNameStr = [str | Ast.Symbole str <- args]
+defineFunc [Ast.Symbole n, Ast.Call "lambda" d] (v, f) = return $ RetVal (v, newReg) Ast.Null
+    where newReg = Map.insert n (Ast.ExprList d) f
 definefunc _ _ = throwIO $ InvalidFunctionDefinition "<Unknown Function Name>"
 
 -- Get definitions

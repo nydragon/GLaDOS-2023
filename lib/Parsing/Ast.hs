@@ -33,6 +33,7 @@ instance Show Expr where
 -- This means it will only parse function calls in sublists thanks to parseExpr
 parseExprList :: [Cpt.Cpt] -> [Expr]
 parseExprList [] = []
+parseExprList (Cpt.List [Cpt.Sym "define", Cpt.List (Cpt.Sym a : arg), Cpt.List body] : xs) = Call "define" [ Symbole a, Call "lambda" [parseExpr arg, parseExpr body]] : parseExprList xs
 parseExprList (x : xs) = case x of
   Cpt.Sym str -> Symbole str : parseExprList xs
   Cpt.Val i -> Num i : parseExprList xs
@@ -69,6 +70,9 @@ isValidBuiltin "div" = True
 isValidBuiltin "*" = True
 isValidBuiltin "mod" = True
 isValidBuiltin "<" = True
+isValidBuiltin "<=" = True
+isValidBuiltin ">" = True
+isValidBuiltin ">=" = True
 isValidBuiltin "if" = True
 isValidBuiltin "println" = True
 isValidBuiltin "print" = True
