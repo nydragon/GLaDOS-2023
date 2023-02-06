@@ -7,6 +7,7 @@ import Exec.RuntimeException
 import qualified Parsing.Ast as Ast
 import Exec.Variables
 import Exec.Function
+import Debug.Trace
 
 -- Function declarations should use the same prototype :
 -- [Ast.Expr] -> Registry -> IO RetVal
@@ -79,7 +80,7 @@ add :: [Ast.Expr] -> Registry -> IO RetVal
 add [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Num ((+) a b)
 add [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
 add [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
-add _ _ = throwIO $ InvalidArgumentCount "+"
+add arg _ = trace ("Invalid args : " ++ show arg) throwIO (InvalidArgumentCount "+")
 
 lt :: [Ast.Expr] -> Registry -> IO RetVal
 lt [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Boolean ((<) a b)

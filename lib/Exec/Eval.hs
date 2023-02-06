@@ -8,6 +8,7 @@ import Exec.Registry
 import Exec.RuntimeException
 import Exec.Variables
 import qualified Parsing.Ast as Ast
+import Debug.Trace
 
 -- ─── Evaluate Expression ─────────────────────────────────────────────────────────────────────────
 
@@ -33,13 +34,13 @@ evalExprList' (x : xs) reg = do
 -- This function first checks if expression list is valid
 evalExprList :: [Ast.Expr] -> Registry -> IO RetVal
 evalExprList (Ast.Symbole s : xs) (v, f) = case lookupFunc s f of
-  Nothing -> utilConvert $ evalExprList' (Ast.Symbole s : xs) reg -- If not valid function call
-  Just _ -> case Ast.exprListToCall exprList of
-    Nothing -> throwIO FatalError
-    Just call -> eval call reg
-  where
-    exprList = Ast.Symbole s : xs
-    reg = (v, f)
+    Nothing -> utilConvert $ evalExprList' (Ast.Symbole s : xs) reg -- If not valid function call
+    Just _ -> case Ast.exprListToCall exprList of
+        Nothing -> throwIO FatalError
+        Just call -> eval call reg
+    where
+        exprList = Ast.Symbole s : xs
+        reg = (v, f)
 evalExprList ls reg = utilConvert $ evalExprList' ls reg
 
 -- Evaluates a given expression into an atom
@@ -50,12 +51,15 @@ eval (Ast.Call fn args) reg = do
     -- Pattern match return of eval of args
     RetVal a b <- eval (Ast.ExprList args) reg
 
+    putStrLn "In eval call"
+    print b
+
     case b of
         Ast.ExprList c -> execCall (Ast.Call fn c) a
         _ -> throwIO FatalError
-eval (Ast.Symbole s) (v, f) = case lookupVar s v of
-  Nothing -> return $ RetVal (v, f) (Ast.Symbole s)
-  Just x -> return $ RetVal (v, f) x
+eval (Ast.Symbole s) (v, f) = trace ("\tevaluating symbole : " ++ s) $ case lookupVar s v of
+    Nothing -> trace ("\tReturn is : " ++ "NOTHING") return $ RetVal (v, f) (Ast.Symbole s)
+    Just x -> trace ("\tReturn is : " ++ show x) return $ RetVal (v, f) x
 eval x reg = return $ RetVal reg x
 
 -- Dunno what either of these comments are about

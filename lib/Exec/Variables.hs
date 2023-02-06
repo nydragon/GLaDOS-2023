@@ -6,6 +6,7 @@ import Control.Exception
 import qualified Parsing.Ast as Ast
 import Exec.RuntimeException
 import Exec.Registry
+import Debug.Trace
 
 -- Get definitions
 lookupVar :: String -> VarRegistry -> Maybe Ast.Expr
