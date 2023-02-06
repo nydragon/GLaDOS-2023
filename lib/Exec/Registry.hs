@@ -25,6 +25,7 @@ emptyRegistry = (Map.empty, Map.empty)
 
 -- Data structure used as main function return type
 data RetVal = RetVal Registry Ast.Expr
+    deriving (Show)
 
 -- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
 

@@ -52,14 +52,14 @@ eval (Ast.Call fn args) reg = do
     RetVal a b <- eval (Ast.ExprList args) reg
 
     putStrLn "In eval call"
-    print b
+    print fn
 
     case b of
         Ast.ExprList c -> execCall (Ast.Call fn c) a
         _ -> throwIO FatalError
-eval (Ast.Symbole s) (v, f) = trace ("\tevaluating symbole : " ++ s) $ case lookupVar s v of
-    Nothing -> trace ("\tReturn is : " ++ "NOTHING") return $ RetVal (v, f) (Ast.Symbole s)
-    Just x -> trace ("\tReturn is : " ++ show x) return $ RetVal (v, f) x
+eval (Ast.Symbole s) (v, f) = trace "KSOS" $ case lookupVar s v of
+    Nothing -> trace ("A: " ++ s) return $ RetVal (v, f) (Ast.Symbole s)
+    Just x -> trace ("B: " ++ s) return $ RetVal (v, f) x
 eval x reg = return $ RetVal reg x
 
 -- Dunno what either of these comments are about

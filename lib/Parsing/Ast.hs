@@ -41,10 +41,7 @@ parseExprList (x : xs) = case x of
 
 -- Parses a CPT list into a single Expr value
 parseExpr :: [Cpt.Cpt] -> Expr
-parseExpr (Cpt.Sym str : xs) =
-  if isValidBuiltin str
-    then Call str (parseExprList xs)
-    else ExprList (parseExprList original)
+parseExpr (Cpt.Sym str : xs) = ExprList (parseExprList original)
   where
     original = Cpt.Sym str : xs
 parseExpr ls = ExprList (parseExprList ls)

@@ -61,8 +61,3 @@ interactiveMode = do
   loop emptyRegistry
 
   return ()
-
--- Fonction main
---  Affiche entrée "input"bon au  format
--- get the return of the "checkBrackets" function
--- which gives the correct test format with true occurance '(' == ')'

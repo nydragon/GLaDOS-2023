@@ -6,6 +6,7 @@ import Control.Exception
 import qualified Parsing.Ast as Ast
 import Exec.Registry
 import Exec.RuntimeException
+import Debug.Trace
 
 -- IMPORTANT : This file must NOT be imported in Exec module. (Cyclic Dependencies)
 
