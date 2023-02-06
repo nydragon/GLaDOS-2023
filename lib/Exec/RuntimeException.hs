@@ -25,12 +25,12 @@ instance Exception RuntimeException
 
 instance Show RuntimeException where
   show :: RuntimeException -> String
-  show (InvalidFunctionCall a) = a ++ " is an invalid function call."
-  show UndefinedBehaviour = "This is undefined."
-  show NotYetImplemented = "OH MAXI BEBOU"
-  show (InvalidArgument a b c) = "Argument " ++ show a ++ " invalid: expected '" ++ b ++ "' but received '" ++ c ++ "'."
-  show (InvalidArgumentCount fn) = "Function " ++ fn ++ ": Invalid arg count."
-  show NullDivision = "Did you not pay attention in math class?"
+  show (InvalidFunctionCall a) = "InvalidFunctionCall: " ++ a ++ " is not a function."
+  show UndefinedBehaviour = "UndefinedBehaviour: This behaviour is undefined."
+  show NotYetImplemented = "NotYetImplemented"
+  show (InvalidArgument a b c) = "InvalidArgument: argument " ++ show a ++ ", expected '" ++ b ++ "' but received '" ++ c ++ "'."
+  show (InvalidArgumentCount fn) = "InvalidArgumentCount: Function " ++ fn ++ " received an invalid amount of arguments."
+  show NullDivision = "NullDivision: Did you not pay attention in math class?"
 
 data InternalException
   = NonAtomicFunctionArgs String [Ast.Expr]
