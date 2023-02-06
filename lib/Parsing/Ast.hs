@@ -66,6 +66,9 @@ isValidBuiltin "div" = True
 isValidBuiltin "*" = True
 isValidBuiltin "mod" = True
 isValidBuiltin "<" = True
+isValidBuiltin "<=" = True
+isValidBuiltin ">" = True
+isValidBuiltin ">=" = True
 isValidBuiltin "if" = True
 isValidBuiltin "println" = True
 isValidBuiltin "print" = True
