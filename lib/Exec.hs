@@ -28,6 +28,7 @@ isAtomicExpression (Ast.Num n) = True
 isAtomicExpression (Ast.Boolean n) = True
 isAtomicExpression Ast.Null = True
 isAtomicExpression (Ast.Symbole _) = True
+isAtomicExpression _ = False
 
 isAtomicExpressionList :: [Ast.Expr] -> Bool
 isAtomicExpressionList = all isAtomicExpression

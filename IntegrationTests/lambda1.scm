@@ -1,1 +1,1 @@
-(lambda (a b) (+ a b))
+(print (lambda (a b) (+ a b)))

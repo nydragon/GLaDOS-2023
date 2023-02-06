@@ -1,2 +1,2 @@
 (define (add a b) (+ a b))
-(add 3 4)
+(print (add 3 4))
