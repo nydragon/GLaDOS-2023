@@ -7,6 +7,7 @@ import Exec.Variables
 import qualified Parsing.Ast as Ast
 import Test.Tasty
 import Test.Tasty.HUnit
+import Exec.Registry
 
 -- Test data
 vars = emptyRegistry

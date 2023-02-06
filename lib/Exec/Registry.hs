@@ -5,7 +5,7 @@ import qualified Parsing.Ast as Ast
 
 -- Represents a function
 -- Contains: Args List [String], and definition Ast.Call
-type Function = ([String], Ast.Expr)
+type Function =  Ast.Expr
 
 -- Function registry
 type FuncRegistry = Map.Map String Function

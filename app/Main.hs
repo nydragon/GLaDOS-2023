@@ -14,7 +14,7 @@ import Parsing.Token (tokenizeFile)
 import System.Console.GetOpt ()
 import System.Environment (getArgs)
 import System.Exit (exitSuccess)
-import Exec.InteractivePrompt
+import Exec.InteractivePrompt ( interactiveMode )
 
 getFileName :: [String] -> Maybe FilePath -> String
 getFileName [] b = fromMaybe "stdin" b

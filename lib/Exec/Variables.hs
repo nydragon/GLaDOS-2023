@@ -32,10 +32,7 @@ removeVars (x : xs) (vars, funcs) = removeVars xs newReg
 defineVar :: [Ast.Expr] -> Registry -> IO RetVal
 -- Note : For the time being, there is no check in "atomicity" being done for the binding of variable
     -- If this doesn't cause any issues, it would allow us to bind EVERYTHING to variables
-defineVar (Ast.Symbole varName : x : xs) (v, f) =
-    if isNameDefined varName (v, f)
-        then throwIO AlreadyDefined
-        else return ret
+defineVar (Ast.Symbole varName : x : xs) (v, f) = return ret
     where
         updatedRegistry = Map.insert varName x v
         ret = RetVal (updatedRegistry, f) Ast.Null
