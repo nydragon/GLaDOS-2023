@@ -9,22 +9,18 @@ import System.Process
 import Print
 
 getFiles :: IO [String]
-getFiles = map takeBaseName . filter (`notElem` [".", ".."]) <$> getDirectoryContents "./integrationTests/integrationTestFolder/TestFiles/"
+getFiles = map takeBaseName . filter (isSuffixOf ".scm") <$> filter (`notElem` [".", ".."]) <$> getDirectoryContents "./integrationTests/TestFiles/"
 
 getOutput :: String -> IO ()
 getOutput fn =
   test fn
     =<< readProcessWithExitCode
-      "cabal"
-      [ "run",
-        "glados",
-        "echo-args",
-        "--",
-        ("./integrationTests/integrationTestFolder/TestFiles/" ++ fn ++ ".scm")
-      ]
+      "./glados"
+      [ ("./integrationTests/TestFiles/" ++ fn ++ ".scm") ]
       ""
 
 test :: String -> (ExitCode, String, String) -> IO ()
 test fn (ex, out, err) = do
-  solvedStr <- readFile ("./integrationTests/integrationTestFolder/TestFilesSolved/" ++ fn ++ ".scm")
+  solvedStr <- readFile ("./integrationTests/TestFiles/" ++ fn ++ ".scm.slv")
   printRes (solvedStr == out) (isInfixOf "error" fn) ex
+  putStrLn fn
