@@ -6,6 +6,7 @@ import Exec.Registry
 import Exec.RuntimeException
 import qualified Parsing.Ast as Ast
 import Exec.Variables
+import Exec.Function
 
 -- Function declarations should use the same prototype :
 -- [Ast.Expr] -> Registry -> IO RetVal
@@ -32,7 +33,7 @@ execBuiltin (Ast.Call func ls) reg = case func of
   "<" -> lt ls reg
   "eq?" -> eq ls reg
   "if" -> ifBuiltin ls reg
-  "define" -> defineVar ls reg
+  "define" -> distinguishDefine ls reg
   _ -> throwIO NotYetImplemented
 execBuiltin _ _ = throwIO UndefinedBehaviour -- Builtin not found
 
@@ -106,3 +107,10 @@ ifBuiltin _ _ = throwIO $ InvalidArgumentCount "eq"
 -- This will most likely have to be moved
 getTypeName :: Typeable a => a -> String
 getTypeName = show . typeOf
+
+-- Utility function to distinguish between variable definition and function definition
+-- Args : [Expr] of args -> Registry
+distinguishDefine :: [Ast.Expr] -> Registry -> IO RetVal
+distinguishDefine args reg = case args of
+    (Ast.ExprList ls1 : Ast.ExprList ls2 : _) -> defineFunc args reg
+    _ -> defineVar args reg
