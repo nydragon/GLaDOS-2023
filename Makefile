@@ -14,7 +14,7 @@ unit-test: clean
 
 
 integration-test: clean
-	@cabal run test-integration --test-show-details=direct
+	@cabal run integrationTest --test-show-details=direct
 
 clean:
 	@rm -f *.tix

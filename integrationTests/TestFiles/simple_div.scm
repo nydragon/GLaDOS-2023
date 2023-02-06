@@ -1,1 +1,1 @@
-(print (/ 8 2))
+(print (div 8 2))

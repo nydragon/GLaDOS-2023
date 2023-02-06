@@ -1,1 +1,1 @@
-(print (% 5 2))
+(print (mod 5 2))
