@@ -7,14 +7,16 @@ import Exec ()
 import Exec.Eval (eval)
 import Exec.Registry (Registry, RetVal (RetVal), emptyRegistry)
 import Parsing ()
-import Parsing.Args (Args (file), parse)
+import Parsing.Args (Args (file, interactive), parse)
 import Parsing.Ast (Expr, parseExprList)
 import Parsing.Cpt (parseTokenList)
-import Parsing.Token (tokenizeFile)
+import Parsing.Token (tokenizeFile, Token, tokenize)
 import System.Console.GetOpt ()
 import System.Environment (getArgs)
 import System.Exit (exitSuccess)
 import Exec.InteractivePrompt ( interactiveMode )
+import GHC.IO.Handle
+import GHC.IO.FD
 
 getFileName :: [String] -> Maybe FilePath -> String
 getFileName [] b = fromMaybe "stdin" b
@@ -24,8 +26,11 @@ runFile :: String -> IO ()
 runFile filename = do
     -- Tokenize
     tokens <- tokenizeFile filename
+    execute tokens
 
-    -- Parse CPT
+execute :: [Token] -> IO ()
+execute tokens = do
+     -- Parse CPT
     let cpt = parseTokenList tokens
 
     -- Parse AST
@@ -35,15 +40,15 @@ runFile filename = do
 
     evalTree ast reg
 
-    return ()
 
-evalTree :: [Expr] -> Registry -> IO String
+evalTree :: [Expr] -> Registry -> IO ()
 evalTree [x] reg = do
-    (RetVal reg v) <- eval x reg
-    return (show v)
+    eval x reg
+    return ()
 evalTree (x : xs) reg = do
     (RetVal reg v) <- eval x reg
     evalTree xs reg
+
 
 main :: IO ()
 main = do
@@ -51,7 +56,12 @@ main = do
   (res, fls) <- getArgs >>= parse
 
   let fileName = getFileName fls (file res)
-  if (==) fileName "stdin"
+
+  if interactive res
     then interactiveMode -- interactive
-    else runFile fileName -- normal
+    else if fileName == "stdin"
+        then do 
+            file <- getContents
+            execute $ tokenize file
+        else runFile fileName -- normal
   return ()

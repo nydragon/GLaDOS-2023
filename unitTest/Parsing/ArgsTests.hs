@@ -23,8 +23,8 @@ argsSuite =
       longDebugFlag
     ]
   where
-    noArgs = parseArgsTest "Empty Args" [] Args {file = Nothing, help = False, debug = False} []
-    fileNonArg = parseArgsTest "File via non flag params" ["file.scm"] Args {file = Nothing, help = False, debug = False} ["file.scm"]
-    shortDebugFlagWithFile = parseArgsTest "Short debug flag with File" ["file.scm", "-d"] Args {file = Nothing, help = False, debug = True} ["file.scm"]
-    fileViaLongFlag = parseArgsTest "Filename via flag" ["--file=filename"] Args {file = Just "filename", help = False, debug = False} []
-    longDebugFlag = parseArgsTest "Long debug flag" ["--debug"] Args {file = Nothing, help = False, debug = True} []
+    noArgs = parseArgsTest "Empty Args" [] Args {file = Nothing, help = False, debug = False, interactive = False} []
+    fileNonArg = parseArgsTest "File via non flag params" ["file.scm"] Args {file = Nothing, help = False, debug = False, interactive = False} ["file.scm"]
+    shortDebugFlagWithFile = parseArgsTest "Short debug flag with File" ["file.scm", "-d"] Args {file = Nothing, help = False, debug = True, interactive = False} ["file.scm"]
+    fileViaLongFlag = parseArgsTest "Filename via flag" ["--file=filename"] Args {file = Just "filename", help = False, debug = False, interactive = False} []
+    longDebugFlag = parseArgsTest "Long debug flag" ["--debug"] Args {file = Nothing, help = False, debug = True, interactive = False} []
