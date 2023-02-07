@@ -68,10 +68,7 @@ eval (Ast.Symbole s) (v, f) = case lookupVar s v of
   Just x -> return $ RetVal (v, f) x
 eval x reg = return $ RetVal reg x
 
--- Dunno what either of these comments are about
--- INPUT SHOULDN'T BE LIST
--- LIST NEEDS TO BE CHECKED IF FUNCTION CALL
-
+-- transforms a list of Symboles into a list of Strings
 toString :: [Ast.Expr] -> [String]
 toString [Ast.Symbole x] = [x]
 toString (Ast.Symbole x: xs) = x : toString xs
@@ -87,24 +84,18 @@ execFunc funcName argValues reg
   | Ast.isValidBuiltin funcName = execBuiltin (Ast.Call funcName argValues) reg
   | otherwise = case lookupFunc funcName (snd reg) of
       Nothing -> throwIO $ InvalidFunctionCall funcName
-      Just (Ast.ExprList [Ast.ExprList args, body]) -> evalLambda  args body argValues reg
+      Just (Ast.ExprList [Ast.ExprList args, body]) -> evalLambda args body argValues reg
       _ -> throwIO FatalError
 
-makeLambda :: [Ast.Expr] -> Ast.Expr -> [Ast.Expr] -> Ast.Expr
-makeLambda args body argValues = Ast.ExprList (Ast.ExprList [Ast.Symbole "lambda", Ast.ExprList args, body] : argValues)
-
+-- Evaluates a lambda expression
+-- Accepts: Expression describing the behaviour,
+--          Expression describing the arguments,
+--          Expression describing the argument's values
 evalLambda :: [Ast.Expr] -> Ast.Expr -> [Ast.Expr] -> Registry -> IO RetVal
-evalLambda args body argValues = evalLambda' (makeLambda args body argValues)
-
-evalLambda' :: Ast.Expr -> Registry -> IO RetVal
-evalLambda' (Ast.ExprList (Ast.ExprList [Ast.Symbole "lambda", Ast.ExprList args, body] : argValues)) reg = do
-    tempReg <- bindArgs (toString args) argValues reg
+evalLambda args body val reg = do
+    tempReg <- bindArgs (toString args) val reg
     (RetVal a v) <- eval body tempReg
     return (RetVal reg v)
-evalLambda' a _ = throwIO $ InvalidFunctionCall "lambda"
-
--- Ast.Call n a -> bindArgs argNames argValues reg >>= execCall (Ast.Call n a) >>= unbindArgs argNames
--- _ -> throwIO FatalError -- If body isn't an Ast.Call
 
 -- Syntactic sugar to convert Ast.Call to args for execFunc
 --

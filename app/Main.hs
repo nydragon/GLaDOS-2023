@@ -52,16 +52,16 @@ evalTree (x : xs) reg = do
 
 main :: IO ()
 main = do
-  -- Parsing arguments
-  (res, fls) <- getArgs >>= parse
+    -- Parsing arguments
+    (res, fls) <- getArgs >>= parse
 
-  let fileName = getFileName fls (file res)
+    let fileName = getFileName fls (file res)
 
-  if interactive res
+    if interactive res
     then interactiveMode -- interactive
     else if fileName == "stdin"
         then do 
             file <- getContents
             execute $ tokenize file
         else runFile fileName -- normal
-  return ()
+    return ()
