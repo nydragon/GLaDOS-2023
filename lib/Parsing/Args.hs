@@ -29,7 +29,7 @@ options =
         Option ['f'] ["file"]  (OptArg ((\ f opts -> opts { file = Just f }) . fromMaybe "stdin") "FILE") "The FILE that is to be executed.",
         Option ['h'] ["help"] (NoArg (\ opts -> opts { help = True })) "Display this message.",
         Option ['d'] ["debug"] (NoArg (\ opts -> opts { debug = True })) "Enter debug mode",
-        Option ['i'] ["interactive"] (NoArg (\ opts -> opts { debug = True })) "Enter debug mode"
+        Option ['i'] ["interactive"] (NoArg (\ opts -> opts { interactive = True })) "Enter interactive REPL"
     ]
 
 parse :: [String] -> IO (Args, [String])
