@@ -24,34 +24,34 @@ import Debug.Trace
 -- args : Expr.Call -> Registry
 execBuiltin :: Ast.Expr -> Registry -> IO RetVal
 execBuiltin (Ast.Call func ls) reg = case func of
-  "println" -> printlnBuiltin ls reg
-  "print" -> printBuiltin ls reg
-  "div" -> divBuiltin ls reg
-  "mod" -> modulo ls reg
-  "*" -> multiply ls reg
-  "-" -> subBuiltin ls reg
-  "+" -> add ls reg
-  "<" -> lt ls reg
-  "<=" -> lte ls reg
-  ">" -> gt ls reg
-  ">=" -> gte ls reg
-  "eq?" -> eq ls reg
-  "if" -> ifBuiltin ls reg
-  "define" -> distinguishDefine ls reg
-  _ -> throwIO NotYetImplemented
+    "println" -> printlnBuiltin ls reg
+    "print" -> printBuiltin ls reg
+    "div" -> divBuiltin ls reg
+    "mod" -> modulo ls reg
+    "*" -> multiply ls reg
+    "-" -> subBuiltin ls reg
+    "+" -> add ls reg
+    "<" -> lt ls reg
+    "<=" -> lte ls reg
+    ">" -> gt ls reg
+    ">=" -> gte ls reg
+    "eq?" -> eq ls reg
+    "if" -> ifBuiltin ls reg
+    "define" -> distinguishDefine ls reg
+    _ -> throwIO NotYetImplemented
 execBuiltin _ _ = throwIO UndefinedBehaviour -- Builtin not found
 
 -- ─── Builtin Implementations ─────────────────────────────────────────────────────────────────────
 
 printlnBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
 printlnBuiltin ls reg = print (head ls) >> return output
-  where
-    output = RetVal reg Ast.Null
+    where
+        output = RetVal reg Ast.Null
 
 printBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
 printBuiltin ls reg = putStr (show $ head ls) >> return output
-  where
-    output = RetVal reg Ast.Null
+    where
+        output = RetVal reg Ast.Null
 
 divBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
 divBuiltin [Ast.Num a, Ast.Num 0] reg = throwIO NullDivision
@@ -113,15 +113,15 @@ eq :: [Ast.Expr] -> Registry -> IO RetVal
 eq [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Boolean ((==) a b)
 eq [Ast.Boolean a, Ast.Boolean b] reg = return $ RetVal reg $ Ast.Boolean ((==) a b)
 eq [a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
-eq _ _ = throwIO $ InvalidArgumentCount "eq"
+eq _ _ = throwIO $ InvalidArgumentCount "eq?"
 
 ifBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
 ifBuiltin [Ast.Boolean cond, caseT, caseF] reg
-  | cond = return $ RetVal reg caseT
-  | otherwise = return $ RetVal reg caseF
-ifBuiltin [Ast.Boolean a, Ast.Boolean b] reg = return $ RetVal reg $ Ast.Boolean ((==) a b)
-ifBuiltin [a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
-ifBuiltin _ _ = throwIO $ InvalidArgumentCount "eq"
+    | cond = return $ RetVal reg caseT
+    | otherwise = return $ RetVal reg caseF
+-- ifBuiltin [Ast.Boolean a, Ast.Boolean b] reg = return $ RetVal reg $ Ast.Boolean ((==) a b)
+ifBuiltin (x:xs) _ = throwIO $ InvalidArgument 1 (getTypeName Ast.Boolean) (getTypeName x)
+ifBuiltin _ _ = throwIO $ InvalidArgumentCount "if"
 
 -- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
 
