@@ -100,9 +100,11 @@ execFunc funcName argValues reg
       _ -> throwIO FatalError
 
 -- Evaluates a lambda expression
--- Accepts: Expression describing the behaviour,
---          Expression describing the arguments,
---          Expression describing the argument's values
+-- Accepts: Expression describing the arguments [Symbole "a", Symbole "b"],
+--          Expression describing the behaviour Call "+" [Symbole "a", Symbole "b"]],
+--          Expression describing the arguments' values [Num 2, Num 3]
+
+-- Argument values are bound to arguments based on order
 evalLambda :: [Ast.Expr] -> Ast.Expr -> [Ast.Expr] -> Registry -> IO RetVal
 evalLambda args body val reg = do
     tempReg <- bindArgs (toString args) val reg
