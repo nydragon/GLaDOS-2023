@@ -1,1 +1,1 @@
-glados: Argument 0 invalid: expected 'Integer' but received 'Expr'.
+glados: InvalidArgument: argument 0, expected 'Integer' but received 'Expr'.

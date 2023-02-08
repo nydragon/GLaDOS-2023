@@ -55,11 +55,23 @@ evalExprList ls reg = utilConvert $ evalExprList' ls reg
 eval :: Ast.Expr -> Registry -> IO RetVal
 eval (Ast.ExprList (Ast.Call "lambda" [Ast.ExprList args, body] : argValues)) reg = evalLambda args body argValues reg
 eval (Ast.ExprList ls) reg = evalExprList ls reg
+-- Function special cases
 eval (Ast.Call "define" args) reg = execCall (Ast.Call "define" args) reg
+eval (Ast.Call "if" (x : xs)) reg = do
+    -- Evaluate first argument
+    RetVal a condVal <- eval x reg
+    let newArgs = condVal : xs
+
+    -- Run if
+    RetVal b outputExpr <- execBuiltin (Ast.Call "if" newArgs) a
+
+    -- Eval and return outputExpr
+    eval outputExpr b
 eval (Ast.Call fn args) reg = do
-    -- Pattern match return of eval of args
+    -- Pattern match return of evaluation of args
     RetVal a b <- eval (Ast.ExprList args) reg
 
+    -- Extract arg list from return and call function
     case b of
         Ast.ExprList c -> execCall (Ast.Call fn c) a
         _ -> throwIO FatalError
