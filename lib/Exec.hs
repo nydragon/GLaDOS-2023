@@ -1,48 +1,45 @@
 module Exec where
 
-import Control.Exception
+import Control.Exception (throwIO)
+import Debug.Trace
 
-import qualified Parsing.Ast as Ast
-import Exec.Lookup
-import Exec.RuntimeException
 import Exec.Builtins
+import Exec.Function (lookupFunc)
+import Exec.Registry (Registry, RetVal (..))
+import Exec.RuntimeException
+import Exec.Variables (defineVar, removeVars)
+import qualified Parsing.Ast as Ast
 
 -- ─── Function Execution ──────────────────────────────────────────────────────────────────────────
 
--- Executes a given function
--- Args : Expr.Call -> Lookup
-execFunc :: Ast.Expr -> Lookup -> IO RetVal
-execFunc (Ast.Call func ls) reg
-    | Ast.isValidBuiltin func = execBuiltin call reg    -- if Builtin
-    | otherwise = throwIO NotYetImplemented             -- else
-    where   call = Ast.Call func ls
+regFromRet :: RetVal -> Registry
+regFromRet (RetVal a b) = a
 
--- Evaluate expression
--- Returns result of expression
--- Can be used for function calls, atoms, lists
+-- Bind all arguments to their values in preparation of a function call
+bindArgs :: [String] -> [Ast.Expr] -> Registry -> IO Registry
+bindArgs [] _ reg = return reg
+bindArgs _ [] reg = return reg
+bindArgs (x:xs) (y:ys) (v, f) = do
+    RetVal reg ret <- defineVar [Ast.Symbole x, y] reg
+
+    bindArgs xs ys reg
+    where
+        reg = (v, f)
+
+-- Unbinds list of variable names it is given on entry
+unbindArgs :: [String] -> RetVal -> IO RetVal
+unbindArgs vars (RetVal reg ret) = return newRet
+    where
+        newRet = RetVal (removeVars vars reg) ret
+
+isAtomicExpression :: Ast.Expr -> Bool
+isAtomicExpression (Ast.Num n) = True
+isAtomicExpression (Ast.Boolean n) = True
+isAtomicExpression Ast.Null = True
+isAtomicExpression (Ast.Symbole _) = True
+isAtomicExpression _ = False
+
+isAtomicExpressionList :: [Ast.Expr] -> Bool
+isAtomicExpressionList = all isAtomicExpression
 
 
--- ─── Main Function ───────────────────────────────────────────────────────────────────────────────
-
--- Runs a given list of expressions
---
--- Args : List of expressions (expected to be functions) -> Lookup
--- Expects all base expressions to be valid function calls
-run' :: [Ast.Expr] -> Lookup -> IO RetVal
-run' [] reg = return $ RetVal reg Nothing -- Returns lookup
--- Recursive call on run' using registry returned by the function execution of
-run' (Ast.Call func ls:xs) reg = do
-    -- Pattern match reg and retval
-    RetVal reg funcRes <- execFunc call reg
-
-    -- Run sublist
-    run' xs reg
-    where   call = Ast.Call func ls
-run' (Ast.ExprList ls:xs) reg = case Ast.exprListToCall ls of
-    Just x -> execFunc x reg
-    Nothing -> throwIO (InvalidFunctionCall "PLACEHOLDER")
-        >>= run' xs
-
--- Entry point function
-run :: [Ast.Expr] -> IO RetVal
-run ls = run' ls emptyLookup

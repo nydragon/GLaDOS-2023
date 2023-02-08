@@ -1,15 +1,19 @@
 module Exec.Builtins where
 
-import Exec.Lookup
-import qualified Parsing.Ast as Ast
 import Control.Exception (throwIO)
+import Data.Typeable
+import Exec.Registry
 import Exec.RuntimeException
+import qualified Parsing.Ast as Ast
+import Exec.Variables
+import Exec.Function
+import Debug.Trace
 
 -- Function declarations should use the same prototype :
--- [Ast.Expr] -> Lookup -> IO RetVal
+-- [Ast.Expr] -> Registry -> IO RetVal
 --
 -- The first list is a list of all arguments
--- Lookup is the registry
+-- Registry is the registry
 --
 -- Returns RetVal
 
@@ -17,38 +21,117 @@ import Exec.RuntimeException
 
 -- Executes an Expr.Call that has been confirmed to be a builtin function
 --
--- args : Expr.Call -> Lookup
-execBuiltin :: Ast.Expr -> Lookup -> IO RetVal
+-- args : Expr.Call -> Registry
+execBuiltin :: Ast.Expr -> Registry -> IO RetVal
 execBuiltin (Ast.Call func ls) reg = case func of
-    "println" -> printBuiltin ls reg
-    "/" -> divBuiltin ls reg
-    _ -> throwIO NotYetImplemented
+  "println" -> printlnBuiltin ls reg
+  "print" -> printBuiltin ls reg
+  "div" -> divBuiltin ls reg
+  "mod" -> modulo ls reg
+  "*" -> multiply ls reg
+  "-" -> subBuiltin ls reg
+  "+" -> add ls reg
+  "<" -> lt ls reg
+  "<=" -> lte ls reg
+  ">" -> gt ls reg
+  ">=" -> gte ls reg
+  "eq?" -> eq ls reg
+  "if" -> ifBuiltin ls reg
+  "define" -> distinguishDefine ls reg
+  _ -> throwIO NotYetImplemented
 execBuiltin _ _ = throwIO UndefinedBehaviour -- Builtin not found
 
 -- ─── Builtin Implementations ─────────────────────────────────────────────────────────────────────
 
-printBuiltin :: [Ast.Expr] -> Lookup -> IO RetVal
-printBuiltin ls reg = print (head ls) >> return output
-    where   output = RetVal reg Nothing
+printlnBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
+printlnBuiltin ls reg = print (head ls) >> return output
+  where
+    output = RetVal reg Ast.Null
 
-divBuiltin :: [Ast.Expr] -> Lookup -> IO RetVal
-divBuiltin (Ast.Num a : Ast.Num b : _) reg = if b == 0 then throwIO NullDivision else return output
-    where   output = RetVal reg (Just  $ Val (div a b))
-divBuiltin (Ast.Num a : x : xs) _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName x)
+printBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
+printBuiltin ls reg = putStr (show $ head ls) >> return output
+  where
+    output = RetVal reg Ast.Null
 
-modulo :: Integer -> Integer -> Either Integer String
-modulo a 0 = Right "ZeroDivisionError"
-modulo a b = Left (mod a b)
+divBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
+divBuiltin [Ast.Num a, Ast.Num 0] reg = throwIO NullDivision
+divBuiltin [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Num (div a b)
+divBuiltin [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
+divBuiltin [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
+divBuiltin _ _ = throwIO $ InvalidArgumentCount "/"
 
-multiply :: Integer -> Integer -> Integer
-multiply a b = a * b
+modulo :: [Ast.Expr] -> Registry -> IO RetVal
+modulo [Ast.Num a, Ast.Num 0] reg = throwIO NullDivision
+modulo [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Num (mod a b)
+modulo [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
+modulo [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
+modulo _ _ = throwIO $ InvalidArgumentCount "%"
 
-substract :: Integer -> Integer -> Integer
-substract a b = a - b
+multiply :: [Ast.Expr] -> Registry -> IO RetVal
+multiply [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Num ((*) a b)
+multiply [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
+multiply [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
+multiply _ _ = throwIO $ InvalidArgumentCount "*"
 
-add :: Integer -> Integer ->   Integer
+subBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
+subBuiltin [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Num ((-) a b)
+subBuiltin [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
+subBuiltin [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
+subBuiltin _ _ = throwIO $ InvalidArgumentCount "-"
 
-add a b = a + b
+add :: [Ast.Expr] -> Registry -> IO RetVal
+add [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Num ((+) a b)
+add [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
+add [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
+add arg _ = throwIO (InvalidArgumentCount "+")
 
-lt :: (Ord a) => a -> a -> Bool
-lt a b = a < b
+lt :: [Ast.Expr] -> Registry -> IO RetVal
+lt [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Boolean ((<) a b)
+lt [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
+lt [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
+lt _ _ = throwIO $ InvalidArgumentCount "<"
+
+lte :: [Ast.Expr] -> Registry -> IO RetVal
+lte [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Boolean ((<=) a b)
+lte [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
+lte [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
+lte _ _ = throwIO $ InvalidArgumentCount "<="
+
+gt :: [Ast.Expr] -> Registry -> IO RetVal
+gt [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Boolean ((>) a b)
+gt [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
+gt [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
+gt _ _ = throwIO $ InvalidArgumentCount ">"
+
+gte :: [Ast.Expr] -> Registry -> IO RetVal
+gte [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Boolean ((>=) a b)
+gte [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
+gte [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
+gte _ _ = throwIO $ InvalidArgumentCount ">="
+
+eq :: [Ast.Expr] -> Registry -> IO RetVal
+eq [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Boolean ((==) a b)
+eq [Ast.Boolean a, Ast.Boolean b] reg = return $ RetVal reg $ Ast.Boolean ((==) a b)
+eq [a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
+eq _ _ = throwIO $ InvalidArgumentCount "eq"
+
+ifBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
+ifBuiltin [Ast.Boolean cond, caseT, caseF] reg
+  | cond = return $ RetVal reg caseT
+  | otherwise = return $ RetVal reg caseF
+ifBuiltin [Ast.Boolean a, Ast.Boolean b] reg = return $ RetVal reg $ Ast.Boolean ((==) a b)
+ifBuiltin [a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
+ifBuiltin _ _ = throwIO $ InvalidArgumentCount "eq"
+
+-- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
+
+-- Get string representation of type name
+-- This will most likely have to be moved
+getTypeName :: Typeable a => a -> String
+getTypeName = show . typeOf
+
+-- Utility function to distinguish between variable definition and function definition
+-- Args : [Expr] of args -> Registry
+distinguishDefine :: [Ast.Expr] -> Registry -> IO RetVal
+distinguishDefine [Ast.Symbole s, Ast.Call "lambda" [Ast.ExprList args, body]] reg = defineFunc [Ast.Symbole s, Ast.Call "lambda" [Ast.ExprList args, body]] reg
+distinguishDefine args reg = defineVar args reg

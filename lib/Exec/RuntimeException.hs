@@ -3,26 +3,46 @@
 module Exec.RuntimeException where
 
 import Control.Exception
-import Exec.Lookup
+import qualified Parsing.Ast as Ast
 
 -- Runtime exception data type
 --
 -- NOTE: This definition will be completed as development continues
 data RuntimeException
   = InvalidFunctionCall String
+  | InvalidFunctionDefinition String
   | UndefinedBehaviour -- Pretty much for anything that shouldn't ever happen
   | NotYetImplemented
-  | -- args: argument index, expected type, got type
-    InvalidArgument Integer String String
+  -- args: argument index, expected type, got type
+  | InvalidArgument Integer String String
+  | InvalidArgumentCount String
   | NullDivision
+  | FatalError -- For stuff that shouldn't happen
+  | AlreadyDefined
+  | InvalidLambda Ast.Expr
   deriving (Eq)
 
 instance Exception RuntimeException
 
 instance Show RuntimeException where
   show :: RuntimeException -> String
-  show (InvalidFunctionCall a) = a ++ " is an invalid function call."
-  show UndefinedBehaviour = "This is undefined."
-  show NotYetImplemented = "OH MAXI BEBOU"
-  show (InvalidArgument a b c) = "Argument " ++ show a ++ " invalid: expected '" ++ b ++ "' but received '" ++ c ++ "'."
-  show NullDivision = "Did you not pay attention in math class?"
+  show (InvalidFunctionCall a) = "InvalidFunctionCall: " ++ a ++ " is not a function."
+  show UndefinedBehaviour = "UndefinedBehaviour: This behaviour is undefined."
+  show NotYetImplemented = "NotYetImplemented"
+  show (InvalidArgument a b c) = "InvalidArgument: argument " ++ show a ++ ", expected '" ++ b ++ "' but received '" ++ c ++ "'."
+  show (InvalidArgumentCount fn) = "InvalidArgumentCount: Function " ++ fn ++ " received an invalid amount of arguments."
+  show NullDivision = "NullDivision: Did you not pay attention in math class?"
+  show FatalError = "FatalError"
+  show AlreadyDefined = "AlreadyDefined"
+  show (InvalidLambda e) = "InvalidLambda: " ++ show e
+  show _ = "oh oh"
+
+data InternalException
+  = NonAtomicFunctionArgs String [Ast.Expr]
+  deriving (Eq)
+
+instance Exception InternalException
+
+instance Show InternalException where
+  show :: InternalException -> String
+  show (NonAtomicFunctionArgs a b) = "Function " ++ a ++ ": args are not Atoms\n " ++ show b

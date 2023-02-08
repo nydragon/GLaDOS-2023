@@ -11,14 +11,16 @@ import Data.Maybe (fromMaybe)
 data Args = Args {
     file  :: Maybe FilePath,
     help  :: Bool,
-    debug :: Bool
+    debug :: Bool,
+    interactive :: Bool
 } deriving  (Show, Eq)
 
 defaultOptions :: Args
 defaultOptions = Args {
-    file       = Nothing,
-    help       = False,
-    debug      = False
+    file        = Nothing,
+    help        = False,
+    debug       = False,
+    interactive = False
 }
 
 options :: [OptDescr (Args -> Args)]
@@ -26,7 +28,8 @@ options =
     [
         Option ['f'] ["file"]  (OptArg ((\ f opts -> opts { file = Just f }) . fromMaybe "stdin") "FILE") "The FILE that is to be executed.",
         Option ['h'] ["help"] (NoArg (\ opts -> opts { help = True })) "Display this message.",
-        Option ['d'] ["debug"] (NoArg (\ opts -> opts { debug = True })) "Enter debug mode"
+        Option ['d'] ["debug"] (NoArg (\ opts -> opts { debug = True })) "Enter debug mode",
+        Option ['i'] ["interactive"] (NoArg (\ opts -> opts { interactive = True })) "Enter interactive REPL"
     ]
 
 parse :: [String] -> IO (Args, [String])
@@ -34,7 +37,7 @@ parse argv =
     case getOpt Permute options argv of
         (o,n,[]) -> do
             if "-h" `elem` argv
-                then do 
+                then do
                     hPutStrLn stderr (usageInfo header options)
                     exitSuccess
                 else
