@@ -11,6 +11,7 @@ import qualified Parsing.Ast as Ast
 import Debug.Trace
 import Exec.Builtins
 import qualified Parsing.Ast as Eval
+import Parsing.Ast (isAtomic)
 
 -- ─── Evaluate Expression ─────────────────────────────────────────────────────────────────────────
 
@@ -117,3 +118,10 @@ evalLambda args body val reg = do
 execCall :: Ast.Expr -> Registry -> IO RetVal
 execCall (Ast.Call n args) reg =  execFunc n args reg
 execCall _ _ = throwIO $ InvalidFunctionCall "<Unknown Function Name>"
+
+unpack :: RetVal -> (Ast.Expr, Registry)
+unpack (RetVal reg expr) = (expr, reg)
+
+reduceTree :: Ast.Expr -> Registry -> IO RetVal
+reduceTree (Ast.Call e args) r | isAtomic (Ast.ExprList args) = execCall (Ast.Call e args) r >>= uncurry reduceTree . unpack
+reduceTree (Ast.ExprList (e : es)) r = reduceTree e r
