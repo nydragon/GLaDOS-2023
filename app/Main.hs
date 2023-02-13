@@ -4,11 +4,11 @@ module Main where
 
 import Data.Maybe (fromMaybe)
 import Exec ()
-import Exec.Eval (eval)
+import Exec.Eval (eval, reduceTree)
 import Exec.Registry (Registry, RetVal (RetVal), emptyRegistry)
 import Parsing ()
 import Parsing.Args (Args (file, interactive), parse)
-import Parsing.Ast (Expr, parseExprList)
+import Parsing.Ast (Expr (ExprList), parseExprList)
 import Parsing.Cpt (parseTokenList)
 import Parsing.Token (tokenizeFile, Token, tokenize)
 import System.Console.GetOpt ()
@@ -46,7 +46,7 @@ evalTree [x] reg = do
     eval x reg
     return ()
 evalTree (x : xs) reg = do
-    (RetVal reg v) <- eval x reg
+    (RetVal reg v) <- reduceTree x reg
     evalTree xs reg
 
 
@@ -60,7 +60,7 @@ main = do
     if interactive res
     then interactiveMode -- interactive
     else if fileName == "stdin"
-        then do 
+        then do
             file <- getContents
             execute $ tokenize file
         else runFile fileName -- normal
