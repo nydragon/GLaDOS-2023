@@ -47,9 +47,9 @@ In addition to these basic features, our interpreter also implements the followi
 - print
 - div
 - mod
-- *
-- -
-- +
+- \*
+- \-
+- \+
 - <
 - <=
 - \>
