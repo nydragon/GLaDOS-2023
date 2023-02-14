@@ -3,8 +3,10 @@
 module Parsing.Ast where
 
 import qualified Parsing.Cpt as Cpt
+import           Data.Maybe  (fromMaybe)
+import           Debug.Trace (trace)
 
--- ─── Abstract Syntaxe Tree ───────────────────────────────────────────────────────────────────────
+-- ─── Abstract Syntax Tree ───────────────────────────────────────────────────────────────────────
 
 data Expr
   = ExprList [Expr]
@@ -37,7 +39,7 @@ parseExprList (Cpt.List [Cpt.Sym "define", Cpt.List (Cpt.Sym a : arg), Cpt.List 
 parseExprList (x : xs) = case x of
   Cpt.Sym str -> Symbole str : parseExprList xs
   Cpt.Val i -> Num i : parseExprList xs
-  Cpt.List ls -> parseExpr ls : parseExprList xs
+  Cpt.List ls -> trace (show ls) $ parseExpr ls : parseExprList xs
   Cpt.Boolean b -> Boolean b : parseExprList xs
 
 -- Parses a CPT list into a single Expr value
@@ -51,6 +53,34 @@ parseExpr (Cpt.Sym str : xs) =
 parseExpr ls = ExprList (parseExprList ls)
 
 -- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
+
+getOpPrecedence :: Cpt.Cpt -> Int
+getOpPrecedence (Cpt.Sym "^") = 3
+getOpPrecedence (Cpt.Sym "/") = 2
+getOpPrecedence (Cpt.Sym "*") = 2
+getOpPrecedence (Cpt.Sym "+") = 1
+getOpPrecedence (Cpt.Sym "-") = 1
+getOpPrecedence (Cpt.Sym _)   = 0
+
+reverseList :: [a] -> [a]
+reverseList = foldl (flip (:)) []
+
+popStack :: [Cpt.Cpt] -> [Cpt.Cpt] -> [Cpt.Cpt] -> Integer -> [Cpt.Cpt] -> Maybe [Cpt.Cpt]
+popStack [] valStack opStack i buffer = Just (buffer ++ valStack ++ opStack)
+popStack infixExpr valStack opStack i buffer
+    = trace ("popstack : " ++ show buffer) $ infixToPostfix' infixExpr [] [] i (buffer ++ valStack ++ opStack)
+
+infixToPostfix' :: [Cpt.Cpt] -> [Cpt.Cpt] -> [Cpt.Cpt] -> Integer -> [Cpt.Cpt] ->  Maybe [Cpt.Cpt]
+infixToPostfix' [x] valStack opStack i buffer = popStack [] ([x] <> valStack) opStack i buffer
+infixToPostfix' (x: xs) valStack opStack i buffer
+    | i == 0 || even i = infixToPostfix' xs ([x] <> valStack) opStack (succ i) buffer
+    | not $ even i  && getOpPrecedence x <= getOpPrecedence (last opStack)
+        = infixToPostfix' xs valStack (opStack <> [x]) (succ i) buffer
+    | otherwise = popStack (x : xs) valStack opStack i buffer
+infixToPostfix'  x valStack opStack i buffer = Just buffer
+
+infixToPostfix :: [Cpt.Cpt] -> [Cpt.Cpt]
+infixToPostfix a = reverseList $ fromMaybe [] $ infixToPostfix' a [] [] 0 []
 
 -- Utility function for execution
 -- Converts cpt list to Expr Call

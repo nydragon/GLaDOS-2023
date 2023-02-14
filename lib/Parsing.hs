@@ -6,7 +6,7 @@ splitOn :: (Eq a) => a -> [a] -> [[a]]
 splitOn _ [] = []
 splitOn c arr = take nextSep arr : splitOn c (drop nextSep arr)
   where
-    nextSep = (getNextSep c arr 0) + 1 -- +1 because it's a character count
+    nextSep = getNextSep c arr 0 + 1 -- +1 because it's a character count
 
 -- Gets index of next occurence of separator
 getNextSep :: (Eq a) => a -> [a] -> Int -> Int
