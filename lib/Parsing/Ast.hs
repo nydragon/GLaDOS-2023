@@ -3,8 +3,8 @@
 module Parsing.Ast where
 
 import qualified Parsing.Cpt as Cpt
-import           Data.Maybe  (fromMaybe)
 import           Debug.Trace (trace)
+import Parsing.Infix (infixToPrefix)
 
 -- ─── Abstract Syntax Tree ───────────────────────────────────────────────────────────────────────
 
@@ -35,11 +35,11 @@ instance Show Expr where
 -- This means it will only parse function calls in sublists thanks to parseExpr
 parseExprList :: [Cpt.Cpt] -> [Expr]
 parseExprList [] = []
-parseExprList (Cpt.List [Cpt.Sym "define", Cpt.List (Cpt.Sym a : arg), Cpt.List body] : xs) = Call "define" [ Symbole a, Call "lambda" [parseExpr arg, parseExpr $ infixToPostfix body]] : parseExprList xs
+parseExprList (Cpt.List [Cpt.Sym "define", Cpt.List (Cpt.Sym a : arg), Cpt.List body] : xs) = Call "define" [ Symbole a, Call "lambda" [parseExpr arg, parseExpr $ infixToPrefix body]] : parseExprList xs
 parseExprList (x : xs) = case x of
   Cpt.Sym str -> Symbole str : parseExprList xs
   Cpt.Val i -> Num i : parseExprList xs
-  Cpt.List ls -> parseExpr (infixToPostfix ls) : parseExprList xs
+  Cpt.List ls -> trace (show $ infixToPrefix ls ) $ parseExpr (infixToPrefix ls) : parseExprList xs
   Cpt.Boolean b -> Boolean b : parseExprList xs
 
 -- Parses a CPT list into a single Expr value
@@ -53,49 +53,6 @@ parseExpr (Cpt.Sym str : xs) =
 parseExpr ls = ExprList (parseExprList ls)
 
 -- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
-
-getOpPrecedence :: Cpt.Cpt -> Int
-getOpPrecedence (Cpt.Sym "^") = 3
-getOpPrecedence (Cpt.Sym "/") = 2
-getOpPrecedence (Cpt.Sym "*") = 2
-getOpPrecedence (Cpt.Sym "+") = 1
-getOpPrecedence (Cpt.Sym "-") = 1
-getOpPrecedence _ = 0
-
-reverseList :: [a] -> [a]
-reverseList = foldl (flip (:)) []
-
-isInfix'' :: [Cpt.Cpt] -> Integer -> Bool
-isInfix'' [] _ = True
-isInfix'' (x : xs) i | getOpPrecedence x > 0 = isInfix' xs i
-                     | otherwise = False
-
-isInfix' :: [Cpt.Cpt] -> Integer -> Bool
-isInfix' [] _ = True
-isInfix' x i  | odd i = isInfix'' x $ succ i
-              | otherwise = isInfix' (tail x) $ succ i
-
-isInfix :: [Cpt.Cpt] -> Bool
-isInfix a = isInfix' a 0
-
-popStack :: [Cpt.Cpt] -> [Cpt.Cpt] -> [Cpt.Cpt] -> Integer -> [Cpt.Cpt] -> Maybe [Cpt.Cpt]
-popStack [] valStack opStack i buffer = Just (buffer ++ valStack ++ opStack)
-popStack infixExpr valStack opStack i buffer
-    = infixToPostfix' infixExpr [] [] i (buffer ++ valStack ++ opStack)
-
-infixToPostfix' :: [Cpt.Cpt] -> [Cpt.Cpt] -> [Cpt.Cpt] -> Integer -> [Cpt.Cpt] ->  Maybe [Cpt.Cpt]
-infixToPostfix' [x] valStack opStack i buffer = popStack [] ([x] <> valStack) opStack i buffer
-infixToPostfix' (x: xs) valStack opStack i buffer
-    | i == 0 || even i = infixToPostfix' xs ([x] <> valStack) opStack (succ i) buffer
-    | not $ even i  && getOpPrecedence x <= getOpPrecedence (last opStack)
-        = infixToPostfix' xs valStack (opStack <> [x]) (succ i) buffer
-    | otherwise = popStack (x : xs) valStack opStack i buffer
-infixToPostfix'  x valStack opStack i buffer = Just buffer
-
-
-infixToPostfix :: [Cpt.Cpt] -> [Cpt.Cpt]
-infixToPostfix a | isInfix a = reverseList $ fromMaybe [] $ infixToPostfix' a [] [] 0 []
-                 | otherwise = a
 
 -- Utility function for execution
 -- Converts cpt list to Expr Call
