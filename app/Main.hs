@@ -32,10 +32,9 @@ execute :: [Token] -> IO ()
 execute tokens = do
      -- Parse CPT
     let cpt = parseTokenList tokens
-    print cpt
+
     -- Parse AST
     let ast = parseExprList cpt
-    print ast
 
     let reg = emptyRegistry
 
