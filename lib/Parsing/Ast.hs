@@ -39,7 +39,7 @@ parseExprList (Cpt.List [Cpt.Sym "define", Cpt.List (Cpt.Sym a : arg), Cpt.List 
 parseExprList (x : xs) = case x of
   Cpt.Sym str -> Symbole str : parseExprList xs
   Cpt.Val i -> Num i : parseExprList xs
-  Cpt.List ls -> trace (show ls) $ parseExpr ls : parseExprList xs
+  Cpt.List ls -> parseExpr ls : parseExprList xs
   Cpt.Boolean b -> Boolean b : parseExprList xs
 
 -- Parses a CPT list into a single Expr value
@@ -60,15 +60,29 @@ getOpPrecedence (Cpt.Sym "/") = 2
 getOpPrecedence (Cpt.Sym "*") = 2
 getOpPrecedence (Cpt.Sym "+") = 1
 getOpPrecedence (Cpt.Sym "-") = 1
-getOpPrecedence (Cpt.Sym _)   = 0
+getOpPrecedence _ = 0
 
 reverseList :: [a] -> [a]
 reverseList = foldl (flip (:)) []
 
+isInfix'' :: [Cpt.Cpt] -> Integer -> Bool
+isInfix'' [] _ = True
+isInfix'' (x : xs) i | getOpPrecedence x > 0 = isInfix' xs i
+                     | otherwise = False
+
+isInfix' :: [Cpt.Cpt] -> Integer -> Bool
+isInfix' [] _ = True
+isInfix' x i  | odd i = trace ("Help" ++ show x) $ isInfix'' x $ succ i
+              | otherwise = trace ("Help" ++ show x) $ isInfix' (tail x) $ succ i
+
+isInfix :: [Cpt.Cpt] -> Bool
+isInfix a = trace (show x) x
+      where x = isInfix' a 0
+
 popStack :: [Cpt.Cpt] -> [Cpt.Cpt] -> [Cpt.Cpt] -> Integer -> [Cpt.Cpt] -> Maybe [Cpt.Cpt]
 popStack [] valStack opStack i buffer = Just (buffer ++ valStack ++ opStack)
 popStack infixExpr valStack opStack i buffer
-    = trace ("popstack : " ++ show buffer) $ infixToPostfix' infixExpr [] [] i (buffer ++ valStack ++ opStack)
+    = infixToPostfix' infixExpr [] [] i (buffer ++ valStack ++ opStack)
 
 infixToPostfix' :: [Cpt.Cpt] -> [Cpt.Cpt] -> [Cpt.Cpt] -> Integer -> [Cpt.Cpt] ->  Maybe [Cpt.Cpt]
 infixToPostfix' [x] valStack opStack i buffer = popStack [] ([x] <> valStack) opStack i buffer
@@ -79,8 +93,10 @@ infixToPostfix' (x: xs) valStack opStack i buffer
     | otherwise = popStack (x : xs) valStack opStack i buffer
 infixToPostfix'  x valStack opStack i buffer = Just buffer
 
+
 infixToPostfix :: [Cpt.Cpt] -> [Cpt.Cpt]
-infixToPostfix a = reverseList $ fromMaybe [] $ infixToPostfix' a [] [] 0 []
+infixToPostfix a | isInfix a = reverseList $ fromMaybe [] $ infixToPostfix' a [] [] 0 []
+                 | otherwise = a
 
 -- Utility function for execution
 -- Converts cpt list to Expr Call
