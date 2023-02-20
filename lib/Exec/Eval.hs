@@ -121,7 +121,3 @@ execCall _ _ = throwIO $ InvalidFunctionCall "<Unknown Function Name>"
 
 unpack :: RetVal -> (Ast.Expr, Registry)
 unpack (RetVal reg expr) = (expr, reg)
-
-reduceTree :: Ast.Expr -> Registry -> IO RetVal
-reduceTree (Ast.Call e args) r | isAtomic (Ast.ExprList args) = execCall (Ast.Call e args) r >>= uncurry reduceTree . unpack
-reduceTree (Ast.ExprList (e : es)) r = reduceTree e r
