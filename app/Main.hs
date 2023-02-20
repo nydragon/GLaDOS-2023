@@ -4,7 +4,7 @@ module Main where
 
 import Data.Maybe (fromMaybe)
 import Exec ()
-import Exec.Eval (eval, reduceTree)
+import Exec.Eval (eval)
 import Exec.Registry (Registry, RetVal (RetVal), emptyRegistry)
 import Parsing ()
 import Parsing.Args (Args (file, interactive), parse)
@@ -46,7 +46,7 @@ evalTree [x] reg = do
     eval x reg
     return ()
 evalTree (x : xs) reg = do
-    (RetVal reg v) <- reduceTree x reg
+    (RetVal reg v) <- eval x reg
     evalTree xs reg
 
 
