@@ -2,21 +2,16 @@ module Main where
 
 -- Our modules
 
-import Data.Maybe (fromMaybe)
-import Exec ()
 import Exec.Eval (eval)
 import Exec.Registry (Registry, RetVal (RetVal), emptyRegistry)
-import Parsing ()
+import Exec.InteractivePrompt ( interactiveMode )
 import Parsing.Args (Args (file, interactive), parse)
-import Parsing.Ast (Expr (ExprList), parseExprList)
+import Parsing.Ast (Expr, parseExprList)
 import Parsing.Cpt (parseTokenList)
 import Parsing.Token (tokenizeFile, Token, tokenize)
-import System.Console.GetOpt ()
+
+import Data.Maybe (fromMaybe)
 import System.Environment (getArgs)
-import System.Exit (exitSuccess)
-import Exec.InteractivePrompt ( interactiveMode )
-import GHC.IO.Handle
-import GHC.IO.FD
 
 getFileName :: [String] -> Maybe FilePath -> String
 getFileName [] b = fromMaybe "stdin" b
