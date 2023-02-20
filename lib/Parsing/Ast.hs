@@ -35,11 +35,11 @@ instance Show Expr where
 -- This means it will only parse function calls in sublists thanks to parseExpr
 parseExprList :: [Cpt.Cpt] -> [Expr]
 parseExprList [] = []
-parseExprList (Cpt.List [Cpt.Sym "define", Cpt.List (Cpt.Sym a : arg), Cpt.List body] : xs) = Call "define" [ Symbole a, Call "lambda" [parseExpr arg, parseExpr body]] : parseExprList xs
+parseExprList (Cpt.List [Cpt.Sym "define", Cpt.List (Cpt.Sym a : arg), Cpt.List body] : xs) = Call "define" [ Symbole a, Call "lambda" [parseExpr arg, parseExpr $ infixToPostfix body]] : parseExprList xs
 parseExprList (x : xs) = case x of
   Cpt.Sym str -> Symbole str : parseExprList xs
   Cpt.Val i -> Num i : parseExprList xs
-  Cpt.List ls -> parseExpr ls : parseExprList xs
+  Cpt.List ls -> parseExpr (infixToPostfix ls) : parseExprList xs
   Cpt.Boolean b -> Boolean b : parseExprList xs
 
 -- Parses a CPT list into a single Expr value
@@ -72,12 +72,11 @@ isInfix'' (x : xs) i | getOpPrecedence x > 0 = isInfix' xs i
 
 isInfix' :: [Cpt.Cpt] -> Integer -> Bool
 isInfix' [] _ = True
-isInfix' x i  | odd i = trace ("Help" ++ show x) $ isInfix'' x $ succ i
-              | otherwise = trace ("Help" ++ show x) $ isInfix' (tail x) $ succ i
+isInfix' x i  | odd i = isInfix'' x $ succ i
+              | otherwise = isInfix' (tail x) $ succ i
 
 isInfix :: [Cpt.Cpt] -> Bool
-isInfix a = trace (show x) x
-      where x = isInfix' a 0
+isInfix a = isInfix' a 0
 
 popStack :: [Cpt.Cpt] -> [Cpt.Cpt] -> [Cpt.Cpt] -> Integer -> [Cpt.Cpt] -> Maybe [Cpt.Cpt]
 popStack [] valStack opStack i buffer = Just (buffer ++ valStack ++ opStack)
