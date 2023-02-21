@@ -18,6 +18,11 @@ infixToPrefixTestF testName arr restest = testCase testName $ do
   let res = infixToPrefix' arr
   restest @=? res
 
+-- processTestF :: String -> [Cpt.Cpt] -> [Cpt.Cpt] -> [Cpt.Cpt] -> ([Cpt.Cpt], [Cpt.Cpt]) -> TestTree
+-- processTestF testName buffer opStack expr restest = testCase testName $ do
+--   let res = process buffer opStack expr
+--   restest @=? res
+
 insertListsTest :: TestTree
 insertListsTest =
   testGroup
@@ -44,11 +49,27 @@ infixToPrefixTest =
           [Cpt.Sym "+", Cpt.Val 3, Cpt.Val 5],
         infixToPrefixTestF "Succesfull Simple 2"
           [Cpt.Val 3, Cpt.Sym "+", Cpt.Val 5, Cpt.Sym "*", Cpt.Val 9]
-          [Cpt.Sym "+", Cpt.Sym "*", Cpt.Val 3, Cpt.Val 5, Cpt.Val 9],
+          [Cpt.Sym "+", Cpt.Val 3, Cpt.Sym "*", Cpt.Val 5, Cpt.Val 9],
         infixToPrefixTestF "Succesfull Complex"
           [Cpt.Val 4, Cpt.Sym "*", Cpt.Val 3, Cpt.Sym "-", Cpt.Val 6, Cpt.Sym "/", Cpt.Val 3, Cpt.Sym "+", Cpt.Val 5]
           [Cpt.Sym "-", Cpt.Sym "*", Cpt.Val 4, Cpt.Val 3, Cpt.Sym "+", Cpt.Sym "/", Cpt.Val 6, Cpt.Val 3, Cpt.Val 5]
     ]
+
+-- processTest :: TestTree
+-- processTest =
+--   testGroup
+--     "Parsing.InfixTest process"
+--     [
+--         processTestF "Succesfull Simple"
+--           [Cpt.Val 3, Cpt.Sym "+", Cpt.Val 5]
+--           [Cpt.Sym "+", Cpt.Val 3, Cpt.Val 5],
+--         processTestF "Succesfull Simple 2"
+--           [Cpt.Val 3, Cpt.Sym "+", Cpt.Val 5, Cpt.Sym "*", Cpt.Val 9]
+--           [Cpt.Sym "+", Cpt.Sym "*", Cpt.Val 3, Cpt.Val 5, Cpt.Val 9],
+--         processTestF "Succesfull Complex"
+--           [Cpt.Val 4, Cpt.Sym "*", Cpt.Val 3, Cpt.Sym "-", Cpt.Val 6, Cpt.Sym "/", Cpt.Val 3, Cpt.Sym "+", Cpt.Val 5]
+--           [Cpt.Sym "-", Cpt.Sym "*", Cpt.Val 4, Cpt.Val 3, Cpt.Sym "+", Cpt.Sym "/", Cpt.Val 6, Cpt.Val 3, Cpt.Val 5]
+--     ]
 
 
 infixSuite :: TestTree
