@@ -4,41 +4,47 @@ import qualified Parsing.Cpt as Cpt
 import           Data.Maybe  (fromMaybe)
 import           Debug.Trace (trace)
 
+getPrecedence ::  [Cpt.Cpt] -> Integer
+getPrecedence [] = 0
+getPrecedence (a : _) = getOpPrecedence a
+
 process :: [Cpt.Cpt] -> [Cpt.Cpt] -> [Cpt.Cpt] -> ([Cpt.Cpt], [Cpt.Cpt])
 process buffer [] _ = (buffer, [])
-process buffer opStack expr | getOpPrecedence op <= precedence || null expr = process (buffer ++ [op]) opStack expr
+process buffer opStack expr 
+    | getOpPrecedence op >= precedence || null expr = process (buffer ++ [op]) (init opStack) expr
     | otherwise = (buffer, opStack)
         where
-            op = head opStack
-            precedence = getOpPrecedence $ head expr
+            op = last opStack
+            precedence =  getPrecedence expr
 
 -- when encountering an operator we pop the operator stack onto the value stack
 -- as described in Djikstra's shunting yard algorithm
 popStack :: [Cpt.Cpt] -> [Cpt.Cpt] -> [Cpt.Cpt] -> Integer -> [Cpt.Cpt] -> Maybe [Cpt.Cpt]
-popStack [] valStack opStack i buffer = Just (buffer ++ valStack ++ opStack)
-popStack infixExpr valStack opStack i buffer = infixToPrefix' infixExpr [] newOpStack i newBuffer
+popStack infixExpr valStack opStack i buffer =  infixToPrefix'' infixExpr [] newOpStack i newBuffer
     where
-        (newBuffer, newOpStack) = process buffer opStack infixExpr
+        (newBuffer, newOpStack) = process (buffer ++ valStack) opStack infixExpr
 
 -- An implementation of Djikstra's shunting yard algorithm
-infixToPrefix' :: [Cpt.Cpt] -> [Cpt.Cpt] -> [Cpt.Cpt] -> Integer -> [Cpt.Cpt] ->  Maybe [Cpt.Cpt]
-infixToPrefix' [x] valStack opStack i buffer = popStack [] ([x] <> valStack) opStack i buffer
-infixToPrefix' (x: xs) valStack opStack i buffer
-    | i == 0 || even i = infixToPrefix' xs ([x] <> valStack) opStack (succ i) buffer
-    | not $ even i && getOpPrecedence x <= getOpPrecedence (last opStack)
-        = infixToPrefix' xs valStack (opStack <> [x]) (succ i) buffer
+infixToPrefix'' :: [Cpt.Cpt] -> [Cpt.Cpt] -> [Cpt.Cpt] -> Integer -> [Cpt.Cpt] ->  Maybe [Cpt.Cpt]
+infixToPrefix'' [x] valStack opStack i buffer = popStack [] ([x] <> valStack) opStack i buffer
+infixToPrefix'' (x: xs) valStack opStack i buffer
+    | even i = infixToPrefix'' xs ([x] <> valStack) opStack (succ i) buffer
+    | odd i || getOpPrecedence x < getOpPrecedence (last opStack) = infixToPrefix'' xs valStack (opStack <> [x]) (succ i) buffer
     | otherwise = popStack (x : xs) valStack opStack i buffer
-infixToPrefix'  x valStack opStack i buffer = Just buffer
+infixToPrefix''  x valStack opStack i buffer = Just buffer
+
+infixToPrefix' :: [Cpt.Cpt] -> [Cpt.Cpt]
+infixToPrefix' a = reverseList $ fromMaybe [] $ infixToPrefix'' a [] [] 0 []
 
 -- Transform an infix expression into a prefix expression
--- interface to the actual function logic: infixToPrefix''
+-- interface to the actual function logic: infixToPrefix'
 infixToPrefix :: [Cpt.Cpt] -> [Cpt.Cpt]
-infixToPrefix a | isInfix a = insertLists $  reverseList $ fromMaybe [] $ infixToPrefix' a [] [] 0 []
+infixToPrefix a | isInfix a = insertLists $ infixToPrefix' a
                  | otherwise = a
 
 ---- helper functions
 
-getOpPrecedence :: Cpt.Cpt -> Int
+getOpPrecedence :: Cpt.Cpt -> Integer
 getOpPrecedence (Cpt.Sym "^") = 3
 getOpPrecedence (Cpt.Sym "/") = 2
 getOpPrecedence (Cpt.Sym "*") = 2

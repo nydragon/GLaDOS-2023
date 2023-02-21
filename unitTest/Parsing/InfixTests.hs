@@ -4,7 +4,7 @@ import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@=?))
 
 import qualified Parsing.Cpt as Cpt
-import Parsing.Infix (insertLists, infixToPrefix)
+import Parsing.Infix (insertLists, infixToPrefix')
 import Parsing.Token (tokenize, Token)
 import Parsing.Cpt (tokenToCpt)
 
@@ -15,7 +15,7 @@ insertListsTestF testName arr restest = testCase testName $ do
 
 infixToPrefixTestF :: String -> [Cpt.Cpt] -> [Cpt.Cpt] -> TestTree
 infixToPrefixTestF testName arr restest = testCase testName $ do
-  let res = infixToPrefix arr
+  let res = infixToPrefix' arr
   restest @=? res
 
 insertListsTest :: TestTree
@@ -44,9 +44,9 @@ infixToPrefixTest =
           [Cpt.Sym "+", Cpt.Val 3, Cpt.Val 5],
         infixToPrefixTestF "Succesfull Simple 2"
           [Cpt.Val 3, Cpt.Sym "+", Cpt.Val 5, Cpt.Sym "*", Cpt.Val 9]
-          [Cpt.Sym "+", Cpt.Val 3, Cpt.List [Cpt.Sym "*", Cpt.Val 5, Cpt.Val 9]],
+          [Cpt.Sym "+", Cpt.Sym "*", Cpt.Val 3, Cpt.Val 5, Cpt.Val 9],
         infixToPrefixTestF "Succesfull Complex"
-          (Cpt.parseTokenList $ tokenize "(4 * 3 - 6 / 3 + 5)")
+          [Cpt.Val 4, Cpt.Sym "*", Cpt.Val 3, Cpt.Sym "-", Cpt.Val 6, Cpt.Sym "/", Cpt.Val 3, Cpt.Sym "+", Cpt.Val 5]
           [Cpt.Sym "-", Cpt.Sym "*", Cpt.Val 4, Cpt.Val 3, Cpt.Sym "+", Cpt.Sym "/", Cpt.Val 6, Cpt.Val 3, Cpt.Val 5]
     ]
 
