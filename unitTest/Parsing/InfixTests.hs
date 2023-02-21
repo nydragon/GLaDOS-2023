@@ -52,7 +52,7 @@ infixToPrefixTest =
           [Cpt.Sym "+", Cpt.Val 3, Cpt.Sym "*", Cpt.Val 5, Cpt.Val 9],
         infixToPrefixTestF "Succesfull Complex"
           [Cpt.Val 4, Cpt.Sym "*", Cpt.Val 3, Cpt.Sym "-", Cpt.Val 6, Cpt.Sym "/", Cpt.Val 3, Cpt.Sym "+", Cpt.Val 5]
-          [Cpt.Sym "-", Cpt.Sym "*", Cpt.Val 4, Cpt.Val 3, Cpt.Sym "+", Cpt.Sym "/", Cpt.Val 6, Cpt.Val 3, Cpt.Val 5]
+          [Cpt.Sym "+", Cpt.Sym "-", Cpt.Sym "*", Cpt.Val 4, Cpt.Val 3, Cpt.Sym "/", Cpt.Val 6, Cpt.Val 3, Cpt.Val 5]
     ]
 
 -- processTest :: TestTree
