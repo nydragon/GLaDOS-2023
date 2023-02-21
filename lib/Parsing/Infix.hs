@@ -20,26 +20,28 @@ process buffer opStack expr
 -- when encountering an operator we pop the operator stack onto the value stack
 -- as described in Djikstra's shunting yard algorithm
 popStack :: [Cpt.Cpt] -> [Cpt.Cpt] -> [Cpt.Cpt] -> Integer -> [Cpt.Cpt] -> Maybe [Cpt.Cpt]
-popStack infixExpr valStack opStack i buffer =  infixToPrefix'' infixExpr [] newOpStack i newBuffer
+popStack infixExpr valStack opStack i buffer
+    | null infixExpr = Just newBuffer
+    | otherwise =  infixToPrefix'' infixExpr [] newOpStack i newBuffer
     where
         (newBuffer, newOpStack) = process (buffer ++ valStack) opStack infixExpr
 
 -- An implementation of Djikstra's shunting yard algorithm
 infixToPrefix'' :: [Cpt.Cpt] -> [Cpt.Cpt] -> [Cpt.Cpt] -> Integer -> [Cpt.Cpt] ->  Maybe [Cpt.Cpt]
-infixToPrefix'' [x] valStack opStack i buffer = popStack [] (valStack <> [x]) opStack i buffer
+infixToPrefix'' [x] valStack opStack i buffer = trace ("infixToPrefix'' 1" ++ show [x]) $ popStack [] (valStack <> [x]) opStack i buffer
 infixToPrefix'' (x: xs) valStack opStack i buffer
-    | even i = infixToPrefix'' xs (valStack <> [x]) opStack (succ i) buffer
-    | odd i && getOpPrecedence x > getOpPrecedence (last opStack) = infixToPrefix'' xs valStack (opStack <> [x]) (succ i) buffer
-    | otherwise = popStack (x : xs) valStack opStack i buffer
-infixToPrefix''  x valStack opStack i buffer = Just buffer
+    | even i = trace ("infixToPrefix'' 2" ++ show (x : xs) ++ show valStack ++ show opStack) $ infixToPrefix'' xs (valStack <> [x]) opStack (succ i) buffer
+    | odd i && getOpPrecedence x > getOpPrecedence (last opStack) = trace ("infixToPrefix'' 3" ++ show (x : xs)) $ infixToPrefix'' xs valStack (opStack <> [x]) (succ i) buffer
+    | otherwise = trace ("infixToPrefix'' 4" ++ show (x : xs)) $ popStack (x : xs) valStack opStack i buffer
+infixToPrefix'' x valStack opStack i buffer = trace ("infixToPrefix'' 5" ++ show x) $ Just buffer
 
 infixToPrefix' :: [Cpt.Cpt] -> [Cpt.Cpt]
-infixToPrefix' a = reverseList $ fromMaybe [] $ infixToPrefix'' a [] [] 0 []
+infixToPrefix' a = trace ("infixToPrefix'" ++ show a) $ reverseList $ fromMaybe [] $ infixToPrefix'' a [] [] 0 []
 
 -- Transform an infix expression into a prefix expression
 -- interface to the actual function logic: infixToPrefix'
 infixToPrefix :: [Cpt.Cpt] -> [Cpt.Cpt]
-infixToPrefix a | isInfix a = insertLists $ infixToPrefix' a
+infixToPrefix a | isInfix a = trace ("infixToPrefix" ++ show a) $ insertLists $ infixToPrefix' a
                  | otherwise = a
 
 ---- helper functions
@@ -89,4 +91,4 @@ conve (Cpt.List a) = a
 conve a = [a]
 
 insertLists :: [Cpt.Cpt] -> [Cpt.Cpt]
-insertLists a = conve $ head $ insertLists' a 
+insertLists a = trace ("insertLists" ++ show a) $ conve $ head $ insertLists' a 
