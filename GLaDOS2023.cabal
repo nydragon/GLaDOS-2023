@@ -29,6 +29,7 @@ library
         Parsing.Token,
         Parsing.Ast,
         Parsing.Cpt,
+        Parsing.Infix,
         Exec,
         Exec.RuntimeException,
         Exec.Function,
@@ -37,6 +38,7 @@ library
         Exec.Builtins,
         Exec.InteractivePrompt
         Exec.Eval
+
     hs-source-dirs:   lib
     build-depends:    base >= 4.14.1.0, containers
     default-language: Haskell2010
@@ -62,6 +64,7 @@ test-suite unitTest
         Parsing.TokenTests,
         Parsing.CptTests,
         Parsing.AstTests,
+        Parsing.InfixTests,
         ParsingTests,
         ExecTests
     build-depends: base >=4.14.1.0,

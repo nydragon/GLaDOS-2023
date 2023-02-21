@@ -12,7 +12,6 @@ test: clean
 unit-test: clean
 	@cabal run unitTest --test-show-details=direct
 
-
 integration-test: clean
 	@cabal run integrationTest --test-show-details=direct
 

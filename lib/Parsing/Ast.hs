@@ -3,8 +3,9 @@
 module Parsing.Ast where
 
 import qualified Parsing.Cpt as Cpt
+import Parsing.Infix (infixToPrefix)
 
--- ─── Abstract Syntaxe Tree ───────────────────────────────────────────────────────────────────────
+-- ─── Abstract Syntax Tree ───────────────────────────────────────────────────────────────────────
 
 data Expr
   = ExprList [Expr]
@@ -33,11 +34,11 @@ instance Show Expr where
 -- This means it will only parse function calls in sublists thanks to parseExpr
 parseExprList :: [Cpt.Cpt] -> [Expr]
 parseExprList [] = []
-parseExprList (Cpt.List [Cpt.Sym "define", Cpt.List (Cpt.Sym a : arg), Cpt.List body] : xs) = Call "define" [ Symbole a, Call "lambda" [parseExpr arg, parseExpr body]] : parseExprList xs
+parseExprList (Cpt.List [Cpt.Sym "define", Cpt.List (Cpt.Sym a : arg), Cpt.List body] : xs) = Call "define" [ Symbole a, Call "lambda" [parseExpr arg, parseExpr $ infixToPrefix body]] : parseExprList xs
 parseExprList (x : xs) = case x of
   Cpt.Sym str -> Symbole str : parseExprList xs
   Cpt.Val i -> Num i : parseExprList xs
-  Cpt.List ls -> parseExpr ls : parseExprList xs
+  Cpt.List ls -> parseExpr (infixToPrefix ls) : parseExprList xs
   Cpt.Boolean b -> Boolean b : parseExprList xs
 
 -- Parses a CPT list into a single Expr value

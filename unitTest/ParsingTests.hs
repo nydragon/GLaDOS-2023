@@ -7,11 +7,13 @@ import Parsing.CptTests
 import Parsing.ArgsTests
 import Parsing.AstTests
 import Parsing.TokenTests
+import Parsing.InfixTests
 
 parsingSuite :: TestTree
 parsingSuite = testGroup "Parsing Suite Tests" [
         argsSuite,
         tokenSuite,
         cptSuite,
-        astSuite
+        astSuite,
+        infixSuite
     ]
