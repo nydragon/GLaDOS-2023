@@ -23,7 +23,7 @@ process buffer opStack expr
 -- as described in Djikstra's shunting yard algorithm
 popStack :: [Cpt.Cpt] -> [Cpt.Cpt] -> [Cpt.Cpt] -> Integer-> [Cpt.Cpt]
 popStack [] buffer opStack i = fst $ process buffer opStack [] 
-popStack (x : infixExpr) buffer opStack i =  infixToPrefix'' infixExpr newBuffer (newOpStack <> [x]) i
+popStack (x : infixExpr) buffer opStack i =  infixToPrefix'' infixExpr newBuffer (newOpStack <> [x]) (succ i)
       where
         (newBuffer, newOpStack) = process buffer opStack (x : infixExpr)  
 
