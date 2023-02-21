@@ -2,7 +2,6 @@ module Parsing.Infix where
 
 import qualified Parsing.Cpt as Cpt
 import           Data.Maybe  (fromMaybe)
-import           Debug.Trace (trace)
 
 getPrecedence ::  [Cpt.Cpt] -> Integer
 getPrecedence [] = 0
