@@ -33,7 +33,7 @@ infixToPrefix'' :: [Cpt.Cpt] -> [Cpt.Cpt] -> [Cpt.Cpt] -> Integer ->  [Cpt.Cpt]
 infixToPrefix'' [x] buffer opStack i = popStack [] (buffer <> [x]) opStack i
 infixToPrefix'' (x: xs) buffer opStack i
     | even i = infixToPrefix'' xs (buffer <> [x]) opStack (succ i)
-    | odd i &&  (null opStack ||  (getOpPrecedence (last opStack) <= getOpPrecedence x)) = infixToPrefix'' xs buffer (opStack <> [x]) (succ i)
+    | odd i &&  (null opStack || (getOpPrecedence (last opStack) <= getOpPrecedence x)) = infixToPrefix'' xs buffer (opStack <> [x]) (succ i)
     | otherwise = popStack (x: xs) buffer opStack i
 
 infixToPrefix' :: [Cpt.Cpt] -> [Cpt.Cpt]
