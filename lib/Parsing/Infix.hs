@@ -26,10 +26,10 @@ popStack infixExpr valStack opStack i buffer =  infixToPrefix'' infixExpr [] new
 
 -- An implementation of Djikstra's shunting yard algorithm
 infixToPrefix'' :: [Cpt.Cpt] -> [Cpt.Cpt] -> [Cpt.Cpt] -> Integer -> [Cpt.Cpt] ->  Maybe [Cpt.Cpt]
-infixToPrefix'' [x] valStack opStack i buffer = popStack [] ([x] <> valStack) opStack i buffer
+infixToPrefix'' [x] valStack opStack i buffer = popStack [] (valStack <> [x]) opStack i buffer
 infixToPrefix'' (x: xs) valStack opStack i buffer
-    | even i = infixToPrefix'' xs ([x] <> valStack) opStack (succ i) buffer
-    | odd i || getOpPrecedence x < getOpPrecedence (last opStack) = infixToPrefix'' xs valStack (opStack <> [x]) (succ i) buffer
+    | even i = infixToPrefix'' xs (valStack <> [x]) opStack (succ i) buffer
+    | odd i && getOpPrecedence x > getOpPrecedence (last opStack) = infixToPrefix'' xs valStack (opStack <> [x]) (succ i) buffer
     | otherwise = popStack (x : xs) valStack opStack i buffer
 infixToPrefix''  x valStack opStack i buffer = Just buffer
 
