@@ -11,7 +11,7 @@ import Print
 getFiles :: IO [String]
 getFiles = map takeBaseName . filter (isSuffixOf ".scm") <$> filter (`notElem` [".", ".."]) <$> getDirectoryContents "./integrationTests/TestFiles/"
 
-getOutput :: String -> IO ()
+getOutput :: String -> IO Bool
 getOutput fn =
   test fn
     =<< readProcessWithExitCode
@@ -19,8 +19,9 @@ getOutput fn =
       [ ("./integrationTests/TestFiles/" ++ fn ++ ".scm") ]
       ""
 
-test :: String -> (ExitCode, String, String) -> IO ()
+test :: String -> (ExitCode, String, String) -> IO Bool
 test fn (ex, out, err) = do
   solvedStr <- readFile ("./integrationTests/TestFiles/" ++ fn ++ ".scm.slv")
   printRes (solvedStr == out) (isInfixOf "error" fn) ex
   putStrLn fn
+  return (solvedStr == out)
