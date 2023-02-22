@@ -26,8 +26,8 @@ execBuiltin :: Ast.Expr -> Registry -> IO RetVal
 execBuiltin (Ast.Call func ls) reg = case func of
     "println" -> printlnBuiltin ls reg
     "print" -> printBuiltin ls reg
-    "div" -> divBuiltin ls reg
-    "mod" -> modulo ls reg
+    "/" -> divBuiltin ls reg
+    "%" -> modulo ls reg
     "*" -> multiply ls reg
     "-" -> subBuiltin ls reg
     "+" -> add ls reg
