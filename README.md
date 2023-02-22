@@ -22,15 +22,15 @@
     - Continuous integration running tests on every **Pull Request**
     - **Over 60** Unit tests and close to **50% coverage**
     - **Close to 20** Integration tests
-- **Abstract Syntaxe Tree** and **Concrete Parse Tree** implementation
+- **Abstract Syntax Tree** and **Concrete Parse Tree** implementation
 - Standard input reading
+- An [ABNF syntax description](./doc/syntax-description.md)
 
 ## Supported Scheme Features
 
 - Atoms
     - Signed Integers
     - Symbol
-- Lists
 - Boolean type
 - Function execution
 - Function definition
@@ -69,8 +69,6 @@ or
 ```
 ./glados --interactive
 ```
-
-# Building and Running
 
 ## Install Dependencies
 

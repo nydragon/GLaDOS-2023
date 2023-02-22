@@ -37,3 +37,5 @@ cabal run test
 ```sh
 make test
 ```
+
+[Return to the main page](../README.md)
