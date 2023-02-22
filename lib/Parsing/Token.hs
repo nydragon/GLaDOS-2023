@@ -2,6 +2,8 @@ module Parsing.Token where
 
 import Data.Maybe
 import Text.Read
+import Data.Char (isDigit)
+import Debug.Trace
 
 -- ─── Tokenization ────────────────────────────────────────────────────────────────────────────────
 
@@ -10,15 +12,31 @@ data Token = OpenScope -- Opening parenthesis
         | CloseScope -- Closing parenthesis
         | Num Integer
         | Keyword String
+        | Literal String
         deriving (Show, Eq)
 
 -- Parse token from string
 parseToken :: String -> Token
 parseToken "(" = OpenScope
 parseToken ")" = CloseScope
-parseToken input = case readMaybe input :: Maybe Integer of
-        Just x -> Num x
-        Nothing -> Keyword input
+parseToken input
+        | all isDigit input = trace ("pos" ++ input) $ Num (read input :: Integer)
+        | not (null (tail input)) && all isDigit (tail input) && head input == '-' = trace ("neg" ++ input) $ Num $ negate (read (tail input) :: Integer)
+parseToken input = Keyword input
+
+
+parseString' :: String -> String
+parseString' ('\\' : x : xs ) = x : parseString' xs
+parseString' ('"' : xs) = ""
+parseString' (x : xs) = x : parseString' xs
+
+parseString :: String -> Token
+parseString ('"' : str) = Literal $ parseString' str
+
+stringFastForward :: String -> String
+stringFastForward ('\\' : x : xs ) = stringFastForward xs
+stringFastForward ('"' : xs) = xs
+stringFastForward (x : xs) = stringFastForward xs
 
 -- Function that tokenizes string
 --
@@ -35,6 +53,8 @@ tokenize' ('(':xs) "" = OpenScope : tokenize' xs ""
 tokenize' ('(':xs) str = parseToken str : tokenize' ('(':xs) ""
 tokenize' (')':xs) "" = CloseScope : tokenize' xs ""
 tokenize' (')':xs) str = parseToken str : tokenize' (')':xs) ""
+tokenize' ('"':xs) "" = parseString ('"':xs) : tokenize' (stringFastForward xs) ""
+tokenize' ('"':xs) str = trace "SHOULD NOT HAPPEN" parseToken str : parseString ('"':xs) : tokenize' (stringFastForward xs) ""
 tokenize' (x:xs) str = tokenize' xs (str <> [x])
 
 -- Utility entry point function
