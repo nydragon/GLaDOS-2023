@@ -44,14 +44,12 @@ execBuiltin _ _ = throwIO UndefinedBehaviour -- Builtin not found
 -- ─── Builtin Implementations ─────────────────────────────────────────────────────────────────────
 
 printlnBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
-printlnBuiltin ls reg = print (head ls) >> return output
-    where
-        output = RetVal reg Ast.Null
+printlnBuiltin (Ast.Literal x : ls ) reg = putStrLn x >> return (RetVal reg Ast.Null)
+printlnBuiltin ls reg = print (head ls) >> return (RetVal reg Ast.Null)
 
 printBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
-printBuiltin ls reg = putStr (show $ head ls) >> return output
-    where
-        output = RetVal reg Ast.Null
+printBuiltin (Ast.Literal x : ls ) reg = putStr x >> return (RetVal reg Ast.Null)
+printBuiltin ls reg = putStr (show $ head ls) >> return (RetVal reg Ast.Null)
 
 divBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
 divBuiltin [Ast.Num a, Ast.Num 0] reg = throwIO NullDivision

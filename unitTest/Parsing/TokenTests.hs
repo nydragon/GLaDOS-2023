@@ -43,8 +43,29 @@ tokenizeLoop (x:xs) = (tokenize'Test x:tokenizeTest x: tokenizeLoop xs)
 tokenizeSuite :: TestTree
 tokenizeSuite = testGroup "tokenize tests" (tokenizeLoop listTokenizeTests)
 
+parseStringTestF :: String -> String -> Token -> TestTree
+parseStringTestF testName str restest = testCase testName $ do
+  restest @=? parseString str
+
+parseStringTest :: TestTree
+parseStringTest =
+  testGroup
+    "Parsing.InfixTest infixToPrefix"
+    [
+        parseStringTestF "Succesfull Simple"
+                "\"Hello World!\""
+                (Literal "Hello World!"),
+        parseStringTestF "Succesfull with escapeing"
+                "\"Hello\\\\ World!\""
+                (Literal  "Hello\\ World!"),
+        parseStringTestF "Succesfull with double quotes in string"
+                "\"\\\"Ik bin ein Berliner\\\"\""
+                (Literal "\"Ik bin ein Berliner\"")
+    ]
+
 tokenSuite :: TestTree
 tokenSuite = testGroup "Parsing.Token Test Suite" [
         parseTokenTests,
-        tokenizeSuite
+        tokenizeSuite,
+        parseStringTest
     ]

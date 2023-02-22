@@ -35,6 +35,7 @@ unbindArgs vars (RetVal reg ret) = return newRet
 isAtomicExpression :: Ast.Expr -> Bool
 isAtomicExpression (Ast.Num n) = True
 isAtomicExpression (Ast.Boolean n) = True
+isAtomicExpression (Ast.Literal n) = True
 isAtomicExpression Ast.Null = True
 isAtomicExpression (Ast.Symbole _) = True
 isAtomicExpression _ = False

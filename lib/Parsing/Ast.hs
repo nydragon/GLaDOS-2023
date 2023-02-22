@@ -12,6 +12,7 @@ data Expr
   | Num Integer
   | Boolean Bool
   | Symbole String
+  | Literal String
   | Call String [Expr] -- Will also be used for the boolean expression
   | Null -- Instead of using Maybe Expr
   deriving (Eq)
@@ -24,6 +25,7 @@ instance Show Expr where
   show (ExprList ls) = show ls
   show (Num n) = show n
   show (Symbole s) = show s
+  show (Literal s) = show s
   show (Call _ _) = "#<procedure>"
   show Null = "Null"
 
@@ -40,6 +42,7 @@ parseExprList (x : xs) = case x of
   Cpt.Val i -> Num i : parseExprList xs
   Cpt.List ls -> parseExpr (infixToPrefix ls) : parseExprList xs
   Cpt.Boolean b -> Boolean b : parseExprList xs
+  Cpt.Literal' b -> Literal b : parseExprList xs
 
 -- Parses a CPT list into a single Expr value
 parseExpr :: [Cpt.Cpt] -> Expr
@@ -85,6 +88,7 @@ isValidBuiltin _ = False
 -- Note: Sym is not atomic as it needs to be reduced to a value
 isAtomic :: Expr -> Bool
 isAtomic (Num _) = True
+isAtomic (Literal _) = True
 isAtomic (Boolean _) = True
 isAtomic Null = True
 isAtomic _ = False
