@@ -25,6 +25,7 @@
 - **Abstract Syntax Tree** and **Concrete Parse Tree** implementation
 - Standard input reading
 - An [ABNF syntax description](./doc/syntax-description.md)
+- **Infix notations** for operators and custom functions
 
 ## Supported Scheme Features
 
