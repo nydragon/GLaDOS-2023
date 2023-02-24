@@ -27,7 +27,8 @@ tokenToCpt (Num i) = Just (Val i)
 tokenToCpt (Literal i) = Just (Literal' i)
 tokenToCpt (Keyword "#f") = Just (Boolean False)
 tokenToCpt (Keyword "#t") = Just (Boolean True)
-tokenToCpt (Keyword str) = Just (Sym str)
+tokenToCpt (Keyword str) | head str == '`' && last str == '`' = Just (Sym $ tail $ init str)
+        | otherwise = Just (Sym str)
 
 -- Parses list in between parenthesis
 -- EXPECTS : First token in list to be OpenScope

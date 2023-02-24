@@ -37,14 +37,19 @@ getInput inputs openBrackets = do
   let num_close = countChar ')' input
   recurse (inputs <> [input ++ "\n"]) (openBrackets + num_open) num_close
 
+convert :: Ast.Expr -> [Ast.Expr]
+convert (Ast.ExprList a) = a
+convert a = [a]
+
+
 loop :: Registry -> IO ()
 loop reg = do
   -- Parse AST
   ast <- parseExprList . parseTokenList . tokenize <$> getInput [] 0
 
   -- Run
-  (RetVal newReg _) <- eval (Ast.ExprList ast) reg
-
+  (RetVal newReg res) <- eval (Ast.ExprList ast) reg
+  print $ head (convert res)
   loop newReg
 
 interactiveMode :: IO ()

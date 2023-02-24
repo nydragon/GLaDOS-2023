@@ -52,14 +52,15 @@ getOpPrecedence (Cpt.Sym "/") = 2
 getOpPrecedence (Cpt.Sym "*") = 2
 getOpPrecedence (Cpt.Sym "+") = 1
 getOpPrecedence (Cpt.Sym "-") = 1
-getOpPrecedence _ = 0
+getOpPrecedence (Cpt.Sym _) = 0
+getOpPrecedence _ = -1
 
 reverseList :: [a] -> [a]
 reverseList = foldl (flip (:)) []
 
 isInfix'' :: [Cpt.Cpt] -> Integer -> Bool
 isInfix'' [] _ = True
-isInfix'' (x : xs) i | getOpPrecedence x > 0 = isInfix' xs i
+isInfix'' (x : xs) i | getOpPrecedence x >= 0 = isInfix' xs i
                      | otherwise = False
 
 isInfix' :: [Cpt.Cpt] -> Integer -> Bool
@@ -70,8 +71,6 @@ isInfix' x i  | odd i = isInfix'' x $ succ i
 -- verifies if a given Cpt.ExprList is an infix expression
 isInfix :: [Cpt.Cpt] -> Bool
 isInfix a = isInfix' a 0
-
-
 
 valid :: Cpt.Cpt -> Bool
 valid (Cpt.Sym a) = False
