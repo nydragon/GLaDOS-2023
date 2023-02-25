@@ -10,10 +10,15 @@ getPrecedence (a : _) = getOpPrecedence a
 toPop :: Cpt.Cpt -> Cpt.Cpt -> Bool
 toPop a b = (>) (getOpPrecedence a) (getOpPrecedence b)
 
+prefixify :: Cpt.Cpt -> Cpt.Cpt
+prefixify (Cpt.Sym str) | head str == '`' && last str == '`' = Cpt.Sym (tail $ init str)
+prefixify (Cpt.Sym str) = Cpt.Sym str
+prefixify a = a  
+
 process :: [Cpt.Cpt] -> [Cpt.Cpt] -> [Cpt.Cpt] -> ([Cpt.Cpt], [Cpt.Cpt])
 process buffer [] _ = (buffer, [])
 process buffer opStack expr 
-    | (getOpPrecedence op > precedence) || null expr = process (buffer <> [op]) (init opStack) expr
+    | (getOpPrecedence op > precedence) || null expr = process (buffer <> [prefixify op]) (init opStack) expr
     | otherwise = (buffer, opStack)
         where
             op = last opStack
@@ -47,19 +52,20 @@ infixToPrefix a | isInfix a = insertLists $ infixToPrefix' a
 ---- helper functions
 
 getOpPrecedence :: Cpt.Cpt -> Integer
-getOpPrecedence (Cpt.Sym "^") = 3
-getOpPrecedence (Cpt.Sym "/") = 2
-getOpPrecedence (Cpt.Sym "*") = 2
-getOpPrecedence (Cpt.Sym "+") = 1
-getOpPrecedence (Cpt.Sym "-") = 1
-getOpPrecedence _ = 0
+getOpPrecedence (Cpt.Sym "^" ) = 3
+getOpPrecedence (Cpt.Sym "/" ) = 2
+getOpPrecedence (Cpt.Sym "*" ) = 2
+getOpPrecedence (Cpt.Sym "+" ) = 1
+getOpPrecedence (Cpt.Sym "-" ) = 1
+getOpPrecedence (Cpt.Sym str) | head str == '`' && last str == '`'  = 0
+getOpPrecedence _ = -1
 
 reverseList :: [a] -> [a]
 reverseList = foldl (flip (:)) []
 
 isInfix'' :: [Cpt.Cpt] -> Integer -> Bool
 isInfix'' [] _ = True
-isInfix'' (x : xs) i | getOpPrecedence x > 0 = isInfix' xs i
+isInfix'' (x : xs) i | getOpPrecedence x >= 0 = isInfix' xs i
                      | otherwise = False
 
 isInfix' :: [Cpt.Cpt] -> Integer -> Bool
@@ -71,15 +77,13 @@ isInfix' x i  | odd i = isInfix'' x $ succ i
 isInfix :: [Cpt.Cpt] -> Bool
 isInfix a = isInfix' a 0
 
-
-
 valid :: Cpt.Cpt -> Bool
 valid (Cpt.Sym a) = False
 valid _ = True
 
 insertLists' :: [Cpt.Cpt] -> [Cpt.Cpt]
 insertLists' [] = []
-insertLists' (Cpt.Sym a : b : c : as)
+insertLists' (Cpt.Sym a: b : c : as)
             | valid b && valid c = [Cpt.List [Cpt.Sym a, b, c]] <> insertLists' as
             | valid b = [Cpt.List $ [Cpt.Sym a, b] <> insertLists' (c : as)]
             | otherwise = [Cpt.List $ [Cpt.Sym a] <> insertLists' (b : c : as)]

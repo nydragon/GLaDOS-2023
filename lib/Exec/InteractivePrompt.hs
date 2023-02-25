@@ -3,7 +3,7 @@ module Exec.InteractivePrompt where
 import Data.List (isInfixOf)
 import Exec.Eval
 import Exec.Registry
-import Parsing.Ast (parseExprList)
+import Parsing.Ast (parseExprList, isAtomic)
 import qualified Parsing.Ast as Ast
 import Parsing.Cpt (parseTokenList)
 import Parsing.Token (tokenize)
@@ -37,13 +37,22 @@ getInput inputs openBrackets = do
   let num_close = countChar ')' input
   recurse (inputs <> [input ++ "\n"]) (openBrackets + num_open) num_close
 
+convert :: Ast.Expr -> [Ast.Expr]
+convert (Ast.ExprList a) = a
+convert a = [a]
+
+display :: Ast.Expr -> IO ()
+display a | isAtomic a = print $ head (convert a)
+          | otherwise = return ()
+
 loop :: Registry -> IO ()
 loop reg = do
   -- Parse AST
   ast <- parseExprList . parseTokenList . tokenize <$> getInput [] 0
 
   -- Run
-  (RetVal newReg _) <- eval (Ast.ExprList ast) reg
+  (RetVal newReg res) <- eval (Ast.ExprList ast) reg
+  display res
 
   loop newReg
 

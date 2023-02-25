@@ -20,7 +20,7 @@ parseToken :: String -> Token
 parseToken "(" = OpenScope
 parseToken ")" = CloseScope
 parseToken input
-        | all isDigit input = trace ("pos" ++ input) $ Num (read input :: Integer)
+        | all isDigit input = Num (read input :: Integer)
         | not (null (tail input)) && all isDigit (tail input) && head input == '-' = trace ("neg" ++ input) $ Num $ negate (read (tail input) :: Integer)
 parseToken input = Keyword input
 
