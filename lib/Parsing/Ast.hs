@@ -36,9 +36,9 @@ instance Show Expr where
 -- This means it will only parse function calls in sublists thanks to parseExpr
 parseExprList :: [Cpt.Cpt] -> [Expr]
 parseExprList [] = []
-parseExprList (Cpt.List [Cpt.Sym "define" _, Cpt.List (Cpt.Sym a _ : arg), Cpt.List body] : xs) = Call "define" [ Symbole a, Call "lambda" [parseExpr arg, parseExpr $ infixToPrefix body]] : parseExprList xs
+parseExprList (Cpt.List [Cpt.Sym "define", Cpt.List (Cpt.Sym a : arg), Cpt.List body] : xs) = Call "define" [ Symbole a, Call "lambda" [parseExpr arg, parseExpr $ infixToPrefix body]] : parseExprList xs
 parseExprList (x : xs) = case x of
-  Cpt.Sym str _ -> Symbole str : parseExprList xs
+  Cpt.Sym str -> Symbole str : parseExprList xs
   Cpt.Val i -> Num i : parseExprList xs
   Cpt.List ls -> parseExpr (infixToPrefix ls) : parseExprList xs
   Cpt.Boolean b -> Boolean b : parseExprList xs
@@ -46,12 +46,12 @@ parseExprList (x : xs) = case x of
 
 -- Parses a CPT list into a single Expr value
 parseExpr :: [Cpt.Cpt] -> Expr
-parseExpr (Cpt.Sym str s : xs) =
+parseExpr (Cpt.Sym str : xs) =
   if isValidBuiltin str
     then Call str (parseExprList xs)
     else ExprList (parseExprList original)
   where
-    original = Cpt.Sym str s : xs
+    original = Cpt.Sym str : xs
 parseExpr ls = ExprList (parseExprList ls)
 
 -- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
