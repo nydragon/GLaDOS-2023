@@ -42,8 +42,8 @@ convert (Ast.ExprList a) = a
 convert a = [a]
 
 display :: Ast.Expr -> IO ()
-display a | isAtomic a = print $ head (convert a)
-          | otherwise = return ()
+display (Ast.ExprList (a : as)) | isAtomic a = print a
+display _ = return ()
 
 loop :: Registry -> IO ()
 loop reg = do
@@ -52,6 +52,7 @@ loop reg = do
 
   -- Run
   (RetVal newReg res) <- eval (Ast.ExprList ast) reg
+
   display res
 
   loop newReg
