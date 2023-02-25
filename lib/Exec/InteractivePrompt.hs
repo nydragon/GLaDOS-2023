@@ -3,7 +3,7 @@ module Exec.InteractivePrompt where
 import Data.List (isInfixOf)
 import Exec.Eval
 import Exec.Registry
-import Parsing.Ast (parseExprList)
+import Parsing.Ast (parseExprList, isAtomic)
 import qualified Parsing.Ast as Ast
 import Parsing.Cpt (parseTokenList)
 import Parsing.Token (tokenize)
@@ -41,6 +41,9 @@ convert :: Ast.Expr -> [Ast.Expr]
 convert (Ast.ExprList a) = a
 convert a = [a]
 
+display :: Ast.Expr -> IO ()
+display a | isAtomic a = print $ head (convert a)
+          | otherwise = return ()
 
 loop :: Registry -> IO ()
 loop reg = do
@@ -49,7 +52,8 @@ loop reg = do
 
   -- Run
   (RetVal newReg res) <- eval (Ast.ExprList ast) reg
-  print $ head (convert res)
+  display res
+
   loop newReg
 
 interactiveMode :: IO ()

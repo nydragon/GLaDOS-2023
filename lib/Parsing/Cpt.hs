@@ -2,6 +2,7 @@ module Parsing.Cpt where
 
 import Parsing.Token
 import Data.Maybe
+import Debug.Trace
 
 -- ─── Concrete Parsing Tree ───────────────────────────────────────────────────────────────────────
 
@@ -9,7 +10,7 @@ import Data.Maybe
 -- Represents the main elements of our Context Free Grammar
 data Cpt = Val Integer -- Using "Val" in order to avoid ambiguity check (yes it's ugly)
         | Literal' String
-        | Sym String -- Symbol
+        | Sym String Bool -- Symbol
         | List [Cpt] -- The list is sort of what an expression would be in other grammars
         | Boolean Bool
         deriving (Show, Eq)
@@ -28,8 +29,8 @@ tokenToCpt (Literal i) = Just (Literal' i)
 tokenToCpt (Keyword "#f") = Just (Boolean False)
 tokenToCpt (Keyword "#t") = Just (Boolean True)
 -- if a symbol starts and ends with ` it means that it is used in infix form
-tokenToCpt (Keyword str) | head str == '`' && last str == '`' = Just (Sym $ tail $ init str)
-        | otherwise = Just (Sym str)
+tokenToCpt (Keyword str) | head str == '`' && last str == '`' = Just (Sym (tail $ init str) True)
+        | otherwise = Just (Sym str False)
 
 -- Parses list in between parenthesis
 -- EXPECTS : First token in list to be OpenScope
@@ -79,7 +80,7 @@ getCloseScope (x:xs) = getCloseScope' xs 1 0 1 -- index starts at 1 since first 
 -- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
 
 getSymbol :: Cpt -> Maybe String
-getSymbol (Sym s) = Just s
+getSymbol (Sym s _) = Just s
 getSymbol _ = Nothing
 
 getInteger :: Cpt -> Maybe Integer

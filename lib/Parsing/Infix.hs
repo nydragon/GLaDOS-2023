@@ -47,12 +47,12 @@ infixToPrefix a | isInfix a = insertLists $ infixToPrefix' a
 ---- helper functions
 
 getOpPrecedence :: Cpt.Cpt -> Integer
-getOpPrecedence (Cpt.Sym "^") = 3
-getOpPrecedence (Cpt.Sym "/") = 2
-getOpPrecedence (Cpt.Sym "*") = 2
-getOpPrecedence (Cpt.Sym "+") = 1
-getOpPrecedence (Cpt.Sym "-") = 1
-getOpPrecedence (Cpt.Sym _) = 0
+getOpPrecedence (Cpt.Sym "^" _) = 3
+getOpPrecedence (Cpt.Sym "/" _) = 2
+getOpPrecedence (Cpt.Sym "*" _) = 2
+getOpPrecedence (Cpt.Sym "+" _) = 1
+getOpPrecedence (Cpt.Sym "-" _) = 1
+getOpPrecedence (Cpt.Sym _ True) = 0
 getOpPrecedence _ = -1
 
 reverseList :: [a] -> [a]
@@ -73,15 +73,15 @@ isInfix :: [Cpt.Cpt] -> Bool
 isInfix a = isInfix' a 0
 
 valid :: Cpt.Cpt -> Bool
-valid (Cpt.Sym a) = False
+valid (Cpt.Sym a _) = False
 valid _ = True
 
 insertLists' :: [Cpt.Cpt] -> [Cpt.Cpt]
 insertLists' [] = []
-insertLists' (Cpt.Sym a : b : c : as)
-            | valid b && valid c = [Cpt.List [Cpt.Sym a, b, c]] <> insertLists' as
-            | valid b = [Cpt.List $ [Cpt.Sym a, b] <> insertLists' (c : as)]
-            | otherwise = [Cpt.List $ [Cpt.Sym a] <> insertLists' (b : c : as)]
+insertLists' (Cpt.Sym a s: b : c : as)
+            | valid b && valid c = [Cpt.List [Cpt.Sym a s, b, c]] <> insertLists' as
+            | valid b = [Cpt.List $ [Cpt.Sym a s, b] <> insertLists' (c : as)]
+            | otherwise = [Cpt.List $ [Cpt.Sym a s] <> insertLists' (b : c : as)]
 insertLists' (a : as) = a : insertLists' as
 
 
