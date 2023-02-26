@@ -26,8 +26,8 @@ execBuiltin :: Ast.Expr -> Registry -> IO RetVal
 execBuiltin (Ast.Call func ls) reg = case func of
     "println" -> printlnBuiltin ls reg
     "print" -> printBuiltin ls reg
-    "div" -> divBuiltin ls reg
-    "mod" -> modulo ls reg
+    "/" -> divBuiltin ls reg
+    "%" -> modulo ls reg
     "*" -> multiply ls reg
     "-" -> subBuiltin ls reg
     "+" -> add ls reg
@@ -45,11 +45,13 @@ execBuiltin _ _ = throwIO UndefinedBehaviour -- Builtin not found
 
 printlnBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
 printlnBuiltin (Ast.Literal x : ls ) reg = putStrLn x >> return (RetVal reg Ast.Null)
-printlnBuiltin ls reg = print (head ls) >> return (RetVal reg Ast.Null)
+printlnBuiltin ls reg | not $ null ls = print (head ls) >> return (RetVal reg Ast.Null)
+printlnBuiltin _ _ = throwIO $ InvalidArgumentCount "println"
 
 printBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
 printBuiltin (Ast.Literal x : ls ) reg = putStr x >> return (RetVal reg Ast.Null)
-printBuiltin ls reg = putStr (show $ head ls) >> return (RetVal reg Ast.Null)
+printBuiltin ls reg | not $ null ls = putStr (show $ head ls) >> return (RetVal reg Ast.Null)
+printBuiltin _ _ = throwIO $ InvalidArgumentCount "println"
 
 divBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
 divBuiltin [Ast.Num a, Ast.Num 0] reg = throwIO NullDivision

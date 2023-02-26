@@ -70,9 +70,9 @@ isValidBuiltin "define" = True
 isValidBuiltin "lambda" = True
 isValidBuiltin "+" = True
 isValidBuiltin "-" = True
-isValidBuiltin "div" = True
+isValidBuiltin "/" = True
 isValidBuiltin "*" = True
-isValidBuiltin "mod" = True
+isValidBuiltin "%" = True
 isValidBuiltin "<" = True
 isValidBuiltin "<=" = True
 isValidBuiltin ">" = True

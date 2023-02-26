@@ -2,6 +2,7 @@ module Parsing.Cpt where
 
 import Parsing.Token
 import Data.Maybe
+import Debug.Trace
 
 -- ─── Concrete Parsing Tree ───────────────────────────────────────────────────────────────────────
 
@@ -27,6 +28,7 @@ tokenToCpt (Num i) = Just (Val i)
 tokenToCpt (Literal i) = Just (Literal' i)
 tokenToCpt (Keyword "#f") = Just (Boolean False)
 tokenToCpt (Keyword "#t") = Just (Boolean True)
+-- if a symbol starts and ends with ` it means that it is used in infix form
 tokenToCpt (Keyword str) = Just (Sym str)
 
 -- Parses list in between parenthesis
