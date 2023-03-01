@@ -4,7 +4,7 @@ module Parsing.Ast where
 
 import qualified Parsing.Cpt as Cpt
 import Parsing.Infix (infixToPrefix)
-
+import GHC.IO.Handle
 -- ─── Abstract Syntax Tree ───────────────────────────────────────────────────────────────────────
 
 data Expr
@@ -14,6 +14,7 @@ data Expr
   | Symbole String
   | Literal String
   | Call String [Expr] -- Will also be used for the boolean expression
+  | Handle Handle -- A file handle
   | Null -- Instead of using Maybe Expr
   deriving (Eq)
 
@@ -26,6 +27,7 @@ instance Show Expr where
   show (Num n) = show n
   show (Symbole s) = show s
   show (Literal s) = show s
+  show (Handle s) = show s
   show (Call _ _) = "#<procedure>"
   show Null = "Null"
 
@@ -81,7 +83,13 @@ isValidBuiltin "if" = True
 isValidBuiltin "println" = True
 isValidBuiltin "print" = True
 isValidBuiltin "eq?" = True
-isValidBuiltin "noop" = True -- Should be useful in the future, will return list of args
+isValidBuiltin "readFile" = True
+isValidBuiltin "openFile" = True
+isValidBuiltin "head" = True
+isValidBuiltin "tail" = True
+isValidBuiltin "init" = True
+isValidBuiltin "last" = True
+isValidBuiltin "join" = True
 isValidBuiltin _ = False
 
 -- Returns boolean if Expr is atomic. This means it cannot be further reduced.
@@ -90,6 +98,7 @@ isAtomic :: Expr -> Bool
 isAtomic (Num _) = True
 isAtomic (Literal _) = True
 isAtomic (Boolean _) = True
+isAtomic (Handle _) = True
 isAtomic Null = True
 isAtomic _ = False
 

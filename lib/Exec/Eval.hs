@@ -4,6 +4,7 @@ import Control.Exception
 import Data.Maybe
 import Exec
 import Exec.Function
+import Exec.Utils
 import Exec.Registry
 import Exec.RuntimeException
 import Exec.Variables
@@ -57,7 +58,7 @@ eval :: Ast.Expr -> Registry -> IO RetVal
 eval (Ast.ExprList (Ast.Call "lambda" [Ast.ExprList args, body] : argValues)) reg = evalLambda args body argValues reg
 eval (Ast.ExprList ls) reg = evalExprList ls reg
 -- Function special cases
-eval (Ast.Call "define" args) reg = execCall (Ast.Call "define" args) reg
+eval (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg = execCall (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg
 eval (Ast.Call "if" (x : xs)) reg = do
     -- Evaluate first argument
     RetVal a condVal <- eval x reg
@@ -92,7 +93,7 @@ toString _  = []
 execFunc :: String -> [Ast.Expr] -> Registry -> IO RetVal
 execFunc "define" args reg = execBuiltin (Ast.Call "define" args) reg
 execFunc f args _
-  | not $ isAtomicExpressionList args = throwIO $ NonAtomicFunctionArgs f args
+  | not $ isAtomicList args = throwIO $ NonAtomicFunctionArgs f args
 execFunc funcName argValues reg
   | Ast.isValidBuiltin funcName = execBuiltin (Ast.Call funcName argValues) reg
   | otherwise = case lookupFunc funcName (snd reg) of
@@ -119,5 +120,3 @@ execCall :: Ast.Expr -> Registry -> IO RetVal
 execCall (Ast.Call n args) reg =  execFunc n args reg
 execCall _ _ = throwIO $ InvalidFunctionCall "<Unknown Function Name>"
 
-unpack :: RetVal -> (Ast.Expr, Registry)
-unpack (RetVal reg expr) = (expr, reg)
