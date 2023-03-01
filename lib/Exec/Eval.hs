@@ -91,9 +91,7 @@ toString _  = []
 -- Executes function call
 -- Note: Arguments do not need to have been reduced, execFunc takes care of it
 execFunc :: String -> [Ast.Expr] -> Registry -> IO RetVal
-execFunc "define" args reg = do
-    RetVal _ val <- eval (Ast.ExprList args) reg
-    execBuiltin (Ast.Call "define" (convert val)) reg
+execFunc "define" args reg = execBuiltin (Ast.Call "define" args) reg
 execFunc f args _
   | not $ isAtomicExpressionList args = throwIO $ NonAtomicFunctionArgs f args
 execFunc funcName argValues reg
