@@ -9,6 +9,7 @@ import Parsing.Cpt (parseTokenList)
 import Parsing.Token (tokenize)
 import System.Exit (exitSuccess)
 import System.IO (hFlush, stdout)
+import Exec.Utils
 
 -- Function that counts the character received as argument
 -- Returns the number of times this character appears in a string
@@ -37,12 +38,8 @@ getInput inputs openBrackets = do
   let num_close = countChar ')' input
   recurse (inputs <> [input ++ "\n"]) (openBrackets + num_open) num_close
 
-convert :: Ast.Expr -> [Ast.Expr]
-convert (Ast.ExprList a) = a
-convert a = [a]
-
 display :: Ast.Expr -> IO ()
-display (Ast.ExprList (a : as)) | isAtomic a = print a
+display (Ast.ExprList (a : as)) | isAtomic a && not (a == Ast.Null) = print a
 display _ = return ()
 
 loop :: Registry -> IO ()

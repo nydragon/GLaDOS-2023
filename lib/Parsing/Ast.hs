@@ -81,6 +81,8 @@ isValidBuiltin "if" = True
 isValidBuiltin "println" = True
 isValidBuiltin "print" = True
 isValidBuiltin "eq?" = True
+isValidBuiltin "readFile" = True
+isValidBuiltin "openFile" = True
 isValidBuiltin "noop" = True -- Should be useful in the future, will return list of args
 isValidBuiltin _ = False
 

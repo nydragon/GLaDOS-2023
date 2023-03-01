@@ -4,6 +4,7 @@ import Control.Exception
 import Data.Maybe
 import Exec
 import Exec.Function
+import Exec.Utils
 import Exec.Registry
 import Exec.RuntimeException
 import Exec.Variables
@@ -90,7 +91,9 @@ toString _  = []
 -- Executes function call
 -- Note: Arguments do not need to have been reduced, execFunc takes care of it
 execFunc :: String -> [Ast.Expr] -> Registry -> IO RetVal
-execFunc "define" args reg = execBuiltin (Ast.Call "define" args) reg
+execFunc "define" args reg = do
+    RetVal _ val <- eval (Ast.ExprList args) reg
+    execBuiltin (Ast.Call "define" (convert val)) reg
 execFunc f args _
   | not $ isAtomicExpressionList args = throwIO $ NonAtomicFunctionArgs f args
 execFunc funcName argValues reg
@@ -119,5 +122,3 @@ execCall :: Ast.Expr -> Registry -> IO RetVal
 execCall (Ast.Call n args) reg =  execFunc n args reg
 execCall _ _ = throwIO $ InvalidFunctionCall "<Unknown Function Name>"
 
-unpack :: RetVal -> (Ast.Expr, Registry)
-unpack (RetVal reg expr) = (expr, reg)
