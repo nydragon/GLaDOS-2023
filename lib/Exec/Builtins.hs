@@ -8,7 +8,10 @@ import qualified Parsing.Ast as Ast
 import Exec.Variables
 import Exec.Function
 import Debug.Trace
-
+import GHC.IO.FD
+import System.IO
+import GHC.IO.Handle.FD
+import Foreign.C.Types
 -- Function declarations should use the same prototype :
 -- [Ast.Expr] -> Registry -> IO RetVal
 --
@@ -38,6 +41,8 @@ execBuiltin (Ast.Call func ls) reg = case func of
     "eq?" -> eq ls reg
     "if" -> ifBuiltin ls reg
     "define" -> distinguishDefine ls reg
+    "readFile" -> readFileBuiltin ls reg
+    "openFile" -> openFileBuiltin ls reg
     _ -> throwIO NotYetImplemented
 execBuiltin _ _ = throwIO UndefinedBehaviour -- Builtin not found
 
@@ -114,6 +119,20 @@ eq [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Boolean ((==) a b)
 eq [Ast.Boolean a, Ast.Boolean b] reg = return $ RetVal reg $ Ast.Boolean ((==) a b)
 eq [a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
 eq _ _ = throwIO $ InvalidArgumentCount "eq?"
+
+readFileBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
+readFileBuiltin [Ast.Handle handle] reg = do
+    ret <- hGetContents handle
+    return $ RetVal reg  (Ast.Literal ret)
+readFileBuiltin [a] _ = throwIO $ InvalidArgument 0 (getTypeName a) (getTypeName Ast.Num)
+readFileBuiltin _ _ = throwIO $ InvalidArgumentCount "readFile"
+
+openFileBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
+openFileBuiltin [Ast.Literal filePath] reg = do
+    handle <- GHC.IO.Handle.FD.openFile filePath ReadWriteMode
+    return $ RetVal reg (Ast.Handle handle)
+openFileBuiltin [a] _ = throwIO $ InvalidArgument 0 (getTypeName a) (getTypeName Ast.Literal)
+openFileBuiltin _ _ = throwIO $ InvalidArgumentCount "openFile"
 
 ifBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
 ifBuiltin [Ast.Boolean cond, caseT, caseF] reg

@@ -37,7 +37,9 @@ library
         Exec.Registry,
         Exec.Builtins,
         Exec.InteractivePrompt
-        Exec.Eval
+        Exec.Eval,
+        Exec.Utils
+
 
     hs-source-dirs:   lib
     build-depends:    base >= 4.14.1.0, containers

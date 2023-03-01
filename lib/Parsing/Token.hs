@@ -21,7 +21,7 @@ parseToken "(" = OpenScope
 parseToken ")" = CloseScope
 parseToken input
         | all isDigit input = Num (read input :: Integer)
-        | not (null (tail input)) && all isDigit (tail input) && head input == '-' = trace ("neg" ++ input) $ Num $ negate (read (tail input) :: Integer)
+        | not (null (tail input)) && all isDigit (tail input) && head input == '-' = Num $ negate (read (tail input) :: Integer)
 parseToken input = Keyword input
 
 
