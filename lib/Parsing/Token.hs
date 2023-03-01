@@ -47,14 +47,19 @@ tokenize' [] "" = []
 tokenize' [] str = [parseToken str]
 tokenize' (' ':xs) "" = tokenize' xs ""
 tokenize' (' ':xs) str = parseToken str : tokenize' xs ""
+tokenize' (',':xs) str = parseToken str : tokenize' xs ""
 tokenize' ('\n':xs) "" = tokenize' xs ""
 tokenize' ('\n':xs) str = parseToken str : tokenize' xs ""
 tokenize' ('(':xs) "" = OpenScope : tokenize' xs ""
 tokenize' ('(':xs) str = parseToken str : tokenize' ('(':xs) ""
 tokenize' (')':xs) "" = CloseScope : tokenize' xs ""
 tokenize' (')':xs) str = parseToken str : tokenize' (')':xs) ""
+tokenize' ('[':xs) "" = OpenScope : tokenize' xs ""
+tokenize' ('[':xs) str = parseToken str : tokenize' ('(':xs) ""
+tokenize' (']':xs) "" = CloseScope : tokenize' xs ""
+tokenize' (']':xs) str = parseToken str : tokenize' (')':xs) ""
 tokenize' ('"':xs) "" = parseString ('"':xs) : tokenize' (stringFastForward xs) ""
-tokenize' ('"':xs) str = trace "SHOULD NOT HAPPEN" parseToken str : parseString ('"':xs) : tokenize' (stringFastForward xs) ""
+tokenize' ('"':xs) str = parseToken str : parseString ('"':xs) : tokenize' (stringFastForward xs) ""
 tokenize' (x:xs) str = tokenize' xs (str <> [x])
 
 -- Utility entry point function

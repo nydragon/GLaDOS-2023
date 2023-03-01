@@ -1,17 +1,20 @@
 module Exec.Builtins where
 
 import Control.Exception (throwIO)
-import Data.Typeable
-import Exec.Registry
+import Data.Typeable ( Typeable, typeOf )
+import Exec.Registry ( RetVal(..), Registry )
 import Exec.RuntimeException
+    ( RuntimeException(InvalidArgumentCount, NotYetImplemented,
+                       UndefinedBehaviour, NullDivision, InvalidArgument) )
 import qualified Parsing.Ast as Ast
-import Exec.Variables
-import Exec.Function
-import Debug.Trace
-import GHC.IO.FD
-import System.IO
-import GHC.IO.Handle.FD
-import Foreign.C.Types
+import Exec.Variables ( defineVar )
+import Exec.Function ( defineFunc )
+import Debug.Trace ()
+import GHC.IO.FD ()
+import System.IO ( hGetContents, IOMode(ReadWriteMode) )
+import GHC.IO.Handle.FD ( openFile )
+import Foreign.C.Types ()
+import Exec.Utils ( convert )
 -- Function declarations should use the same prototype :
 -- [Ast.Expr] -> Registry -> IO RetVal
 --
@@ -43,6 +46,11 @@ execBuiltin (Ast.Call func ls) reg = case func of
     "define" -> distinguishDefine ls reg
     "readFile" -> readFileBuiltin ls reg
     "openFile" -> openFileBuiltin ls reg
+    "head" -> headBuiltin ls reg
+    "tail" -> tailBuiltin ls reg
+    "init" -> initBuiltin ls reg
+    "last" -> lastBuiltin ls reg
+    "join" -> joinBuiltin ls reg
     _ -> throwIO NotYetImplemented
 execBuiltin _ _ = throwIO UndefinedBehaviour -- Builtin not found
 
@@ -141,6 +149,31 @@ ifBuiltin [Ast.Boolean cond, caseT, caseF] reg
 -- ifBuiltin [Ast.Boolean a, Ast.Boolean b] reg = return $ RetVal reg $ Ast.Boolean ((==) a b)
 ifBuiltin (x:xs) _ = throwIO $ InvalidArgument 1 (getTypeName Ast.Boolean) (getTypeName x)
 ifBuiltin _ _ = throwIO $ InvalidArgumentCount "if"
+
+headBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
+headBuiltin (Ast.ExprList (elem : _) : _) reg = return $ RetVal reg elem
+headBuiltin (Ast.Literal (elem : _) : _) reg = return $ RetVal reg $ Ast.Literal [elem]
+headBuiltin _ _ = throwIO $ InvalidArgumentCount "head"
+
+tailBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
+tailBuiltin (Ast.ExprList (_ : elems) : _) reg = return $ RetVal reg (Ast.ExprList elems)
+tailBuiltin (Ast.Literal (_ : elems) : _) reg = return $ RetVal reg $ Ast.Literal elems
+tailBuiltin _ _ = throwIO $ InvalidArgumentCount "tail"
+
+initBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
+initBuiltin (Ast.ExprList elems : _) reg = return $ RetVal reg (Ast.ExprList $ init elems)
+initBuiltin (Ast.Literal elems : _) reg = return $ RetVal reg $ Ast.Literal $ init elems
+initBuiltin _ _ = throwIO $ InvalidArgumentCount "init"
+
+lastBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
+lastBuiltin (Ast.ExprList elems : _) reg = return $ RetVal reg $ last elems
+lastBuiltin (Ast.Literal elems : _) reg = return $ RetVal reg $ Ast.Literal [last elems]
+lastBuiltin _ _ = throwIO $ InvalidArgumentCount "last"
+
+joinBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
+joinBuiltin (Ast.ExprList a : Ast.ExprList b : _) reg = return $ RetVal reg $ Ast.ExprList (a ++ b)
+joinBuiltin (Ast.Literal a : Ast.Literal b : _) reg = return $ RetVal reg $ Ast.Literal (a ++ b)
+joinBuiltin _ _ = throwIO $ InvalidArgumentCount "join"
 
 -- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
 

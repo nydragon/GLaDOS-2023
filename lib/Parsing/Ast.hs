@@ -85,7 +85,11 @@ isValidBuiltin "print" = True
 isValidBuiltin "eq?" = True
 isValidBuiltin "readFile" = True
 isValidBuiltin "openFile" = True
-isValidBuiltin "noop" = True -- Should be useful in the future, will return list of args
+isValidBuiltin "head" = True
+isValidBuiltin "tail" = True
+isValidBuiltin "init" = True
+isValidBuiltin "last" = True
+isValidBuiltin "join" = True
 isValidBuiltin _ = False
 
 -- Returns boolean if Expr is atomic. This means it cannot be further reduced.

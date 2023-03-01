@@ -2,6 +2,7 @@ module Exec.Utils where
 
 import qualified Parsing.Ast as Ast
 import Exec.Registry (Registry, RetVal (..))
+import Debug.Trace
 
 convert :: Ast.Expr -> [Ast.Expr]
 convert (Ast.ExprList a) = a
@@ -19,7 +20,8 @@ isAtomic (Ast.Literal n) = True
 isAtomic (Ast.Handle n) = True
 isAtomic Ast.Null = True
 isAtomic (Ast.Symbole _) = True
-isAtomic _ = False
+isAtomic (Ast.ExprList list) = isAtomicList list
+isAtomic a = False
 
 -- Checks if list is atomic
 isAtomicList :: [Ast.Expr] -> Bool
