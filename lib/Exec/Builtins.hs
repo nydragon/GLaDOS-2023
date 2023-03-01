@@ -8,9 +8,9 @@ import qualified Parsing.Ast as Ast
 import Exec.Variables
 import Exec.Function
 import Debug.Trace
+import GHC.IO.FD
 import System.IO
 import GHC.IO.Handle.FD
-import GHC.IO.FD
 import Foreign.C.Types
 -- Function declarations should use the same prototype :
 -- [Ast.Expr] -> Registry -> IO RetVal
@@ -122,18 +122,17 @@ eq _ _ = throwIO $ InvalidArgumentCount "eq?"
 
 readFileBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
 readFileBuiltin [Ast.Num fd] reg = do
-    handle <- fdToHandle (read (show fd) :: CInt)
+    handle <- fdToHandle (fromInteger fd)
     ret <- hGetContents handle
     return $ RetVal reg  (Ast.Literal ret)
-readFileBuiltin [a] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName Ast.Literal)
+readFileBuiltin [a] _ = throwIO $ InvalidArgument 0 (getTypeName a) (getTypeName Ast.Num)
 readFileBuiltin _ _ = throwIO $ InvalidArgumentCount "readFile"
 
 openFileBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
 openFileBuiltin [Ast.Literal filePath] reg = do
-    handle <- System.IO.openFile filePath ReadMode
-    fd <- handleToFd handle
-    return $ RetVal reg (Ast.Num (read (show fd) :: Integer))
-openFileBuiltin [a] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName Ast.Literal)
+    ((FD fd _), _) <- GHC.IO.FD.openFile filePath ReadWriteMode True
+    return $ RetVal reg (Ast.Num $ toInteger fd)
+openFileBuiltin [a] _ = throwIO $ InvalidArgument 0 (getTypeName a) (getTypeName Ast.Literal)
 openFileBuiltin _ _ = throwIO $ InvalidArgumentCount "openFile"
 
 ifBuiltin :: [Ast.Expr] -> Registry -> IO RetVal

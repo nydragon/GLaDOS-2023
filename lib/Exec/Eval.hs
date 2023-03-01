@@ -58,7 +58,7 @@ eval :: Ast.Expr -> Registry -> IO RetVal
 eval (Ast.ExprList (Ast.Call "lambda" [Ast.ExprList args, body] : argValues)) reg = evalLambda args body argValues reg
 eval (Ast.ExprList ls) reg = evalExprList ls reg
 -- Function special cases
-eval (Ast.Call "define" args) reg = execCall (Ast.Call "define" args) reg
+eval (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg = execCall (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg
 eval (Ast.Call "if" (x : xs)) reg = do
     -- Evaluate first argument
     RetVal a condVal <- eval x reg
