@@ -3,7 +3,7 @@ module Exec.InteractivePrompt where
 import Data.List (isInfixOf)
 import Exec.Eval
 import Exec.Registry
-import Parsing.Ast (parseExprList, isAtomic)
+import Parsing.Ast (parseExprList)
 import qualified Parsing.Ast as Ast
 import Parsing.Cpt (parseTokenList)
 import Parsing.Token (tokenize)

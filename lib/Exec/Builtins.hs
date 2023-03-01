@@ -121,8 +121,7 @@ eq [a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
 eq _ _ = throwIO $ InvalidArgumentCount "eq?"
 
 readFileBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
-readFileBuiltin [Ast.Num fd] reg = do
-    handle <- fdToHandle (fromInteger fd)
+readFileBuiltin [Ast.Handle handle] reg = do
     ret <- hGetContents handle
     return $ RetVal reg  (Ast.Literal ret)
 readFileBuiltin [a] _ = throwIO $ InvalidArgument 0 (getTypeName a) (getTypeName Ast.Num)
@@ -130,8 +129,8 @@ readFileBuiltin _ _ = throwIO $ InvalidArgumentCount "readFile"
 
 openFileBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
 openFileBuiltin [Ast.Literal filePath] reg = do
-    ((FD fd _), _) <- GHC.IO.FD.openFile filePath ReadWriteMode True
-    return $ RetVal reg (Ast.Num $ toInteger fd)
+    handle <- GHC.IO.Handle.FD.openFile filePath ReadWriteMode
+    return $ RetVal reg (Ast.Handle handle)
 openFileBuiltin [a] _ = throwIO $ InvalidArgument 0 (getTypeName a) (getTypeName Ast.Literal)
 openFileBuiltin _ _ = throwIO $ InvalidArgumentCount "openFile"
 

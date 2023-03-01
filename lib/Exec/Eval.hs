@@ -93,7 +93,7 @@ toString _  = []
 execFunc :: String -> [Ast.Expr] -> Registry -> IO RetVal
 execFunc "define" args reg = execBuiltin (Ast.Call "define" args) reg
 execFunc f args _
-  | not $ isAtomicExpressionList args = throwIO $ NonAtomicFunctionArgs f args
+  | not $ isAtomicList args = throwIO $ NonAtomicFunctionArgs f args
 execFunc funcName argValues reg
   | Ast.isValidBuiltin funcName = execBuiltin (Ast.Call funcName argValues) reg
   | otherwise = case lookupFunc funcName (snd reg) of
