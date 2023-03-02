@@ -3,7 +3,7 @@ module Parsing.Token where
 import Data.Maybe
 import Text.Read
 import Data.Char (isDigit)
-import Exec.Utils (isFloat)
+import Exec.Utils (isPositiveInt, isNegativeInt, isPositiveFloat, isNegativeFloat)
 import Parsing.TokenType
 -- ─── Tokenization ────────────────────────────────────────────────────────────────────────────────
 
@@ -13,10 +13,10 @@ parseToken :: String -> Token
 parseToken "(" = OpenScope
 parseToken ")" = CloseScope
 parseToken input
-        | all isDigit input = Num (read input :: Integer)
-        | not (null (tail input)) && all isDigit (tail input) && head input == '-' = Num $ negate (read (tail input) :: Integer)
-        | isFloat input =  Flt (read input :: Float)
-        | not (null (tail input)) && isFloat (tail input) && head input == '-' = Flt $ negate (read (tail input) :: Float)
+        | isPositiveInt input = Num (read input :: Integer)
+        | isNegativeInt input = Num $ negate (read (tail input) :: Integer)
+        | isPositiveFloat input =  Flt (read input :: Float)
+        | isNegativeFloat input = Flt $ negate (read (tail input) :: Float)
 parseToken input = Keyword input
 
 

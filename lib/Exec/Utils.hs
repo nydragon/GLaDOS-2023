@@ -12,19 +12,40 @@ convert a = [a]
 unpack :: RetVal -> (Ast.Expr, Registry)
 unpack (RetVal reg expr) = (expr, reg)
 
+isPositiveInt :: String -> Bool
+isPositiveInt str | all isDigit str = True
+isPositiveInt _ = False
+
+isNegativeInt :: String -> Bool
+isNegativeInt str | not (null (tail str)) && all isDigit (tail str) && head str == '-' = True
+isNegativeInt _ = False
+
+isPositiveFloat' :: String -> Integer -> Bool -> Bool
+isPositiveFloat' [x] c True | isDigit x = True
+isPositiveFloat' (x:xs) c point | isDigit x = isPositiveFloat' xs (succ c) point
+isPositiveFloat' ('.':xs) c False = isPositiveFloat' xs 0 True
+isPositiveFloat' [x] c False | isDigit x = False
+isPositiveFloat' _ _ _ = False
+
+isPositiveFloat :: String -> Bool
+isPositiveFloat s = isPositiveFloat' s 0 False
+
+isNegativeFloat :: String -> Bool
+isNegativeFloat str | not (null (tail str)) && isPositiveFloat (tail str) && head str == '-' = True
+isNegativeFloat _ = False
 
 isNumeric :: String -> Bool
-isNumeric str | all isDigit str = True
-isNumeric str | not (null (tail str)) && all isDigit (tail str) && head str == '-' = True
-isNumeric str | isFloat str = True
-isNumeric str | not (null (tail str)) && isFloat (tail str) && head str == '-' = True
+isNumeric str | isPositiveInt str = True
+isNumeric str | isNegativeInt str = True
+isNumeric str | isPositiveFloat str = True
+isNumeric str | isNegativeFloat str = True
 isNumeric _ = False
 
 parseNum :: String -> Ast.Expr
-parseNum str | all isDigit str = Ast.Num (read str :: Integer)
-parseNum str | not (null (tail str)) && all isDigit (tail str) && head str == '-' =  Ast.Num $ negate (read (tail str) :: Integer)
-parseNum str | isFloat str = Ast.Flt (read str :: Float)
-parseNum str | not (null (tail str)) && isFloat (tail str) && head str == '-' = Ast.Flt $ negate (read (tail str) :: Float)
+parseNum str | isPositiveInt str = Ast.Num (read str :: Integer)
+parseNum str | isNegativeInt str =  Ast.Num $ negate (read (tail str) :: Integer)
+parseNum str | isPositiveFloat str = Ast.Flt (read str :: Float)
+parseNum str | isNegativeFloat str = Ast.Flt $ negate (read (tail str) :: Float)
 
 -- Returns boolean if Expr is atomic. This means it cannot be further reduced.
 -- Note: Sym is not atomic as it needs to be reduced to a value
@@ -42,13 +63,3 @@ isAtomic a = False
 -- Checks if list is atomic
 isAtomicList :: [Ast.Expr] -> Bool
 isAtomicList = all isAtomic
-
-isFloat' :: String -> Integer -> Bool -> Bool
-isFloat' [x] c True | isDigit x = True
-isFloat' (x:xs) c point | isDigit x = isFloat' xs (succ c) point
-isFloat' ('.':xs) c False = isFloat' xs 0 True
-isFloat' [x] c False | isDigit x = False
-isFloat' _ _ _ = False
-
-isFloat :: String -> Bool
-isFloat s = isFloat' s 0 False
