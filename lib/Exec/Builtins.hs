@@ -69,7 +69,11 @@ printBuiltin _ _ = throwIO $ InvalidArgumentCount "println"
 
 divBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
 divBuiltin [Ast.Num a, Ast.Num 0] reg = throwIO NullDivision
+divBuiltin [Ast.Num a, Ast.Flt 0.0] reg = throwIO NullDivision
 divBuiltin [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Num (div a b)
+divBuiltin [Ast.Flt a, Ast.Flt b] reg = return $ RetVal reg $ Ast.Flt ((/) a b)
+divBuiltin [Ast.Num a, Ast.Flt b] reg = return $ RetVal reg $ Ast.Flt ((/) (fromIntegral a) b)
+divBuiltin [Ast.Flt a, Ast.Num b] reg = return $ RetVal reg $ Ast.Flt ((/) a (fromIntegral b))
 divBuiltin [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
 divBuiltin [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
 divBuiltin _ _ = throwIO $ InvalidArgumentCount "/"
@@ -83,18 +87,25 @@ modulo _ _ = throwIO $ InvalidArgumentCount "%"
 
 multiply :: [Ast.Expr] -> Registry -> IO RetVal
 multiply [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Num ((*) a b)
+multiply [Ast.Flt a, Ast.Flt b] reg = return $ RetVal reg $ Ast.Flt ((*) a b)
+multiply [Ast.Num a, Ast.Flt b] reg = return $ RetVal reg $ Ast.Flt ((*) (fromIntegral a) b)
+multiply [Ast.Flt a, Ast.Num b] reg = return $ RetVal reg $ Ast.Flt ((*) a (fromIntegral b))
 multiply [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
 multiply [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
 multiply _ _ = throwIO $ InvalidArgumentCount "*"
 
 subBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
 subBuiltin [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Num ((-) a b)
+subBuiltin [Ast.Flt a, Ast.Flt b] reg = return $ RetVal reg $ Ast.Flt ((-) a b)
+subBuiltin [Ast.Num a, Ast.Flt b] reg = return $ RetVal reg $ Ast.Flt ((-) (fromIntegral a) b)
+subBuiltin [Ast.Flt a, Ast.Num b] reg = return $ RetVal reg $ Ast.Flt ((-) a (fromIntegral b))
 subBuiltin [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
 subBuiltin [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
 subBuiltin _ _ = throwIO $ InvalidArgumentCount "-"
 
 add :: [Ast.Expr] -> Registry -> IO RetVal
 add [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Num ((+) a b)
+add [Ast.Flt a, Ast.Flt b] reg = return $ RetVal reg $ Ast.Flt ((+) a b)
 add [Ast.Num a, Ast.Flt b] reg = return $ RetVal reg $ Ast.Flt (fromIntegral a + b)
 add [Ast.Flt a, Ast.Num b] reg = return $ RetVal reg $ Ast.Flt (a + fromIntegral b)
 add [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
