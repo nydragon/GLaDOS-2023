@@ -60,6 +60,7 @@ execBuiltin (Ast.Call func ls) reg = case func of
     "last" -> lastBuiltin ls reg
     "join" -> joinBuiltin ls reg
     "read" -> readBuiltin ls reg
+    "readInt" -> readIntBuiltin ls reg
     _ -> throwIO NotYetImplemented
 execBuiltin _ _ = throwIO UndefinedBehaviour -- Builtin not found
 

@@ -5,7 +5,8 @@ import Test.Tasty.HUnit (testCase, (@=?))
 
 import qualified Parsing.Cpt as Cpt
 import Parsing.Infix (insertLists, infixToPrefix')
-import Parsing.Token (tokenize, Token)
+import Parsing.TokenType (Token)
+import Parsing.Token (tokenize)
 import Parsing.Cpt (tokenToCpt)
 
 insertListsTestF :: String -> [Cpt.Cpt] -> [Cpt.Cpt] -> TestTree
