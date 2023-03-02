@@ -210,8 +210,8 @@ readBuiltin _ reg = do RetVal reg . Ast.Literal <$> getLine
 
 
 toInt :: String -> IO Ast.Expr
-toInt str | all isDigit str = return $ Ast.Num (read str :: Integer)
-toInt _ = throwIO $ InvalidArgumentCount "join"
+toInt str | isNumeric str = return $ parseNum str
+toInt _ = throwIO $ InvalidArgumentCount "readInt"
 
 
 readIntBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
