@@ -19,7 +19,7 @@ import System.IO
       stdout )
 import GHC.IO.Handle.FD ( openFile )
 import Foreign.C.Types ()
-import Exec.Utils ( convert )
+import Exec.Utils ( convert, isNumeric, parseNum )
 import GHC.Float
 import Data.Char (isDigit)
 
