@@ -11,9 +11,20 @@ import Debug.Trace
 data Token = OpenScope -- Opening parenthesis
         | CloseScope -- Closing parenthesis
         | Num Integer
+        | Flt Float
         | Keyword String
         | Literal String
         deriving (Show, Eq)
+
+isFloat' :: String -> Integer -> Bool -> Bool
+isFloat' [x] c True | isDigit x = True
+isFloat' (x:xs) c point | isDigit x = isFloat' xs (succ c) point
+isFloat' ('.':xs) c False = isFloat' xs 0 True
+isFloat' [x] c False | isDigit x = False
+isFloat' _ _ _ = False
+
+isFloat :: String -> Bool
+isFloat s = isFloat' s 0 False
 
 -- Parse token from string
 parseToken :: String -> Token
@@ -21,7 +32,9 @@ parseToken "(" = OpenScope
 parseToken ")" = CloseScope
 parseToken input
         | all isDigit input = Num (read input :: Integer)
-        | not (null (tail input)) && all isDigit (tail input) && head input == '-' = trace ("neg" ++ input) $ Num $ negate (read (tail input) :: Integer)
+        | not (null (tail input)) && all isDigit (tail input) && head input == '-' = Num $ negate (read (tail input) :: Integer)
+        | isFloat input =  Flt (read input :: Float)
+        | not (null (tail input)) && isFloat (tail input) && head input == '-' = Flt $ negate (read (tail input) :: Float)
 parseToken input = Keyword input
 
 
@@ -47,14 +60,19 @@ tokenize' [] "" = []
 tokenize' [] str = [parseToken str]
 tokenize' (' ':xs) "" = tokenize' xs ""
 tokenize' (' ':xs) str = parseToken str : tokenize' xs ""
+tokenize' (',':xs) str = parseToken str : tokenize' xs ""
 tokenize' ('\n':xs) "" = tokenize' xs ""
 tokenize' ('\n':xs) str = parseToken str : tokenize' xs ""
 tokenize' ('(':xs) "" = OpenScope : tokenize' xs ""
 tokenize' ('(':xs) str = parseToken str : tokenize' ('(':xs) ""
 tokenize' (')':xs) "" = CloseScope : tokenize' xs ""
 tokenize' (')':xs) str = parseToken str : tokenize' (')':xs) ""
+tokenize' ('[':xs) "" = OpenScope : tokenize' xs ""
+tokenize' ('[':xs) str = parseToken str : tokenize' ('(':xs) ""
+tokenize' (']':xs) "" = CloseScope : tokenize' xs ""
+tokenize' (']':xs) str = parseToken str : tokenize' (')':xs) ""
 tokenize' ('"':xs) "" = parseString ('"':xs) : tokenize' (stringFastForward xs) ""
-tokenize' ('"':xs) str = trace "SHOULD NOT HAPPEN" parseToken str : parseString ('"':xs) : tokenize' (stringFastForward xs) ""
+tokenize' ('"':xs) str = parseToken str : parseString ('"':xs) : tokenize' (stringFastForward xs) ""
 tokenize' (x:xs) str = tokenize' xs (str <> [x])
 
 -- Utility entry point function

@@ -9,6 +9,7 @@ import Debug.Trace
 -- Basic concrete parsing tree structure
 -- Represents the main elements of our Context Free Grammar
 data Cpt = Val Integer -- Using "Val" in order to avoid ambiguity check (yes it's ugly)
+        | Floating Float
         | Literal' String
         | Sym String -- Symbol
         | List [Cpt] -- The list is sort of what an expression would be in other grammars
@@ -25,6 +26,7 @@ tokenToCpt OpenScope = Nothing
 tokenToCpt CloseScope = Nothing
 -- Main cases
 tokenToCpt (Num i) = Just (Val i)
+tokenToCpt (Flt i) = Just (Floating i)
 tokenToCpt (Literal i) = Just (Literal' i)
 tokenToCpt (Keyword "#f") = Just (Boolean False)
 tokenToCpt (Keyword "#t") = Just (Boolean True)
@@ -44,9 +46,8 @@ parseTokenList (CloseScope:xs) = [] -- Normally shouldn't happen
 parseTokenList (OpenScope:xs) = sublist : parseTokenList newList
         where   sublist = List (parseTokenList xs)
                 index = getCloseScope xs + 1
-                -- +2 because it's index of CloseScope, and we want the element after
+                -- +1 because it's index of CloseScope, and we want the element after
                 newList = [x | (x, i) <- zip xs [0..], i >= index] -- NEEDS MORE TESTING
-                -- newList = take (getCloseScope oldList + 2) oldList
 parseTokenList (x:xs) = fromJust (tokenToCpt x) : parseTokenList xs
 -- Note: If fromJust crashes, something else has gone wrong
 
