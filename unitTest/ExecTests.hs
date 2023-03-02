@@ -4,6 +4,7 @@ import qualified Data.Map as Map
 import Exec.Function (defineFunc, lookupFunc)
 import Exec.Registry (emptyRegistry)
 import Exec.Variables
+import Exec.Builtins
 import qualified Parsing.Ast as Ast
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -73,12 +74,37 @@ testLookupFunc =
 --     lookup = (Map.empty, Map.fromList [("add", (["1", "2"], Ast.ExprList [Ast.Symbole "+", Ast.Num 1, Ast.Num 2]))])
 --     expectedLookup = (Map.empty, Map.fromList [("sub", (["a", "b"], Ast.ExprList [Ast.Symbole "+", Ast.Num 1, Ast.Num 2])), ("add", (["1", "2"], Ast.ExprList [Ast.Symbole "+", Ast.Num 1, Ast.Num 2]))])
 
+
+testBuiltin :: String -> [Ast.Expr] -> Ast.Expr -> ([Ast.Expr] -> Registry -> IO RetVal) -> TestTree
+testBuiltin testName args restest func = testCase testName $ do
+  (RetVal _ res) <- func args emptyRegistry
+  restest @=? res
+
+testFloatOperations :: TestTree
+testFloatOperations = testGroup "Float Operations"
+    [
+      testBuiltin "float / integer" [Ast.Flt 3.5, Ast.Num 2] (Ast.Flt 1.75) (divBuiltin),
+      testBuiltin "float / float" [Ast.Flt 3.5, Ast.Flt 2.0] (Ast.Flt 1.75) (divBuiltin),
+      testBuiltin "integer / float" [Ast.Num 3, Ast.Flt 2.0] (Ast.Flt 1.5) (divBuiltin),
+      testBuiltin "float * integer" [Ast.Flt 3.5, Ast.Num 2] (Ast.Flt 7.0) (multiply),
+      testBuiltin "float * float" [Ast.Flt 3.5, Ast.Flt 2.0] (Ast.Flt 7.0) (multiply),
+      testBuiltin "integer * float" [Ast.Num 3, Ast.Flt 2.0] (Ast.Flt 6.0) (multiply),
+      testBuiltin "float - integer" [Ast.Flt 3.5, Ast.Num 2] (Ast.Flt 1.5) (subBuiltin),
+      testBuiltin "float - float" [Ast.Flt 3.5, Ast.Flt 2.0] (Ast.Flt 1.5) (subBuiltin),
+      testBuiltin "integer - float" [Ast.Num 3, Ast.Flt 2.0] (Ast.Flt 1.0) (subBuiltin),
+      testBuiltin "float + integer" [Ast.Flt 3.5, Ast.Num 2] (Ast.Flt 5.5) (add),
+      testBuiltin "float + float" [Ast.Flt 3.5, Ast.Flt 2.0] (Ast.Flt 5.5) (add),
+      testBuiltin "integer + float" [Ast.Num 3, Ast.Flt 2.0] (Ast.Flt 5.0) (add)
+
+    ]
+
 execSuite :: TestTree
 execSuite =
   testGroup
     "Execution Suite Tests"
     [ testLookupVar,
-      testLookupFunc
+      testLookupFunc,
+      testFloatOperations
       -- testDefineVar,
       -- testDefineFunc
     ]

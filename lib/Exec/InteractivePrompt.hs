@@ -39,7 +39,7 @@ getInput inputs openBrackets = do
   recurse (inputs <> [input ++ "\n"]) (openBrackets + num_open) num_close
 
 display :: Ast.Expr -> IO ()
-display (Ast.ExprList (a : as)) | isAtomic a && not (a == Ast.Null) = print a
+display (Ast.ExprList (a : as)) | isAtomic a && a /= Ast.Null = print a
 display _ = return ()
 
 loop :: Registry -> IO ()

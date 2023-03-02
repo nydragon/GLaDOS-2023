@@ -10,6 +10,7 @@ import GHC.IO.Handle
 data Expr
   = ExprList [Expr]
   | Num Integer
+  | Flt Float
   | Boolean Bool
   | Symbole String
   | Literal String
@@ -25,6 +26,7 @@ instance Show Expr where
     | otherwise = "#f"
   show (ExprList ls) = show ls
   show (Num n) = show n
+  show (Flt n) = show n
   show (Symbole s) = show s
   show (Literal s) = show s
   show (Handle s) = show s
@@ -42,6 +44,7 @@ parseExprList (Cpt.List [Cpt.Sym "define", Cpt.List (Cpt.Sym a : arg), Cpt.List 
 parseExprList (x : xs) = case x of
   Cpt.Sym str -> Symbole str : parseExprList xs
   Cpt.Val i -> Num i : parseExprList xs
+  Cpt.Floating i -> Flt i : parseExprList xs
   Cpt.List ls -> parseExpr (infixToPrefix ls) : parseExprList xs
   Cpt.Boolean b -> Boolean b : parseExprList xs
   Cpt.Literal' b -> Literal b : parseExprList xs
@@ -96,6 +99,7 @@ isValidBuiltin _ = False
 -- Note: Sym is not atomic as it needs to be reduced to a value
 isAtomic :: Expr -> Bool
 isAtomic (Num _) = True
+isAtomic (Flt _) = True
 isAtomic (Literal _) = True
 isAtomic (Boolean _) = True
 isAtomic (Handle _) = True
