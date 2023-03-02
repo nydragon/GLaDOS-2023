@@ -11,7 +11,12 @@ import Exec.Variables ( defineVar )
 import Exec.Function ( defineFunc )
 import Debug.Trace ()
 import GHC.IO.FD ()
-import System.IO ( hGetContents, IOMode(ReadWriteMode) )
+import System.IO
+    ( hGetContents,
+      IOMode(ReadWriteMode),
+      hSetBuffering,
+      BufferMode(LineBuffering, NoBuffering),
+      stdout )
 import GHC.IO.Handle.FD ( openFile )
 import Foreign.C.Types ()
 import Exec.Utils ( convert )
@@ -192,13 +197,13 @@ joinBuiltin _ _ = throwIO $ InvalidArgumentCount "join"
 
 readBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
 readBuiltin (Ast.Literal a : _) reg
-  = do 
-    printest a
-    RetVal reg . Ast.Literal <$> getLine
-readBuiltin _ reg = do RetVal reg . Ast.Literal <$> getLine
-
-printest :: String -> IO ()
-printest = do putStr
+  =  do
+    hSetBuffering stdout NoBuffering
+    putStr a
+    res <- RetVal reg . Ast.Literal <$> getLine
+    hSetBuffering stdout LineBuffering
+    return res
+readBuiltin _ reg = do RetVal reg . Ast.Literal <$> getContents
 
 
 -- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
