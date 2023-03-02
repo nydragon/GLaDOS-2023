@@ -11,11 +11,18 @@ import Exec.Variables ( defineVar )
 import Exec.Function ( defineFunc )
 import Debug.Trace ()
 import GHC.IO.FD ()
-import System.IO ( hGetContents, IOMode(ReadWriteMode) )
+import System.IO
+    ( hGetContents,
+      IOMode(ReadWriteMode),
+      hSetBuffering,
+      BufferMode(LineBuffering, NoBuffering),
+      stdout )
 import GHC.IO.Handle.FD ( openFile )
 import Foreign.C.Types ()
-import Exec.Utils ( convert )
+import Exec.Utils ( convert, isNumeric, parseNum )
 import GHC.Float
+import Data.Char (isDigit)
+
 -- Function declarations should use the same prototype :
 -- [Ast.Expr] -> Registry -> IO RetVal
 --
@@ -52,6 +59,8 @@ execBuiltin (Ast.Call func ls) reg = case func of
     "init" -> initBuiltin ls reg
     "last" -> lastBuiltin ls reg
     "join" -> joinBuiltin ls reg
+    "read" -> readBuiltin ls reg
+    "readInt" -> readIntBuiltin ls reg
     _ -> throwIO NotYetImplemented
 execBuiltin _ _ = throwIO UndefinedBehaviour -- Builtin not found
 
@@ -188,6 +197,36 @@ joinBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
 joinBuiltin (Ast.ExprList a : Ast.ExprList b : _) reg = return $ RetVal reg $ Ast.ExprList (a ++ b)
 joinBuiltin (Ast.Literal a : Ast.Literal b : _) reg = return $ RetVal reg $ Ast.Literal (a ++ b)
 joinBuiltin _ _ = throwIO $ InvalidArgumentCount "join"
+
+readBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
+readBuiltin (Ast.Literal a : _) reg
+  =  do
+    hSetBuffering stdout NoBuffering
+    putStr a
+    res <- RetVal reg . Ast.Literal <$> getLine
+    hSetBuffering stdout LineBuffering
+    return res
+readBuiltin _ reg = do RetVal reg . Ast.Literal <$> getLine
+
+
+toInt :: String -> IO Ast.Expr
+toInt str | isNumeric str = return $ parseNum str
+toInt _ = throwIO $ InvalidArgumentCount "readInt"
+
+
+readIntBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
+readIntBuiltin (Ast.Literal a : _) reg
+  =  do
+    hSetBuffering stdout NoBuffering
+    putStr a
+    line <- getLine
+    res <- RetVal reg <$> toInt line
+    hSetBuffering stdout LineBuffering
+    return res
+readIntBuiltin _ reg = do
+        line <- getLine
+        RetVal reg <$> toInt line
+
 
 -- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
 

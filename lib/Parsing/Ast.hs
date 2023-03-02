@@ -93,6 +93,8 @@ isValidBuiltin "tail" = True
 isValidBuiltin "init" = True
 isValidBuiltin "last" = True
 isValidBuiltin "join" = True
+isValidBuiltin "read" = True
+isValidBuiltin "readInt" = True
 isValidBuiltin _ = False
 
 -- Returns boolean if Expr is atomic. This means it cannot be further reduced.

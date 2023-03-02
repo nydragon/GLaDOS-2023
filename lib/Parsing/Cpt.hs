@@ -1,6 +1,6 @@
 module Parsing.Cpt where
 
-import Parsing.Token
+import Parsing.TokenType
 import Data.Maybe
 import Debug.Trace
 

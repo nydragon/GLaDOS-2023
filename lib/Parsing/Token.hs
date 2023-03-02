@@ -3,38 +3,20 @@ module Parsing.Token where
 import Data.Maybe
 import Text.Read
 import Data.Char (isDigit)
-import Debug.Trace
-
+import Exec.Utils (isPositiveInt, isNegativeInt, isPositiveFloat, isNegativeFloat)
+import Parsing.TokenType
 -- ─── Tokenization ────────────────────────────────────────────────────────────────────────────────
 
--- Token Datatype
-data Token = OpenScope -- Opening parenthesis
-        | CloseScope -- Closing parenthesis
-        | Num Integer
-        | Flt Float
-        | Keyword String
-        | Literal String
-        deriving (Show, Eq)
-
-isFloat' :: String -> Integer -> Bool -> Bool
-isFloat' [x] c True | isDigit x = True
-isFloat' (x:xs) c point | isDigit x = isFloat' xs (succ c) point
-isFloat' ('.':xs) c False = isFloat' xs 0 True
-isFloat' [x] c False | isDigit x = False
-isFloat' _ _ _ = False
-
-isFloat :: String -> Bool
-isFloat s = isFloat' s 0 False
 
 -- Parse token from string
 parseToken :: String -> Token
 parseToken "(" = OpenScope
 parseToken ")" = CloseScope
 parseToken input
-        | all isDigit input = Num (read input :: Integer)
-        | not (null (tail input)) && all isDigit (tail input) && head input == '-' = Num $ negate (read (tail input) :: Integer)
-        | isFloat input =  Flt (read input :: Float)
-        | not (null (tail input)) && isFloat (tail input) && head input == '-' = Flt $ negate (read (tail input) :: Float)
+        | isPositiveInt input = Num (read input :: Integer)
+        | isNegativeInt input = Num $ negate (read (tail input) :: Integer)
+        | isPositiveFloat input =  Flt (read input :: Float)
+        | isNegativeFloat input = Flt $ negate (read (tail input) :: Float)
 parseToken input = Keyword input
 
 
