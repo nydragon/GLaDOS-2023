@@ -52,6 +52,7 @@ execBuiltin (Ast.Call func ls) reg = case func of
     "init" -> initBuiltin ls reg
     "last" -> lastBuiltin ls reg
     "join" -> joinBuiltin ls reg
+    "read" -> readBuiltin ls reg
     _ -> throwIO NotYetImplemented
 execBuiltin _ _ = throwIO UndefinedBehaviour -- Builtin not found
 
@@ -188,6 +189,9 @@ joinBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
 joinBuiltin (Ast.ExprList a : Ast.ExprList b : _) reg = return $ RetVal reg $ Ast.ExprList (a ++ b)
 joinBuiltin (Ast.Literal a : Ast.Literal b : _) reg = return $ RetVal reg $ Ast.Literal (a ++ b)
 joinBuiltin _ _ = throwIO $ InvalidArgumentCount "join"
+
+readBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
+readBuiltin _ reg = do RetVal reg . Ast.Literal <$> getLine
 
 -- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
 
