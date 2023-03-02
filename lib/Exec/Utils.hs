@@ -11,6 +11,8 @@ convert a = [a]
 unpack :: RetVal -> (Ast.Expr, Registry)
 unpack (RetVal reg expr) = (expr, reg)
 
+
+isNumeric
 -- Returns boolean if Expr is atomic. This means it cannot be further reduced.
 -- Note: Sym is not atomic as it needs to be reduced to a value
 isAtomic :: Ast.Expr -> Bool

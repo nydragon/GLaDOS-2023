@@ -21,6 +21,8 @@ import GHC.IO.Handle.FD ( openFile )
 import Foreign.C.Types ()
 import Exec.Utils ( convert )
 import GHC.Float
+import Data.Char (isDigit)
+
 -- Function declarations should use the same prototype :
 -- [Ast.Expr] -> Registry -> IO RetVal
 --
@@ -203,7 +205,26 @@ readBuiltin (Ast.Literal a : _) reg
     res <- RetVal reg . Ast.Literal <$> getLine
     hSetBuffering stdout LineBuffering
     return res
-readBuiltin _ reg = do RetVal reg . Ast.Literal <$> getContents
+readBuiltin _ reg = do RetVal reg . Ast.Literal <$> getLine
+
+
+toInt :: String -> IO Ast.Expr
+toInt str | all isDigit str = return $ Ast.Num (read str :: Integer)
+toInt _ = throwIO $ InvalidArgumentCount "join"
+
+
+readIntBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
+readIntBuiltin (Ast.Literal a : _) reg
+  =  do
+    hSetBuffering stdout NoBuffering
+    putStr a
+    line <- getLine
+    res <- RetVal reg <$> toInt line
+    hSetBuffering stdout LineBuffering
+    return res
+readIntBuiltin _ reg = do
+        line <- getLine
+        RetVal reg <$> toInt line
 
 
 -- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
