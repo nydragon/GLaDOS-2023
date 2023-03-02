@@ -191,7 +191,15 @@ joinBuiltin (Ast.Literal a : Ast.Literal b : _) reg = return $ RetVal reg $ Ast.
 joinBuiltin _ _ = throwIO $ InvalidArgumentCount "join"
 
 readBuiltin :: [Ast.Expr] -> Registry -> IO RetVal
+readBuiltin (Ast.Literal a : _) reg
+  = do 
+    printest a
+    RetVal reg . Ast.Literal <$> getLine
 readBuiltin _ reg = do RetVal reg . Ast.Literal <$> getLine
+
+printest :: String -> IO ()
+printest = do putStr
+
 
 -- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
 
