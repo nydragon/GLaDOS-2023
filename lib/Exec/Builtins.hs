@@ -15,6 +15,7 @@ import System.IO ( hGetContents, IOMode(ReadWriteMode) )
 import GHC.IO.Handle.FD ( openFile )
 import Foreign.C.Types ()
 import Exec.Utils ( convert )
+import GHC.Float
 -- Function declarations should use the same prototype :
 -- [Ast.Expr] -> Registry -> IO RetVal
 --
@@ -94,6 +95,8 @@ subBuiltin _ _ = throwIO $ InvalidArgumentCount "-"
 
 add :: [Ast.Expr] -> Registry -> IO RetVal
 add [Ast.Num a, Ast.Num b] reg = return $ RetVal reg $ Ast.Num ((+) a b)
+add [Ast.Num a, Ast.Flt b] reg = return $ RetVal reg $ Ast.Flt (fromIntegral a + b)
+add [Ast.Flt a, Ast.Num b] reg = return $ RetVal reg $ Ast.Flt (a + fromIntegral b)
 add [Ast.Num a, b] _ = throwIO $ InvalidArgument 1 (getTypeName a) (getTypeName b)
 add [a, Ast.Num b] _ = throwIO $ InvalidArgument 0 (getTypeName b) (getTypeName a)
 add arg _ = throwIO (InvalidArgumentCount "+")

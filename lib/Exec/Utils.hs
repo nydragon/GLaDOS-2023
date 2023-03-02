@@ -15,6 +15,7 @@ unpack (RetVal reg expr) = (expr, reg)
 -- Note: Sym is not atomic as it needs to be reduced to a value
 isAtomic :: Ast.Expr -> Bool
 isAtomic (Ast.Num n) = True
+isAtomic (Ast.Flt n) = True
 isAtomic (Ast.Boolean n) = True
 isAtomic (Ast.Literal n) = True
 isAtomic (Ast.Handle n) = True
