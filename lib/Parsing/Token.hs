@@ -5,8 +5,8 @@ import Text.Read
 import Data.Char (isDigit)
 import Exec.Utils (isPositiveInt, isNegativeInt, isPositiveFloat, isNegativeFloat)
 import Parsing.TokenType
--- ─── Tokenization ────────────────────────────────────────────────────────────────────────────────
 
+-- ─── Tokenization ────────────────────────────────────────────────────────────────────────────────
 
 -- Parse token from string
 parseToken :: String -> Token
@@ -18,20 +18,6 @@ parseToken input
         | isPositiveFloat input =  Flt (read input :: Float)
         | isNegativeFloat input = Flt $ negate (read (tail input) :: Float)
 parseToken input = Keyword input
-
-
-parseString' :: String -> String
-parseString' ('\\' : x : xs ) = x : parseString' xs
-parseString' ('"' : xs) = ""
-parseString' (x : xs) = x : parseString' xs
-
-parseString :: String -> Token
-parseString ('"' : str) = Literal $ parseString' str
-
-stringFastForward :: String -> String
-stringFastForward ('\\' : x : xs ) = stringFastForward xs
-stringFastForward ('"' : xs) = xs
-stringFastForward (x : xs) = stringFastForward xs
 
 -- Function that tokenizes string
 --
@@ -71,3 +57,18 @@ tokenizeFile path = do
 
         -- Return tokenization result
         return (tokenize fileStr)
+
+-- ─── String Parsing ──────────────────────────────────────────────────────────────────────────────
+
+parseString' :: String -> String
+parseString' ('\\' : x : xs ) = x : parseString' xs
+parseString' ('"' : xs) = ""
+parseString' (x : xs) = x : parseString' xs
+
+parseString :: String -> Token
+parseString ('"' : str) = Literal $ parseString' str
+
+stringFastForward :: String -> String
+stringFastForward ('\\' : x : xs ) = stringFastForward xs
+stringFastForward ('"' : xs) = xs
+stringFastForward (x : xs) = stringFastForward xs
