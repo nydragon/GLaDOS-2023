@@ -9,8 +9,11 @@ convert :: Ast.Expr -> [Ast.Expr]
 convert (Ast.ExprList a) = a
 convert a = [a]
 
-unpack :: RetVal -> (Ast.Expr, Registry)
-unpack (RetVal reg expr) = (expr, reg)
+unpack :: RetVal -> (Registry, Ast.Expr)
+unpack (RetVal reg expr) = (reg, expr)
+
+pack :: (Registry, Ast.Expr) ->  RetVal 
+pack = uncurry RetVal
 
 isPositiveInt :: String -> Bool
 isPositiveInt str | all isDigit str = True
@@ -50,15 +53,10 @@ parseNum str | isNegativeFloat str = Ast.Flt $ negate (read (tail str) :: Float)
 -- Returns boolean if Expr is atomic. This means it cannot be further reduced.
 -- Note: Sym is not atomic as it needs to be reduced to a value
 isAtomic :: Ast.Expr -> Bool
-isAtomic (Ast.Num n) = True
-isAtomic (Ast.Flt n) = True
-isAtomic (Ast.Boolean n) = True
-isAtomic (Ast.Literal n) = True
-isAtomic (Ast.Handle n) = True
-isAtomic Ast.Null = True
-isAtomic (Ast.Symbole _) = True
 isAtomic (Ast.ExprList list) = isAtomicList list
-isAtomic a = False
+isAtomic (Ast.Symbole _) = False
+isAtomic (Ast.Call _ _) = False
+isAtomic _ = True
 
 -- Checks if list is atomic
 isAtomicList :: [Ast.Expr] -> Bool

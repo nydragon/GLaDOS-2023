@@ -90,9 +90,9 @@ insertLists' (Cpt.Sym a: b : c : as)
 insertLists' (a : as) = a : insertLists' as
 
 
-conve :: Cpt.Cpt -> [Cpt.Cpt] 
+conve :: Cpt.Cpt -> [Cpt.Cpt]
 conve (Cpt.List a) = a
 conve a = [a]
 
 insertLists :: [Cpt.Cpt] -> [Cpt.Cpt]
-insertLists a = conve $ head $ insertLists' a 
+insertLists a = conve $ head $ insertLists' a
