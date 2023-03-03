@@ -27,6 +27,7 @@ library
     exposed-modules:  Parsing,
         Parsing.Args,
         Parsing.Token,
+        Parsing.TokenType,
         Parsing.Ast,
         Parsing.Cpt,
         Parsing.Infix,

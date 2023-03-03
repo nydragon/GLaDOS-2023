@@ -11,29 +11,18 @@ import Exec.Variables
 import qualified Parsing.Ast as Ast
 import Debug.Trace
 import Exec.Builtins
-import qualified Parsing.Ast as Eval
-import Parsing.Ast (isAtomic)
 
 -- ─── Evaluate Expression ─────────────────────────────────────────────────────────────────────────
 
--- Utility function for converting IO (Registry, [Ast.Expr])
--- to IO RetVal (reg, Ast.ExprList)
-
-utilConvert :: IO (Registry, [Ast.Expr]) -> IO RetVal
-utilConvert og = do
-    (reg, ls) <- og
-
-    return $ RetVal reg (Ast.ExprList ls)
-
 -- Special eval function for Ast.List
-evalExprList' :: [Ast.Expr] -> Registry -> IO (Registry, [Ast.Expr])
-evalExprList' [] reg = return (reg, [])
+evalExprList' :: [Ast.Expr] -> Registry -> IO RetVal
+evalExprList' [] reg = return $ RetVal reg (Ast.ExprList [])
 evalExprList' (x : xs) reg = do
     RetVal evalReg evalOutput <- eval x reg
 
-    (recursiveReg, exprList) <- evalExprList' xs evalReg
+    (RetVal recursiveReg exprList) <- evalExprList' xs evalReg
 
-    return (recursiveReg, evalOutput : exprList)
+    return (RetVal recursiveReg (Ast.ExprList $ evalOutput : convert exprList))
 
 -- This function first checks if expression list is valid
 evalExprList :: [Ast.Expr] -> Registry -> IO RetVal
@@ -46,11 +35,11 @@ evalExprList (Ast.Symbole s : xs) (v, f) = case lookupFunc s f of
             Nothing -> throwIO FatalError
             Just call -> eval call reg
         else
-            utilConvert $ evalExprList' (Ast.Symbole s : xs) reg -- If not valid function call
+         evalExprList' (Ast.Symbole s : xs) reg -- If not valid function call
     where
         exprList = Ast.Symbole s : xs
         reg = (v, f)
-evalExprList ls reg = utilConvert $ evalExprList' ls reg
+evalExprList ls reg = evalExprList' ls reg
 
 -- Evaluates a given expression into an atom
 -- Note : Redirects evalutation to evalExprList if Ast.Expr

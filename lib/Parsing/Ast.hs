@@ -5,6 +5,7 @@ module Parsing.Ast where
 import qualified Parsing.Cpt as Cpt
 import Parsing.Infix (infixToPrefix)
 import GHC.IO.Handle
+
 -- ─── Abstract Syntax Tree ───────────────────────────────────────────────────────────────────────
 
 data Expr
@@ -93,19 +94,7 @@ isValidBuiltin "tail" = True
 isValidBuiltin "init" = True
 isValidBuiltin "last" = True
 isValidBuiltin "join" = True
+isValidBuiltin "read" = True
+isValidBuiltin "readInt" = True
 isValidBuiltin _ = False
 
--- Returns boolean if Expr is atomic. This means it cannot be further reduced.
--- Note: Sym is not atomic as it needs to be reduced to a value
-isAtomic :: Expr -> Bool
-isAtomic (Num _) = True
-isAtomic (Flt _) = True
-isAtomic (Literal _) = True
-isAtomic (Boolean _) = True
-isAtomic (Handle _) = True
-isAtomic Null = True
-isAtomic _ = False
-
--- Checks if list is atomic
-isListAtomic :: [Expr] -> Bool
-isListAtomic = foldr ((&&) . isAtomic) True

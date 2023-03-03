@@ -9,7 +9,7 @@ import Parsing.Cpt (parseTokenList)
 import Parsing.Token (tokenize)
 import System.Exit (exitSuccess)
 import System.IO (hFlush, stdout)
-import Exec.Utils
+import Exec.Utils ( isAtomic )
 
 -- Function that counts the character received as argument
 -- Returns the number of times this character appears in a string
