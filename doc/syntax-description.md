@@ -19,7 +19,7 @@ expression-start      = "("
 
 expression-end        = ")"
 
-sep                   = *(SP / HTAB / EOL)
+sep                   = *(SP / HTAB / LF / CR / CRLF)
 
 boolean               = "#t" / "#f"
 
