@@ -98,14 +98,3 @@ isValidBuiltin "read" = True
 isValidBuiltin "readInt" = True
 isValidBuiltin _ = False
 
--- Returns boolean if Expr is atomic. This means it cannot be further reduced.
--- Note: Sym is not atomic as it needs to be reduced to a value
-isAtomic :: Expr -> Bool
-isAtomic (ExprList _) = False
-isAtomic (Symbole _) = False
-isAtomic (Call _ _) = False
-isAtomic _ = True
-
--- Checks if list is atomic
-isListAtomic :: [Expr] -> Bool
-isListAtomic = foldr ((&&) . isAtomic) True
