@@ -3,7 +3,6 @@ This document defines the syntax of this specific implementation of Scheme using
 
 
 ```ABNF
-; Every visible special character that isn't a double quote
 symbol                = %x20-2F / %x3A-40 / %x5B-60 / %x7B-7E
 
 character             = ALPHA | DIGIT | symbol
