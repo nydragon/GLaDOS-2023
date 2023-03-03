@@ -4,7 +4,7 @@ This document defines the syntax of this specific implementation of Scheme using
 
 ```ABNF
 ; Every visible special character that isn't a double quote
-symbol                = %x20–21 / %x22–2F / %x3A-40 / %x5B-60 / %x7B-7E
+symbol                = %x20-2F / %x3A-40 / %x5B-60 / %x7B-7E
 
 character             = ALPHA | DIGIT | symbol
 
@@ -20,17 +20,33 @@ expression-start      = "("
 
 expression-end        = ")"
 
-newline               = CR / LF / CRLF 
-
-separator             = *(SP / newline)
+sep                   = *(SP / HTAB / EOL)
 
 boolean               = "#t" / "#f"
 
-expression-argument   = literal / number / expression / boolean
+array-start           = "["
 
-expression-arguments  = *(separator expression-argument)
+array-end             = "]"
 
-expression            = expression-start identifier expression-arguments expression-end EOL
+array-item-delimiter  = ","
+
+infix-sign            = "`"
+
+array-content         = expression-argument 1*(*sep array-item-delimiter *sep expression-argument)
+
+array                 = array-start *sep *array-content *sep array-end
+
+expression-argument   = literal / number / expression / boolean / array
+
+expression-arguments  = expression-argument 1*(sep expression-argument)
+
+postfix-expression    = identifier sep *expression-arguments
+
+infix-identifier      = identifier / infix-sign identifier infix-sign
+
+infix-expression      = expression-argument sep infix-identifier sep expression-argument *sep *(sep infix-identifier sep expression-argument)
+
+expression            = expression-start *sep *(postfix-expression / infix-expression) *sep expression-end sep
 
 expressions           = *expression
 ```
