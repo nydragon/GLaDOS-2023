@@ -9,8 +9,11 @@ convert :: Ast.Expr -> [Ast.Expr]
 convert (Ast.ExprList a) = a
 convert a = [a]
 
-unpack :: RetVal -> (Ast.Expr, Registry)
-unpack (RetVal reg expr) = (expr, reg)
+unpack :: RetVal -> (Registry, Ast.Expr)
+unpack (RetVal reg expr) = (reg, expr)
+
+pack :: (Registry, Ast.Expr) ->  RetVal 
+pack = uncurry RetVal
 
 isPositiveInt :: String -> Bool
 isPositiveInt str | all isDigit str = True
