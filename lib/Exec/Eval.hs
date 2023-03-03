@@ -11,8 +11,6 @@ import Exec.Variables
 import qualified Parsing.Ast as Ast
 import Debug.Trace
 import Exec.Builtins
-import qualified Parsing.Ast as Eval
-import Parsing.Ast (isAtomic)
 
 -- ─── Evaluate Expression ─────────────────────────────────────────────────────────────────────────
 
