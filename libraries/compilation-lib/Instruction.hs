@@ -16,10 +16,16 @@ data Instruction
 
 -- ─── Show Implementation ─────────────────────────────────────────────────────────────────────────
 
+showArr :: (a -> ShowS) -> [a] -> ShowS
+showArr _ [] s = ""
+showArr showx (x:xs) s = showx x (showl xs) ++ ['\n']
+  where
+    showl [] = s
+    showl (y:ys) = '\n' : showx y (showl ys)
+
 instance Show Instruction where
     showList :: [Instruction] -> ShowS
-    showList [] = shows ""
-    showList (x:xs) = (show x ++)
+    showList = showArr shows
 
     show :: Instruction -> String
     show (Push a) = "push " ++ a
