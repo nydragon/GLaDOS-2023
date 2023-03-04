@@ -2,6 +2,18 @@
 
 This document defines the compiled syntax of a scheme script [Augmented Backus-Naur form](https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_form) (also [ABNF](https://www.rfc-editor.org/rfc/rfc5234)).
 
+## Table of Contents
+
+- [Syntax definition of our Compiled Scheme implementation](#syntax-definition-of-our-compiled-scheme-implementation)
+  - [Table of Contents](#table-of-contents)
+  - [ABNF](#abnf)
+  - [Keywords](#keywords)
+  - [Various Examples](#various-examples)
+
+## ABNF
+
+The following is the ABNF for our "assembly language".
+
 ```ABNF
 
 character             = ALPHA / DIGIT / %x20-2F / %x3A-40 / %x5B-60 / %x7B-7E
@@ -50,24 +62,27 @@ script                = main-function *function
 
 ```
 
-[Return to the main page](../README.md)
-
 ## Keywords
 
 The following are the keywords used by our "assembly" language.
 
-- main
-- func
-- end
-- push
-- pop
-- init
-- move
-- call
-- enif
-- end
+| Keyword      | Arguments                                           | Description                                                             |
+| ------------ | --------------------------------------------------- | ----------------------------------------------------------------------- |
+| ```main```   | /                                                   | Starts the block containing the main instructions of the program        |
+| ```func```   | ```name```                                          | Starts a function definition                                            |
+| ```end```    | /                                                   | Ends a function definition                                              |
+| ```push```   | ```symbole```                                       | Pushes a value on the **argument queue**                                    |
+| ```pop```    | ```symbole```                                       | Pops a value from the **argument queue** and binds to given local variable  |
+| ```init```   | ```name```                                          | Declares variable. **Does not** assign a value to it |
+| ```move```   | ```symbole, value```                                | Copies a value into a variable or register                              |
+| ```call```   | ```function name```                                 | Calls a function                                                        |
+| ```return``` | ```value```                                         | Assigns value to **#RET** and resume execution in previous function     |
+| ```if```     | ```condition, instruction list, instruction list``` | Ends an if block                                                        |
+| ```enif```   | /                                                   | Ends an if block                                                        |
 
 ## Various Examples
+
+The following is old brainstorming material. This will *eventually* be changed out for proper examples.
 
 ```
 main
