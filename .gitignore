@@ -26,3 +26,5 @@ glados
 tmp
 packagedb
 /*.scm
+runner_lnk
+glados_lnk
