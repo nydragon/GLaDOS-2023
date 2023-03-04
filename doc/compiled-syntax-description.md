@@ -22,7 +22,7 @@ identifier            = 1*ALPHA
 
 text                  = *character
 
-keyword               = "push" / "pop" / "call" / "move" / "init"
+keyword               = "push" / "pop" / "call" / "move" / "init" / "ret"
 
 boolean               = "#t" / "#f"
 
@@ -42,9 +42,9 @@ literal               = DQUOTE text DQUOTE
 
 instruction-argument  = literal / number / float / boolean / identifier / atomic-list
 
-atomic-list           = list-start instruction-argument *(list-item-del instruction-argument) list-end
+atomic-list           = list-start *(instruction-argument *(list-item-del instruction-argument)) list-end
 
-instruction           = keyword *1(" " instruction-argument) eol
+instruction           = keyword *(" " instruction-argument) eol
 
 instruction-list      = 1*instruction
 
@@ -54,9 +54,19 @@ main-function-decl    = "main" eol
 
 function-end          = "end" eol
 
-function              = function-decl instruction-list function-end eol
+conditional-decl      = "if" eol
 
-main-function         = main-function-decl instruction-list function-end eol
+conditional-then      = "then" eol
+
+conditional-else      = "else" eol
+
+conditional-end       = "enif" eol
+
+conditional           = conditional-decl instruction-list conditional-then instruction-list conditional-else instruction-list conditional-end
+
+function              = function-decl (instruction-list / conditional) function-end eol
+
+main-function         = main-function-decl (instruction-list / conditional) function-end eol
 
 script                = main-function *function
 
@@ -66,19 +76,19 @@ script                = main-function *function
 
 The following are the keywords used by our "assembly" language.
 
-| Keyword      | Arguments                                           | Description                                                             |
-| ------------ | --------------------------------------------------- | ----------------------------------------------------------------------- |
-| ```main```   | /                                                   | Starts the block containing the main instructions of the program        |
-| ```func```   | ```name```                                          | Starts a function definition                                            |
-| ```end```    | /                                                   | Ends a function definition                                              |
-| ```push```   | ```symbole```                                       | Pushes a value on the **argument queue**                                    |
-| ```pop```    | ```symbole```                                       | Pops a value from the **argument queue** and binds to given local variable  |
-| ```init```   | ```name```                                          | Declares variable. **Does not** assign a value to it |
-| ```move```   | ```symbole, value```                                | Copies a value into a variable or register                              |
-| ```call```   | ```function name```                                 | Calls a function                                                        |
-| ```return``` | ```value```                                         | Assigns value to **#RET** and resume execution in previous function     |
-| ```if```     | ```condition, instruction list, instruction list``` | Ends an if block                                                        |
-| ```enif```   | /                                                   | Ends an if block                                                        |
+| Keyword    | Arguments                                           | Description                                                                |
+| ---------- | --------------------------------------------------- | -------------------------------------------------------------------------- |
+| ```main``` | /                                                   | Starts the block containing the main instructions of the program           |
+| ```func``` | ```name```                                          | Starts a function definition                                               |
+| ```end```  | /                                                   | Ends a function definition                                                 |
+| ```push``` | ```symbole```                                       | Pushes a value on the **argument queue**                                   |
+| ```pop```  | ```symbole```                                       | Pops a value from the **argument queue** and binds to given local variable |
+| ```init``` | ```name```                                          | Declares variable. **Does not** assign a value to it                       |
+| ```move``` | ```symbole, value```                                | Copies a value into a variable or register                                 |
+| ```call``` | ```function name```                                 | Calls a function                                                           |
+| ```ret```  | ```value```                                         | Assigns value to **#RET** and resume execution in previous function        |
+| ```if```   | ```condition, instruction list, instruction list``` | Starts an if block                                                         |
+| ```enif``` | /                                                   | Ends an if block                                                           |
 
 ## Various Examples
 
@@ -130,4 +140,13 @@ push #RET
 call *
 endif
 end
+
+if
+<instruction to form ret>
+then
+<instruction of then>
+else
+<instruction of else>
+enif
+
 ```
