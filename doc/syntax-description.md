@@ -1,11 +1,10 @@
 # Syntax definition of our Scheme implementation
+
 This document defines the syntax of this specific implementation of Scheme using the [Augmented Backus-Naur form](https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_form) (also [ABNF](https://www.rfc-editor.org/rfc/rfc5234)).
 
 
 ```ABNF
-symbol                = %x20-2F / %x3A-40 / %x5B-60 / %x7B-7E
-
-character             = ALPHA | DIGIT | symbol
+character             = ALPHA / DIGIT / %x20-2F / %x3A-40 / %x5B-60 / %x7B-7E
 
 identifier            = 1*ALPHA
 
@@ -14,6 +13,8 @@ text                  = *character
 literal               = DQUOTE text DQUOTE
 
 number                = 1*DIGIT
+
+float                 = number "." 1*DIGIT
 
 expression-start      = "("
 
@@ -35,7 +36,7 @@ array-content         = expression-argument 1*(*sep array-item-delimiter *sep ex
 
 array                 = array-start *sep *array-content *sep array-end
 
-expression-argument   = literal / number / expression / boolean / array
+expression-argument   = literal / number / float / expression / boolean / array
 
 expression-arguments  = expression-argument 1*(sep expression-argument)
 
