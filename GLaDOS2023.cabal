@@ -1,17 +1,6 @@
 cabal-version:      2.4
 name:               GLaDOS2023
-version:            0.1.0.0
--- A short (one-line) description of the package.
--- synopsis:
-
--- A longer description of the package.
--- description:
-
--- A URL where users can report bugs.
--- bug-reports:
-
--- The license under which the package is released.
--- license:
+version:            0.2.0.0
 author:             Nydragon
 
 -- A copyright notice.
@@ -30,22 +19,17 @@ library compilation-lib
     build-depends:    base >= 4.14.1.0, containers >= 0.5.10.2
     hs-source-dirs:   libraries/compilation-lib
     exposed-modules:
-        Parsing,
         Parsing.Args,
-        Parsing.Token,
-        Parsing.TokenType,
         Parsing.Ast,
         Parsing.Cpt,
         Parsing.Infix,
-        Exec,
-        Exec.RuntimeException,
-        Exec.Function,
-        Exec.Variables
-        Exec.Registry,
-        Exec.Builtins,
-        Exec.InteractivePrompt
-        Exec.Eval,
-        Exec.Utils
+        Parsing.Token,
+        Parsing.TokenType,
+        Compilation.Function,
+        Compilation.Utils,
+        Compilation.Expr,
+        Instruction,
+        FunctionBlock
 
 -- Compiler
 executable glados
@@ -74,7 +58,6 @@ executable runner
     hs-source-dirs: runner
     build-depends: base >= 4.14.1.0, exec-lib
     main-is: Main.hs
-
 
 --
 -- Tests

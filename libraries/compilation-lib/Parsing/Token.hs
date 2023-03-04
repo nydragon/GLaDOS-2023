@@ -3,7 +3,7 @@ module Parsing.Token where
 import Data.Maybe
 import Text.Read
 import Data.Char (isDigit)
-import Exec.Utils (isPositiveInt, isNegativeInt, isPositiveFloat, isNegativeFloat)
+import Compilation.Utils (isPositiveInt, isNegativeInt, isPositiveFloat, isNegativeFloat)
 import Parsing.TokenType
 
 -- ─── Tokenization ────────────────────────────────────────────────────────────────────────────────
