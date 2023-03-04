@@ -12,7 +12,7 @@ convert a = [a]
 unpack :: RetVal -> (Registry, Ast.Expr)
 unpack (RetVal reg expr) = (reg, expr)
 
-pack :: (Registry, Ast.Expr) ->  RetVal 
+pack :: (Registry, Ast.Expr) ->  RetVal
 pack = uncurry RetVal
 
 isPositiveInt :: String -> Bool
