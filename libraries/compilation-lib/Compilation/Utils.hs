@@ -1,19 +1,12 @@
-module Exec.Utils where
+module Compilation.Utils where
 
 import qualified Parsing.Ast as Ast
-import Exec.Registry (Registry, RetVal (..))
 import Debug.Trace
 import Data.Char (isDigit)
 
 convert :: Ast.Expr -> [Ast.Expr]
 convert (Ast.ExprList a) = a
 convert a = [a]
-
-unpack :: RetVal -> (Registry, Ast.Expr)
-unpack (RetVal reg expr) = (reg, expr)
-
-pack :: (Registry, Ast.Expr) ->  RetVal
-pack = uncurry RetVal
 
 isPositiveInt :: String -> Bool
 isPositiveInt str | all isDigit str = True

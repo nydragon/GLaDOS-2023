@@ -1,16 +1,11 @@
-module Exec.Eval where
+module Compilation.Expr where
 
 import Control.Exception
 import Data.Maybe
-import Exec
-import Exec.Function
-import Exec.Utils
-import Exec.Registry
-import Exec.RuntimeException
-import Exec.Variables
+import Compilation.Function
+import Compilation.Utils
 import qualified Parsing.Ast as Ast
 import Debug.Trace
-import Exec.Builtins
 
 -- ─── Evaluate Expression ─────────────────────────────────────────────────────────────────────────
 
