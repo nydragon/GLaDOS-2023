@@ -1,17 +1,6 @@
 cabal-version:      2.4
 name:               GLaDOS2023
-version:            0.1.0.0
--- A short (one-line) description of the package.
--- synopsis:
-
--- A longer description of the package.
--- description:
-
--- A URL where users can report bugs.
--- bug-reports:
-
--- The license under which the package is released.
--- license:
+version:            0.2.0.0
 author:             Nydragon
 
 -- A copyright notice.
@@ -38,7 +27,9 @@ library compilation-lib
         Parsing.TokenType,
         Compilation.Function,
         Compilation.Utils,
-        Compilation.Expr
+        Compilation.Expr,
+        Instruction,
+        FunctionBlock
 
 -- Compiler
 executable glados
@@ -67,7 +58,6 @@ executable runner
     hs-source-dirs: runner
     build-depends: base >= 4.14.1.0, exec-lib
     main-is: Main.hs
-
 
 --
 -- Tests

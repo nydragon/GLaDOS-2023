@@ -10,7 +10,7 @@ identifier            = 1*ALPHA
 
 text                  = *character
 
-keyword               = "push" / "pop" / "call"
+keyword               = "push" / "pop" / "call" / "move" / "init"
 
 boolean               = "#t" / "#f"
 
@@ -22,7 +22,7 @@ list-item-del         = ","
 
 eol                   = LF / CR / CRLF
 
-number                = 1*DIGIT 
+number                = 1*DIGIT
 
 float                 = number "." 1*DIGIT
 
@@ -52,21 +52,24 @@ script                = main-function *function
 
 [Return to the main page](../README.md)
 
-## Explanations
+## Keywords
+
+The following are the keywords used by our "assembly" language.
+
+- main
+- func
+- end
+- push
+- pop
+- init
+- move
+- call
+- enif
+- end
+
+## Various Examples
 
 ```
-Keywords:
-    - main
-    - func
-    - end
-    - push
-    - pop
-    - call
-
-()
-"a"
-a
-
 main
 push 5
 push 3
