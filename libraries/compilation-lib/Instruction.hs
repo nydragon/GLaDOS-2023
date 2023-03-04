@@ -16,16 +16,19 @@ data Instruction
 
 -- ─── Show Implementation ─────────────────────────────────────────────────────────────────────────
 
-printInstructionList :: [Instruction] -> String
-printInstructionList arr = unlines (map show arr)
-
 instance Show Instruction where
+    showList :: [Instruction] -> ShowS
+    showList [] = shows ""
+    showList (x:xs) = (show x ++)
+
     show :: Instruction -> String
     show (Push a) = "push " ++ a
     show (Pop a) = "pop " ++ a
     show (Call a) = "call " ++ a
     show (Init a) = "init " ++ a
     show (Move a b) = "move " ++ a ++ " " ++ b
-    show (Conditional cond arr1 arr2) = printInstructionList cond ++ "if #RET\n" ++
-        printInstructionList arr1 ++ "else\n" ++
-        printInstructionList arr2 ++ "enif\n"
+    show (Conditional cond arr1 arr2) = condStr "if #RET\n" ++ arr1Str "else\n" ++ arr2Str "enif\n"
+        where
+            condStr = showList cond
+            arr1Str = showList arr1
+            arr2Str = showList arr2
