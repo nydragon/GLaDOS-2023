@@ -65,42 +65,21 @@ eval (Ast.Call fn args) reg = do
     case b of
         Ast.ExprList c -> execCall (Ast.Call fn c) a
         _ -> throwIO FatalError
--- Symbole (variable)
-eval (Ast.Symbole s) (v, f) = case lookupVar s v of
-    Nothing -> return $ RetVal (v, f) (Ast.Symbole s)
-    Just x -> return $ RetVal (v, f) x
 -- This pattern match should probably throw an error
 eval x reg = return $ RetVal reg x
 
--- transforms a list of Symboles into a list of Strings
-toString :: [Ast.Expr] -> [String]
-toString [Ast.Symbole x] = [x]
-toString (Ast.Symbole x: xs) = x : toString xs
-toString _  = []
-
 -- Executes function call
 -- Note: Arguments do not need to have been reduced, execFunc takes care of it
-execFunc :: String -> [Ast.Expr] -> Registry -> IO RetVal
-execFunc "define" args reg = execBuiltin (Ast.Call "define" args) reg
-execFunc f args _
-    | not $ isAtomicList args = throwIO $ NonAtomicFunctionArgs f args
-execFunc funcName argValues reg
-    | Ast.isValidBuiltin funcName = execBuiltin (Ast.Call funcName argValues) reg
-    | otherwise = case lookupFunc funcName (snd reg) of
-        Nothing -> throwIO $ InvalidFunctionCall funcName
-        Just (Ast.ExprList [Ast.ExprList args, body]) -> evalLambda args body argValues reg
-        _ -> throwIO FatalError
-
--- Evaluates a lambda expression
--- Accepts: Expression describing the arguments [Symbole "a", Symbole "b"],
---          Expression describing the behaviour Call "+" [Symbole "a", Symbole "b"]],
---          Expression describing the arguments' values [Num 2, Num 3]
--- Argument values are bound to arguments based on order
-evalLambda :: [Ast.Expr] -> Ast.Expr -> [Ast.Expr] -> Registry -> IO RetVal
-evalLambda args body val reg = do
-    tempReg <- bindArgs (toString args) val reg
-    (RetVal a v) <- eval body tempReg
-    return (RetVal reg v)
+-- execFunc :: String -> [Ast.Expr] -> Registry -> IO RetVal
+-- execFunc "define" args reg = execBuiltin (Ast.Call "define" args) reg
+-- execFunc f args _
+--     | not $ isAtomicList args = throwIO $ NonAtomicFunctionArgs f args
+-- execFunc funcName argValues reg
+--     | Ast.isValidBuiltin funcName = execBuiltin (Ast.Call funcName argValues) reg
+--     | otherwise = case lookupFunc funcName (snd reg) of
+--         Nothing -> throwIO $ InvalidFunctionCall funcName
+--         Just (Ast.ExprList [Ast.ExprList args, body]) -> evalLambda args body argValues reg
+--         _ -> throwIO FatalError
 
 -- Syntactic sugar to convert Ast.Call to args for execFunc
 --
