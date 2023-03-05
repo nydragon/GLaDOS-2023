@@ -69,7 +69,7 @@ eval (Ast.Call fn args) reg = do
 eval (Ast.Symbole s) (v, f) = case lookupVar s v of
     Nothing -> return $ RetVal (v, f) (Ast.Symbole s)
     Just x -> return $ RetVal (v, f) x
-
+-- This pattern match should probably throw an error
 eval x reg = return $ RetVal reg x
 
 -- transforms a list of Symboles into a list of Strings
