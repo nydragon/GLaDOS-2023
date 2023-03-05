@@ -16,7 +16,7 @@ extra-source-files:
 
 library compilation-lib
     default-language: Haskell2010
-    build-depends:    base >= 4.14.1.0, containers >= 0.5.10.2
+    build-depends:    base >= 4.14.1.0, containers >= 0.5.10.2, shared-lib
     hs-source-dirs:   libraries/compilation-lib
     exposed-modules:
         Parsing.Args,
@@ -27,9 +27,7 @@ library compilation-lib
         Parsing.TokenType,
         Compilation.Function,
         Compilation.Utils,
-        Compilation.Expr,
-        Instruction,
-        FunctionBlock
+        Compilation.Expr
 
 -- Compiler
 executable glados
@@ -51,13 +49,25 @@ executable glados
 library exec-lib
     default-language: Haskell2010
     hs-source-dirs: libraries/exec-lib
-    build-depends: base >= 4.14.1.0
+    build-depends: base >= 4.14.1.0, shared-lib
 
 executable runner
     default-language: Haskell2010
     hs-source-dirs: runner
     build-depends: base >= 4.14.1.0, exec-lib
     main-is: Main.hs
+
+--
+-- Shared
+--
+
+library shared-lib
+    default-language: Haskell2010
+    build-depends:    base >= 4.14.1.0, containers >= 0.5.10.2
+    hs-source-dirs:   libraries/shared-lib
+    exposed-modules:
+        Instruction,
+        FunctionBlock
 
 --
 -- Tests
