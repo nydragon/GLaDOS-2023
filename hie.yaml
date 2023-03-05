@@ -3,6 +3,9 @@ cradle:
     - path: "./libraries/compilation-lib"
       component: "lib:compilation-lib"
 
+    - path: "./libraries/shared-lib"
+      component: "lib:shared-lib"
+
     - path: "./libraries/exec-lib"
       component: "lib:exec-lib"
 
