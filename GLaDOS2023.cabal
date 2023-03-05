@@ -24,9 +24,8 @@ library compilation-lib
         Parsing.TokenType,
         Compilation.Function,
         Compilation.Utils,
-        Compilation.Compile,
-        Compilation.Instruction,
-        Compilation.FunctionBlock
+        Compilation.Compile
+
 
 -- Compiler
 executable glados

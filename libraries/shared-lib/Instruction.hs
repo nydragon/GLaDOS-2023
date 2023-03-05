@@ -1,6 +1,6 @@
 {-# LANGUAGE InstanceSigs #-}
 
-module Compilation.Instruction where
+module Instruction where
 
 -- This type represents a single instruction
 --

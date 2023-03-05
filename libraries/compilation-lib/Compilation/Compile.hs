@@ -25,7 +25,7 @@ evalExprList (Ast.Symbole s : xs) (v, f) = case lookupFunc s f of
     Just a -> case Ast.exprListToCall exprList of
         Nothing -> throwIO FatalError
         Just call -> eval call reg
-    Nothing -> if Ast.isValidBuiltin s then²
+    Nothing -> if Ast.isValidBuiltin s then
         case Ast.exprListToCall exprList of
             Nothing -> throwIO FatalError
             Just call -> eval call reg
