@@ -1,13 +1,13 @@
 cradle:
   cabal:
     - path: "./libraries/compilation-lib"
-      component: "lib:compilation-lib"
+      component: "GLaDOS2023:lib:compilation-lib"
 
     - path: "./libraries/shared-lib"
-      component: "lib:shared-lib"
+      component: "GLaDOS2023:lib:shared-lib"
 
     - path: "./libraries/exec-lib"
-      component: "lib:exec-lib"
+      component: "GLaDOS2023:lib:exec-lib"
 
     - path: "./compiler/Main.hs"
       component: "GLaDOS2023:exe:glados"
