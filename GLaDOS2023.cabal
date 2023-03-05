@@ -24,7 +24,7 @@ library compilation-lib
         Parsing.TokenType,
         Compilation.Function,
         Compilation.Utils,
-        Compilation.Expr,
+        Compilation.Compile,
         Compilation.Instruction,
         Compilation.FunctionBlock
 
