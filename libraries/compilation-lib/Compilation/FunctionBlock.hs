@@ -1,8 +1,8 @@
 {-# LANGUAGE InstanceSigs #-}
 
-module FunctionBlock where
+module Compilation.FunctionBlock where
 
-import Instruction
+import Compilation.Instruction
 
 data FunctionBlock = FunctionBlock String [Instruction]
 
