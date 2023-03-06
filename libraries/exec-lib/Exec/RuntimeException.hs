@@ -3,7 +3,6 @@
 module Exec.RuntimeException where
 
 import Control.Exception
-import qualified Parsing.Ast as Ast
 
 -- Runtime exception data type
 --
@@ -19,7 +18,6 @@ data RuntimeException
   | NullDivision
   | FatalError -- For stuff that shouldn't happen
   | AlreadyDefined
-  | InvalidLambda Ast.Expr
   deriving (Eq)
 
 instance Exception RuntimeException
@@ -34,15 +32,4 @@ instance Show RuntimeException where
   show NullDivision = "NullDivision: Did you not pay attention in math class?"
   show FatalError = "FatalError"
   show AlreadyDefined = "AlreadyDefined"
-  show (InvalidLambda e) = "InvalidLambda: " ++ show e
   show _ = "oh oh"
-
-data InternalException
-  = NonAtomicFunctionArgs String [Ast.Expr]
-  deriving (Eq)
-
-instance Exception InternalException
-
-instance Show InternalException where
-  show :: InternalException -> String
-  show (NonAtomicFunctionArgs a b) = "Function " ++ a ++ ": args are not Atoms\n " ++ show b
