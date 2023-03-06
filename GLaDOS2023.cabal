@@ -47,7 +47,17 @@ executable glados
 library exec-lib
     default-language: Haskell2010
     hs-source-dirs: libraries/exec-lib
-    build-depends: base >= 4.14.1.0, shared-lib
+    build-depends: base >= 4.14.1.0, shared-lib, containers
+    exposed-modules:
+        Parser.ReadFile,
+        Exec.InferType,
+        Exec.Builtins,
+        Exec
+    other-modules:
+        Exec.Infer,
+        Exec.Instructions,
+        Exec.RuntimeException,
+        Exec.Utils
 
 executable runner
     default-language: Haskell2010
@@ -65,7 +75,8 @@ library shared-lib
     hs-source-dirs:   libraries/shared-lib
     exposed-modules:
         Instruction,
-        FunctionBlock
+        FunctionBlock,
+        Utils
 
 --
 -- Tests
