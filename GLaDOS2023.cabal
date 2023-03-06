@@ -25,7 +25,8 @@ library compilation-lib
         Compilation.Function,
         Compilation.Utils,
         Compilation.Compile,
-        Compilation.CompilationError
+        Compilation.CompilationError,
+        Compilation.Registry
 
 
 -- Compiler
