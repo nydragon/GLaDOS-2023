@@ -6,6 +6,7 @@ import Compilation.Function
 import Compilation.Utils
 import qualified Parsing.Ast as Ast
 import Debug.Trace
+import FunctionBlock
 
 -- ─── Evaluate Expression ─────────────────────────────────────────────────────────────────────────
 
@@ -67,6 +68,11 @@ eval (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg = execCall (Ast.
 --         _ -> throwIO FatalError
 -- This pattern match should probably throw an error
 eval x reg = return $ RetVal reg x
+
+
+compileFunc :: Ast.Expr -> String -> [String] -> IO [FunctionBlock]
+compileFunc (Ast.ExprList ls) vars =
+compileFunc _ name _ = throwIO $ NotAFunction name
 
 -- Executes function call
 -- Note: Arguments do not need to have been reduced, execFunc takes care of it
