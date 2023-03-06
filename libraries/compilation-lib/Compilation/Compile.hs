@@ -1,12 +1,14 @@
 module Compilation.Compile where
 
-import Control.Exception
-import Data.Maybe
+import qualified Parsing.Ast as Ast
 import Compilation.Function
 import Compilation.Utils
-import qualified Parsing.Ast as Ast
-import Debug.Trace
+import Compilation.RetVal
 import FunctionBlock
+
+import Control.Exception
+import Data.Maybe
+import Debug.Trace
 
 -- ─── Evaluate Expression ─────────────────────────────────────────────────────────────────────────
 
@@ -37,15 +39,25 @@ evalExprList (Ast.Symbole s : xs) (v, f) = case lookupFunc s f of
         reg = (v, f)
 evalExprList ls reg = evalExprList' ls reg
 
--- Evaluates a given expression into an atom
--- Note : Redirects evalutation to evalExprList if Ast.Expr
-eval :: Ast.Expr -> Registry -> IO RetVal
+-- Compiles and Ast Expression
+--
+-- This is essentially the main function for compilation,
+--    asides from the compileProgram func
+-- Args : Expression -> Registry -> Defined Functions
+-- Return : (Instructions (if not function def), Updated function definitions)
+compileExpr :: Ast.Expr -> Registry -> [FunctionBlock] -> RetVal
 -- Lambda called on definition
-eval (Ast.ExprList (Ast.Call "lambda" [Ast.ExprList args, body] : argValues)) reg = evalLambda args body argValues reg
+compileExpr (Ast.ExprList (Ast.Call "lambda" [Ast.ExprList args, body] : argValues)) reg = evalLambda args body argValues reg
 -- Basic ExprList
-eval (Ast.ExprList ls) reg = evalExprList ls reg
+compileExpr (Ast.ExprList ls) reg = evalExprList ls reg
 -- Function definition
-eval (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg = execCall (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg
+compileExpr (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg = execCall (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg
+-- Variable definition
+compileExpr (Ast.Call "define" ((Ast.Symbole s) : val)) reg functions
+    | isDeclared s = throw $ VariableAlreadyDefined s
+    | otherwise = compileExpr val
+compileExpr x reg = throw FatalError
+
 -- Conditional
 -- eval (Ast.Call "if" (x : xs)) reg = do
 --     -- Evaluate first argument
@@ -57,6 +69,7 @@ eval (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg = execCall (Ast.
 
 --     -- Eval and return outputExpr
 --     eval outputExpr b
+
 -- Function call
 -- eval (Ast.Call fn args) reg = do
 --     -- Pattern match return of evaluation of args
@@ -67,16 +80,14 @@ eval (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg = execCall (Ast.
 --         Ast.ExprList c -> execCall (Ast.Call fn c) a
 --         _ -> throwIO FatalError
 -- This pattern match should probably throw an error
-eval x reg = return $ RetVal reg x
 
+-- compileExpr :: Ast.Expr -> Registry -> ([Instruction], [FunctionBlock])
 
-compileFunc' :: Ast.Expr -> String -> [String] -> [FunctionBlock]
-compileFunc' (Ast.ExprList (x:xs)) name vars = 
-compileFunc' _ name _ = throw $ NotAFunction name
+compileProgram' :: Ast.Expr -> Registry -> ([Instruction], [FunctionBlock])
+compileProgram' (Ast.ExprList (x:xs)) reg =
 
-compileFunc :: Ast.Expr -> String -> [FunctionBlock]
-compileFunc (Ast.ExprList ls) name = compileFunc' ls name []
-compileFunc _ name _ = throw $ NotAFunction name
+compileProgram :: Ast.Expr -> [FunctionBlock]
+compileProgram (Ast.ExprList ls) = compileFunc' ls []
 
 -- Executes function call
 -- Note: Arguments do not need to have been reduced, execFunc takes care of it
