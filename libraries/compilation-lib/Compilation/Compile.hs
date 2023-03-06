@@ -46,25 +46,25 @@ eval (Ast.ExprList ls) reg = evalExprList ls reg
 -- Function definition
 eval (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg = execCall (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg
 -- Conditional
-eval (Ast.Call "if" (x : xs)) reg = do
-    -- Evaluate first argument
-    RetVal a condVal <- eval x reg
-    let newArgs = condVal : xs
+-- eval (Ast.Call "if" (x : xs)) reg = do
+--     -- Evaluate first argument
+--     RetVal a condVal <- eval x reg
+--     let newArgs = condVal : xs
 
-    -- Run if
-    RetVal b outputExpr <- execBuiltin (Ast.Call "if" newArgs) a
+--     -- Run if
+--     RetVal b outputExpr <- execBuiltin (Ast.Call "if" newArgs) a
 
-    -- Eval and return outputExpr
-    eval outputExpr b
+--     -- Eval and return outputExpr
+--     eval outputExpr b
 -- Function call
-eval (Ast.Call fn args) reg = do
-    -- Pattern match return of evaluation of args
-    RetVal a b <- eval (Ast.ExprList args) reg
+-- eval (Ast.Call fn args) reg = do
+--     -- Pattern match return of evaluation of args
+--     RetVal a b <- eval (Ast.ExprList args) reg
 
-    -- Extract arg list from return and call function
-    case b of
-        Ast.ExprList c -> execCall (Ast.Call fn c) a
-        _ -> throwIO FatalError
+--     -- Extract arg list from return and call function
+--     case b of
+--         Ast.ExprList c -> execCall (Ast.Call fn c) a
+--         _ -> throwIO FatalError
 -- This pattern match should probably throw an error
 eval x reg = return $ RetVal reg x
 
