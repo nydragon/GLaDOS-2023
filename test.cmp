@@ -1,0 +1,15 @@
+func main
+push 3
+push 2
+call add
+push #RET
+call println
+end
+
+func add
+pop a
+pop b
+push a
+push b
+call +
+end

@@ -18,21 +18,21 @@ data Instruction
 
 showArr :: (a -> ShowS) -> [a] -> ShowS
 showArr _ [] s = ""
-showArr showx (x:xs) s = showx x (showl xs) ++ ['\n']
+showArr showx (x:xs) s = showx x (showl xs)
   where
     showl [] = s
-    showl (y:ys) = '\n' : showx y (showl ys)
+    showl (y:ys) = showx y (showl ys)
 
 instance Show Instruction where
     showList :: [Instruction] -> ShowS
     showList = showArr shows
 
     show :: Instruction -> String
-    show (Push a) = "push " ++ a
-    show (Pop a) = "pop " ++ a
-    show (Call a) = "call " ++ a
-    show (Init a) = "init " ++ a
-    show (Move a b) = "move " ++ a ++ " " ++ b
+    show (Push a) = "push " ++ a ++ "\n"
+    show (Pop a) = "pop " ++ a ++ "\n"
+    show (Call a) = "call " ++ a ++ "\n"
+    show (Init a) = "init " ++ a ++ "\n"
+    show (Move a b) = "move " ++ a ++ " " ++ b ++ "\n"
     show (Conditional cond arr1 arr2) = condStr "if #RET\n" ++ arr1Str "else\n" ++ arr2Str "enif\n"
         where
             condStr = showList cond
