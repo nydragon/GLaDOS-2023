@@ -14,9 +14,9 @@ data Type
     | Integer Integer
     | Symbol String
     | List [Type]
+    | Boolean Bool
     | Null
     deriving (Ord, Eq)
-
 instance Num Type where
   (+) :: Type -> Type -> Type
   (+) (Integer a) (Integer b) = Integer (a + b)
