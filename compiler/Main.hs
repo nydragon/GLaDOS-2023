@@ -36,16 +36,6 @@ compile tokens = do
 
     return ()
 
-
--- evalTree :: [Expr] -> Registry -> IO ()
--- evalTree [x] reg = do
---     eval x reg
---     return ()
--- evalTree (x : xs) reg = do
---     (RetVal reg v) <- eval x reg
---     evalTree xs reg
-
-
 main :: IO ()
 main = do
     -- Parsing arguments
@@ -54,4 +44,5 @@ main = do
     let fileName = getFileName fls (file res)
 
     compileFile fileName -- normal
+
     return ()

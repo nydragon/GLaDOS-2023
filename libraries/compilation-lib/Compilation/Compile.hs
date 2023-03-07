@@ -44,7 +44,8 @@ compileProgram' (Ast.ExprList (x:xs)) reg = concatRetVal compiledLeftover compil
         compiledLeftover = compileProgram' (Ast.ExprList xs) reg
         (RetVal _ _ updatedReg) = compiledLeftover
         compiledExpr = compileExpr x updatedReg
-compileProgram' _ _ = throw FatalError
+compileProgram' (Ast.ExprList []) reg = RetVal [] [] reg
+compileProgram' x _ = trace ("HERE" ++ show x) $ throw FatalError
 
 compileProgram :: Ast.Expr -> RetVal
 compileProgram (Ast.ExprList ls) = compileProgram' list emptyRegistry
