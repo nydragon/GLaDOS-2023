@@ -13,3 +13,12 @@ concatRetVal (RetVal instr1 func1) (RetVal instr2 func2) = RetVal newInstrs newF
     where
         newInstrs = instr1 ++ instr2
         newFuncs = func1 ++ func2
+
+prependInstructions :: RetVal -> [Instruction] -> RetVal
+prependInstructions (RetVal instrs funcs) instructions = RetVal (instructions ++ instrs) funcs
+
+appendInstructions :: RetVal -> [Instruction] -> RetVal
+appendInstructions (RetVal instrs funcs) instructions = RetVal (instrs ++ instructions) funcs
+
+appendFunctions :: RetVal -> [FunctionBlock] -> RetVal
+appendFunctions (RetVal instrs funcs) func = RetVal instrs (funcs ++ func)
