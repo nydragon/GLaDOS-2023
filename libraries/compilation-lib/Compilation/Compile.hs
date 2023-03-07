@@ -29,34 +29,36 @@ compileExpr :: Ast.Expr -> Registry -> RetVal
 -- Function definition
 -- compileExpr (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg funcs = execCall (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg
 -- Variable definition
-compileExpr (Ast.Call "define" ((Ast.Symbole s) : val)) reg
-    | isDeclared s reg = throw $ VariableAlreadyDefined s
-    | otherwise = compileVariable call reg
+compileExpr (Ast.Call "define" ((Ast.Symbole s) : val)) reg = compileVariable call reg
     where
         call = Ast.Call "define" (Ast.Symbole s : val)
-compileExpr x reg = throw FatalError
--- compileExpr _ _ funcs = throw Unimplemented
+compileExpr _ _ = throw FatalError
 
-compileProgram' :: Ast.Expr -> Registry -> RetVal
-compileProgram' (Ast.ExprList (x:xs)) reg = concatRetVal compiledLeftover compiledExpr
+-- Compiles a list of expressions
+--
+-- This will compile all instructions inside a retval as well as saving additional function declarations
+compileExprList' :: Ast.Expr -> Registry -> RetVal
+compileExprList' (Ast.ExprList (x:xs)) reg = concatRetVal compiledLeftover compiledExpr
     where
-        (f, v) = reg
-        compiledLeftover = compileProgram' (Ast.ExprList xs) reg
+        compiledLeftover = compileExprList' (Ast.ExprList xs) reg
         (RetVal _ _ updatedReg) = compiledLeftover
         compiledExpr = compileExpr x updatedReg
-compileProgram' (Ast.ExprList []) reg = RetVal [] [] reg
-compileProgram' x _ = trace ("HERE" ++ show x) $ throw FatalError
+compileExprList' (Ast.ExprList []) reg = RetVal [] [] reg
+compileExprList' x _ = trace ("HERE" ++ show x) $ throw FatalError
 
-compileProgram :: Ast.Expr -> RetVal
-compileProgram (Ast.ExprList ls) = compileProgram' list emptyRegistry
+-- Entry point function for compileExprList'
+compileExprList :: Ast.Expr -> RetVal
+compileExprList (Ast.ExprList ls) = compileExprList' list emptyRegistry
     where
         list = Ast.ExprList ls
-compileProgram _ = throw FatalError
+compileExprList _ = throw FatalError
 
-assembleProgram :: Ast.Expr -> [FunctionBlock]
-assembleProgram list = output
+-- Compiles program into list of FunctionBlock INCLUDING main func
+-- Arg : ExprList to be compiled (corresponds to base depth level of input code)
+compileProgram :: Ast.Expr -> [FunctionBlock]
+compileProgram list = output
     where
-        (RetVal instrs funcs _) = compileProgram list
+        (RetVal instrs funcs _) = compileExprList list
         mainFunc = Function "main" instrs
         output = mainFunc : funcs
 
