@@ -1,4 +1,4 @@
-module Parsing.InfixTests where
+module CompilationLib.Parser.InfixTests where
 
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@=?))

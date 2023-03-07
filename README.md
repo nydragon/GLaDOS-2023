@@ -20,7 +20,7 @@
 - Written in **Haskell**
 - **Strict** testing policy
     - Continuous integration running tests on every **Pull Request**
-    - **Over 60** Unit tests and close to **50% coverage**
+    - **Over 100** Unit tests and close to **50% coverage**
     - **Close to 20** Integration tests
 - **Abstract Syntax Tree** and **Concrete Parse Tree** implementation
 - Standard input reading

@@ -1,4 +1,4 @@
-module Parsing.CptTests where
+module CompilationLib.Parser.CptTests where
 
 import Test.Tasty
 import Test.Tasty.HUnit

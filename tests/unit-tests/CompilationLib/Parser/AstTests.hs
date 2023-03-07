@@ -1,4 +1,4 @@
-module Parsing.AstTests where
+module CompilationLib.Parser.AstTests where
 
 import Test.Tasty
 import Test.Tasty.HUnit
