@@ -27,7 +27,9 @@ testInfer = testGroup "infer" [
         testCase "is a symbol " $ infer "Symbol" @?= Type.Symbol "Symbol",
         testCase "is a 2 element array" $ infer "(1,3)" @?= Type.List [Type.Integer 1, Type.Integer 3],
         testCase "is an empty array" $ infer "()" @?= Type.List [],
-        testCase "is an a 2d array" $ infer "((1,2),(3,4))" @?= Type.List [Type.List [Type.Integer 1, Type.Integer 2], Type.List [Type.Integer 3, Type.Integer 4]]
+        testCase "is a 2d array" $ infer "((1,2),(3,4))" @?= Type.List [Type.List [Type.Integer 1, Type.Integer 2], Type.List [Type.Integer 3, Type.Integer 4]],
+        testCase "is a complex array" $ infer "(((1,2),(1,2)),(3,4))" @?= Type.List [Type.List [Type.List [Type.Integer 1, Type.Integer 2], Type.List [Type.Integer 1, Type.Integer 2]], Type.List [Type.Integer 3, Type.Integer 4]],
+        testCase "is a hyper complex array" $ infer "(((1,2),(1,2)),((1,2),(1,2)))" @?= Type.List [Type.List [Type.List [Type.Integer 1, Type.Integer 2], Type.List [Type.Integer 1, Type.Integer 2]], Type.List [Type.List [Type.Integer 1, Type.Integer 2], Type.List [Type.Integer 1, Type.Integer 2]]]
     ]
 
 inferSuite :: TestTree
