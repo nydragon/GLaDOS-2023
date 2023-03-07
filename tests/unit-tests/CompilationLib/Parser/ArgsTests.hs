@@ -1,4 +1,4 @@
-module Parsing.ArgsTests where
+module CompilationLib.Parser.ArgsTests where
 
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@=?))

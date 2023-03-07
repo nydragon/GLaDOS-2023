@@ -1,4 +1,4 @@
-module Parsing.TokenTests where
+module CompilationLib.Parser.TokenTests where
 
 import Test.Tasty
 import Test.Tasty.HUnit
