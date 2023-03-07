@@ -3,7 +3,6 @@ module Parsing.ArgsTests where
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.HUnit (testCase, (@=?))
 
-import Parsing ()
 import Parsing.Args (Args (..), parse)
 
 parseArgsTest :: String -> [String] -> Args -> [String] -> TestTree

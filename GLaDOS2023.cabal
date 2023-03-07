@@ -97,15 +97,16 @@ test-suite unit-tests
                     tasty-hunit >= 0.10.0.3,
                     containers >=0.5.10.2,
                     exec-lib,
+                    compilation-lib,
                     shared-lib
     main-is: TestMain.hs
     type: exitcode-stdio-1.0
     other-modules:
-        -- Parsing.ArgsTests,
-        -- Parsing.TokenTests,
-        -- Parsing.CptTests,
-        -- Parsing.AstTests,
-        -- Parsing.InfixTests,
+        Parsing.ArgsTests,
+        Parsing.TokenTests,
+        Parsing.CptTests,
+        Parsing.AstTests,
+        Parsing.InfixTests,
         ExecLib.Exec.Infer,
         ExecLib.Exec.Instructions,
         ExecLib
