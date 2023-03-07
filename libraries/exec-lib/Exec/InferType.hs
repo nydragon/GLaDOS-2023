@@ -5,7 +5,6 @@
 module Exec.InferType where
 
 import qualified Data.Map as Map
-import GHC.Num (integerAdd)
 import GHC.Float
 
 data Type 
