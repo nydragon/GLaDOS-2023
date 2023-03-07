@@ -34,6 +34,8 @@ compileExpr (Ast.Call "define" ((Ast.Symbole s) : val)) reg = compileVariable ca
         call = Ast.Call "define" (Ast.Symbole s : val)
 compileExpr _ _ = throw FatalError
 
+-- ─── Compilation Main Functions ──────────────────────────────────────────────────────────────────
+
 -- Compiles a list of expressions
 --
 -- This will compile all instructions inside a retval as well as saving additional function declarations
@@ -44,7 +46,7 @@ compileExprList' (Ast.ExprList (x:xs)) reg = concatRetVal compiledLeftover compi
         (RetVal _ _ updatedReg) = compiledLeftover
         compiledExpr = compileExpr x updatedReg
 compileExprList' (Ast.ExprList []) reg = RetVal [] [] reg
-compileExprList' x _ = trace ("HERE" ++ show x) $ throw FatalError
+compileExprList' _ _ = throw FatalError
 
 -- Entry point function for compileExprList'
 compileExprList :: Ast.Expr -> RetVal
@@ -84,7 +86,13 @@ convertToCall (Ast.ExprList (Ast.Symbole name : ls)) reg = if isFunction name re
 compileVariable :: Ast.Expr -> Registry -> RetVal
 compileVariable (Ast.Call "define" [Ast.Symbole s, Ast.ExprList ls]) reg = throw Unimplemented
 compileVariable (Ast.Call "define" [Ast.Symbole s, Ast.Call name args]) reg = throw Unimplemented
-compileVariable (Ast.Call "define" [Ast.Symbole s1, Ast.Symbole s2]) reg = throw Unimplemented
-compileVariable (Ast.Call "define" [Ast.Symbole s, atom]) reg = RetVal instructions [] reg
+compileVariable (Ast.Call "define" [Ast.Symbole s1, Ast.Symbole s2]) reg = if not $ isVariable s2 reg
+    then throw $ VariableNotDefined s2
+    else RetVal instructions [] newReg
+        where
+            newReg = addVar s1 reg
+            instructions = [Init s1, Move s1 s2]
+compileVariable (Ast.Call "define" [Ast.Symbole s, atom]) reg = RetVal instructions [] newReg
     where
+        newReg = addVar s reg
         instructions = [Init s, Move s $ show atom]

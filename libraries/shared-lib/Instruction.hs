@@ -18,7 +18,7 @@ data Instruction
 -- ─── Show Implementation ─────────────────────────────────────────────────────────────────────────
 
 showArr :: (a -> ShowS) -> [a] -> ShowS
-showArr _ [] s = ""
+showArr _ [] _ = ""
 showArr showx (x:xs) s = showx x (showl xs)
   where
     showl [] = s
