@@ -3,9 +3,6 @@ name:               GLaDOS2023
 version:            0.2.0.0
 author:             Nydragon
 
--- A copyright notice.
--- copyright:
--- category:
 extra-source-files:
     CHANGELOG.md
     README.md
@@ -28,7 +25,11 @@ library compilation-lib
         Parsing.TokenType,
         Compilation.Function,
         Compilation.Utils,
-        Compilation.Expr
+        Compilation.Compile,
+        Compilation.CompilationError,
+        Compilation.Registry,
+        Compilation.RetVal
+
 
 -- Compiler
 executable glados

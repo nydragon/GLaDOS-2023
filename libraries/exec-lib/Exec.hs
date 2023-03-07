@@ -18,10 +18,10 @@ currSF (Stack (s:_) _ _) = s
 currSF _ = throw FatalError
 
 
-getCurrentFunc :: [FunctionBlock] -> String -> Maybe FunctionBlock 
+getCurrentFunc :: [FunctionBlock] -> String -> Maybe FunctionBlock
 getCurrentFunc [] _ = Nothing
 getCurrentFunc (f:fs) a | funcName == a = Just f
-    where Function funcName _ = f 
+    where Function funcName _ = f
 getCurrentFunc (f:fs) a = getCurrentFunc fs a
 
 resolveVar :: String -> Stack -> Type
@@ -39,15 +39,15 @@ executeCond c cond lBranch rBranch stack = do
 
 processInstr :: [FunctionBlock] -> [Instruction] -> Stack -> IO Stack
 processInstr c [] stack = return stack
-processInstr c (Push a:is) stack = processInstr c is (pushVal val stack) 
+processInstr c (Push a:is) stack = processInstr c is (pushVal val stack)
     where val = resolveVar a stack
-processInstr c (Pop a:is) stack = processInstr c is (popVal (infer a) stack) 
+processInstr c (Pop a:is) stack = processInstr c is (popVal (infer a) stack)
 processInstr c (Call a:is) stack = executeFunc c a stack >>= processInstr c is
 processInstr c [Conditional cond lBranch rBranch] stack = executeCond c cond lBranch rBranch stack
 
 executeFunc :: [FunctionBlock] -> String -> Stack -> IO Stack
 executeFunc code name stack | isValidBuiltin name = execBuiltin (infer name) stack
 executeFunc code name (Stack stackFr argStack reg) = processInstr code instructions newStack
-    where 
+    where
         Function _ instructions = fromJust $ getCurrentFunc code name
         newStack = Stack (makeStackFrame name 0 : stackFr) argStack reg

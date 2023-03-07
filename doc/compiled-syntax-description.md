@@ -1,14 +1,13 @@
-# Syntax definition of our Compiled Scheme implementation
+****# Syntax definition of our Compiled Scheme implementation
 
 This document defines the compiled syntax of a scheme script [Augmented Backus-Naur form](https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_form) (also [ABNF](https://www.rfc-editor.org/rfc/rfc5234)).
 
 ## Table of Contents
 
-- [Syntax definition of our Compiled Scheme implementation](#syntax-definition-of-our-compiled-scheme-implementation)
-  - [Table of Contents](#table-of-contents)
-  - [ABNF](#abnf)
-  - [Keywords](#keywords)
-  - [Various Examples](#various-examples)
+- [Table of Contents](#table-of-contents)
+- [ABNF](#abnf)
+- [Keywords](#keywords)
+- [Various Examples](#various-examples)
 
 ## ABNF
 
@@ -50,8 +49,6 @@ instruction-list      = 1*instruction
 
 function-decl         = "func" identifier eol
 
-main-function-decl    = "main" eol
-
 function-end          = "end" eol
 
 conditional-decl      = "if" eol
@@ -66,9 +63,7 @@ conditional           = conditional-decl instruction-list conditional-then instr
 
 function              = function-decl (instruction-list / conditional) function-end eol
 
-main-function         = main-function-decl (instruction-list / conditional) function-end eol
-
-script                = main-function *function
+script                = *function
 
 ```
 
