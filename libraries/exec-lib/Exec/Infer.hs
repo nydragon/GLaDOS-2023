@@ -5,7 +5,7 @@ import Exec.Utils (parseNum)
 import Data.Char (isAlpha)
 import Utils (isValidBuiltin, isNumeric)
 import Control.Exception (throw)
-import Exec.RuntimeException (RuntimeException(Unimplemented))
+import Exec.RuntimeException (RuntimeException(Unimplemented, FatalError))
 
 isString :: String -> Bool
 isString str | head str == '"' && last str == '"' = True
@@ -26,3 +26,4 @@ infer str | isString str = Type.String str
 infer str | isNumeric str =  parseNum str
 infer str | isSymbol str = Type.Symbol str
 infer str | isList str = parseList str
+infer _ = throw FatalError

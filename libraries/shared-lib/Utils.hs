@@ -39,10 +39,10 @@ isNegativeInt str | not (null (tail str)) && all isDigit (tail str) && head str 
 isNegativeInt _ = False
 
 isPositiveFloat' :: String -> Integer -> Bool -> Bool
-isPositiveFloat' [x] c True | isDigit x = True
+isPositiveFloat' [x] _ True | isDigit x = True
 isPositiveFloat' (x:xs) c point | isDigit x = isPositiveFloat' xs (succ c) point
-isPositiveFloat' ('.':xs) c False = isPositiveFloat' xs 0 True
-isPositiveFloat' [x] c False | isDigit x = False
+isPositiveFloat' ('.':xs) _ False = isPositiveFloat' xs 0 True
+isPositiveFloat' [x] _ False | isDigit x = False
 isPositiveFloat' _ _ _ = False
 
 isPositiveFloat :: String -> Bool

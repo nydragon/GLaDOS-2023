@@ -10,9 +10,13 @@ import Utils (isValidBuiltin)
 import Exec.Utils (lookupRet)
 import qualified Exec.InferType as Type
 import qualified Data.Map
+import Control.Exception (throw)
+import Exec.RuntimeException (RuntimeException(FatalError))
 
 currSF :: Stack -> StackFrame
-currSF (Stack (s:sf) _ reg) = s
+currSF (Stack (s:_) _ _) = s
+currSF _ = throw FatalError
+
 
 getCurrentFunc :: [FunctionBlock] -> String -> Maybe FunctionBlock 
 getCurrentFunc [] _ = Nothing
