@@ -1,9 +1,6 @@
 module Parsing.Token where
 
-import Data.Maybe
-import Text.Read
-import Data.Char (isDigit)
-import Compilation.Utils (isPositiveInt, isNegativeInt, isPositiveFloat, isNegativeFloat)
+import Utils (isPositiveInt, isNegativeInt, isPositiveFloat, isNegativeFloat)
 import Parsing.TokenType
 
 -- ─── Tokenization ────────────────────────────────────────────────────────────────────────────────
