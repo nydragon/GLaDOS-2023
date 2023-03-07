@@ -1,8 +1,10 @@
 module Parser.ReadFile where
 
-import Instruction (Instruction (Pop, Push, Call, Init, Move))
+import Instruction (Instruction (Pop, Push, Call, Init, Move, Conditional))
 import Data.List (isPrefixOf)
 import FunctionBlock (FunctionBlock (Function))
+import Control.Exception (throw)
+import Exec.RuntimeException (RuntimeException(FatalError, NotAnInstruction))
 
 split' :: String -> String -> (String, String)
 split' lStr (' ':xs)  = (lStr,xs)
@@ -17,6 +19,48 @@ stringToInstruction str | "pop"  `isPrefixOf` str = Pop  $ drop 4 str
 stringToInstruction str | "call" `isPrefixOf` str = Call $ drop 5 str
 stringToInstruction str | "init" `isPrefixOf` str = Init $ drop 5 str
 stringToInstruction str | "move" `isPrefixOf` str = uncurry Move (split str)
+stringToInstruction str = throw $ NotAnInstruction str
+
+getCondition :: [String] -> ([Instruction], [String])
+getCondition (i:is) | "if" `isPrefixOf` i = ([con], rest) 
+    where (con, rest) = reduceConditional' (i:is)
+getCondition ("then":is) = ([], is)
+getCondition ("if":is) = (con, rest) 
+    where (con, rest) = getCondition is
+getCondition (i:is) = (stringToInstruction i:con, rest) 
+    where (con, rest) = getCondition is
+
+getLeftBranch :: [String] -> ([Instruction], [String])
+getLeftBranch (i:is) | "if" `isPrefixOf` i =  ([con], rest) 
+    where (con, rest) = reduceConditional' (i:is)
+getLeftBranch ("else":is) = ([], is)
+getLeftBranch ("then":is) = (con, rest) 
+    where (con, rest) = getLeftBranch is
+getLeftBranch (i:is) = (stringToInstruction i:con, rest) 
+    where (con, rest) = getLeftBranch is
+
+getRightBranch :: [String] -> ([Instruction], [String])
+getRightBranch (i:is) | "if" `isPrefixOf` i = ([con], rest) 
+    where (con, rest) = reduceConditional' (i:is)
+getRightBranch ("enif":is) = ([], is)
+getRightBranch ("else":is) = (con, rest) 
+    where (con, rest) = getRightBranch is
+getRightBranch (i:is) = (stringToInstruction i:con, rest) 
+    where (con, rest) = getRightBranch is
+ 
+reduceConditional' :: [String] -> (Instruction, [String])
+reduceConditional' instr = (Instruction.Conditional cond lBranch rBranch, rest3)
+    where
+        (cond, rest1) = getCondition (tail instr)
+        (lBranch, rest2) = getLeftBranch rest1
+        (rBranch, rest3) = getRightBranch rest2
+
+reduceConditional :: [String] -> Instruction
+reduceConditional instr = fst $ reduceConditional' instr
+
+parseBody :: [String] -> [Instruction]
+parseBody instr | "if" `isPrefixOf` head instr = [reduceConditional instr]
+parseBody instr = map stringToInstruction instr
 
 convertToInstructions :: [String] -> [FunctionBlock]
 convertToInstructions [] = []
@@ -27,7 +71,7 @@ convertToInstructions (l:ls)
     where
         (funcSection,rest) = break (== "end") ls
         name = drop 5 l
-        funcBody = map stringToInstruction funcSection
+        funcBody = parseBody funcSection
 
 splitOn :: Char -> String -> [String]
 splitOn del [] = []

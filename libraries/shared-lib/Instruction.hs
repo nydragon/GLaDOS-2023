@@ -33,7 +33,7 @@ instance Show Instruction where
     show (Call a) = "call " ++ a ++ "\n"
     show (Init a) = "init " ++ a ++ "\n"
     show (Move a b) = "move " ++ a ++ " " ++ b ++ "\n"
-    show (Conditional cond arr1 arr2) = condStr "if #RET\n" ++ arr1Str "else\n" ++ arr2Str "enif\n"
+    show (Conditional cond arr1 arr2) =  "if #RET\n" ++ condStr "then\n" ++ arr1Str "else\n" ++ arr2Str "enif\n"
         where
             condStr = showList cond
             arr1Str = showList arr1
