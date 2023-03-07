@@ -1,15 +1,23 @@
 func main
-push 3
-push 2
-call add
+if #RET
+call readInt
 push #RET
+push 3
+call >
+then
+if #RET
+push 6
+push #RET
+call <
+then
+push "bigger than 6"
 call println
-end
-
-func add
-pop a
-pop b
-push a
-push b
-call +
+else
+push "bigger than 3 but smaller than 6"
+call println
+enif
+else
+push "smaller than or equal to 3"
+call println
+enif
 end

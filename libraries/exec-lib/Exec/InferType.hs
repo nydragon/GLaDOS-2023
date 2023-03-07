@@ -50,6 +50,7 @@ instance Show Type where
   show (Integer a) = show a
   show (Symbol a) = a
   show (List a) = show a
+  show (Boolean a) = show a
   show Null = "Null"
 
 type Registers = Map.Map Type Type
