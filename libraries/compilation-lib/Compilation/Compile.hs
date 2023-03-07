@@ -44,12 +44,20 @@ compileProgram' (Ast.ExprList (x:xs)) reg = concatRetVal compiledLeftover compil
         compiledLeftover = compileProgram' (Ast.ExprList xs) reg
         (RetVal _ _ updatedReg) = compiledLeftover
         compiledExpr = compileExpr x updatedReg
+compileProgram' _ _ = throw FatalError
 
 compileProgram :: Ast.Expr -> RetVal
 compileProgram (Ast.ExprList ls) = compileProgram' list emptyRegistry
     where
         list = Ast.ExprList ls
 compileProgram _ = throw FatalError
+
+assembleProgram :: Ast.Expr -> [FunctionBlock]
+assembleProgram list = output
+    where
+        (RetVal instrs funcs _) = compileProgram list
+        mainFunc = Function "main" instrs
+        output = mainFunc : funcs
 
 -- ─── Function Compilation ────────────────────────────────────────────────────────────────────────
 

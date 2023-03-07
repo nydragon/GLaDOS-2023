@@ -1,49 +1,49 @@
 module Main where
 
--- Our modules
-
-import Exec.Eval (eval)
-import Exec.Registry (Registry, RetVal (RetVal), emptyRegistry)
-import Exec.InteractivePrompt ( interactiveMode )
 import Parsing.Args (Args (file, interactive), parse)
-import Parsing.Ast (Expr, parseExprList)
+import Parsing.Ast (Expr (ExprList), parseExprList)
 import Parsing.Cpt (parseTokenList)
 import Parsing.Token (tokenizeFile, tokenize)
 import Parsing.TokenType ( Token )
 
 import Data.Maybe (fromMaybe)
 import System.Environment (getArgs)
+import Compilation.Compile (assembleProgram, compileProgram)
 
 getFileName :: [String] -> Maybe FilePath -> String
 getFileName [] b = fromMaybe "stdin" b
 getFileName (x : xs) b = x
 
-runFile :: String -> IO ()
-runFile filename = do
+compileFile :: String -> IO ()
+compileFile filename = do
     -- Tokenize
     tokens <- tokenizeFile filename
-    execute tokens
+    compile tokens
 
-execute :: [Token] -> IO ()
-execute tokens = do
+compile :: [Token] -> IO ()
+compile tokens = do
      -- Parse CPT
     let cpt = parseTokenList tokens
 
     -- Parse AST
     let ast = parseExprList cpt
 
-    let reg = emptyRegistry
+    -- Compile
+    let assembledProgram = assembleProgram $ ExprList ast
 
-    evalTree ast reg
+    -- Print
+    print assembledProgram
 
-
-evalTree :: [Expr] -> Registry -> IO ()
-evalTree [x] reg = do
-    eval x reg
     return ()
-evalTree (x : xs) reg = do
-    (RetVal reg v) <- eval x reg
-    evalTree xs reg
+
+
+-- evalTree :: [Expr] -> Registry -> IO ()
+-- evalTree [x] reg = do
+--     eval x reg
+--     return ()
+-- evalTree (x : xs) reg = do
+--     (RetVal reg v) <- eval x reg
+--     evalTree xs reg
 
 
 main :: IO ()
@@ -53,11 +53,5 @@ main = do
 
     let fileName = getFileName fls (file res)
 
-    if interactive res
-    then interactiveMode -- interactive
-    else if fileName == "stdin"
-        then do
-            file <- getContents
-            execute $ tokenize file
-        else runFile fileName -- normal
+    compileFile fileName -- normal
     return ()
