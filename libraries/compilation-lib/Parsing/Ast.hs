@@ -32,7 +32,7 @@ instance Show Expr where
   show (Literal s) = show s
   show (Handle s) = show s
   show (Call _ _) = "#<procedure>"
-  show Null = "Null"
+  show Null = "NULL"
 
 -- ─── Parsing ─────────────────────────────────────────────────────────────────────────────────────
 
