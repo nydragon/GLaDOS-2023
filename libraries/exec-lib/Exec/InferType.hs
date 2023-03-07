@@ -58,13 +58,13 @@ type Registers = Map.Map Type Type
 type ArgStack = [Type]
 
 data StackFrame = StackFrame { localVars :: Registers, parentFunc :: String, parentOffset :: Integer}
-  deriving (Show)
+  deriving (Show, Eq)
 
 makeStackFrame :: String -> Integer -> StackFrame
 makeStackFrame a b = StackFrame { localVars = Map.empty, parentFunc = a, parentOffset = b}
 
 data Stack = Stack [StackFrame] ArgStack Registers
-  deriving (Show)
+  deriving (Show, Eq)
 
 initStack :: Stack
 initStack = Stack [] [] Map.empty

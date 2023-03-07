@@ -13,6 +13,7 @@ data Instruction
     | Init String
     | Move String String
     | Conditional [Instruction] [Instruction] [Instruction]
+    deriving (Eq)
 
 -- ─── Show Implementation ─────────────────────────────────────────────────────────────────────────
 

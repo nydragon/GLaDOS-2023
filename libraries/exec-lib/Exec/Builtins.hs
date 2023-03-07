@@ -1,14 +1,14 @@
 module Exec.Builtins where
 
 import Control.Exception (throwIO)
-import Data.Typeable ( Typeable, typeOf )
 import System.IO ( IOMode(ReadWriteMode), hGetContents )
 import GHC.IO.Handle.FD ( openFile )
 import Exec.InferType (Stack (Stack), Type)
 import qualified Exec.InferType as Type
 import Exec.RuntimeException
     ( RuntimeException(InvalidArgumentCount, UndefinedBehaviour) )
-import Exec.Utils (assignRet, isNumeric, parseNum)
+import Exec.Utils (assignRet, parseNum)
+import Utils (isNumeric)
 
 -- ─── Builtin Execution ───────────────────────────────────────────────────────────────────────────
 

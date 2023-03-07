@@ -32,6 +32,7 @@ test: clean
 ifeq ($(filter unit,$(MAKECMDGOALS)),unit)
 	@cabal run unit-tests --test-show-details=direct
 else ifeq ($(filter integration,$(MAKECMDGOALS)),integration)
+	make build
 	@cabal run integration-tests --test-show-details=direct
 else
 	@cabal run unit-tests --test-show-details=direct
