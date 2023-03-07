@@ -18,6 +18,7 @@ data RuntimeException
   | NullDivision
   | FatalError -- For stuff that shouldn't happen
   | AlreadyDefined
+  | NotAnInstruction String
   deriving (Eq)
 
 instance Exception RuntimeException
@@ -31,5 +32,7 @@ instance Show RuntimeException where
   show (InvalidArgumentCount fn) = "InvalidArgumentCount: Function " ++ fn ++ " received an invalid amount of arguments."
   show NullDivision = "NullDivision: Did you not pay attention in math class?"
   show FatalError = "FatalError"
+  show (NotAnInstruction msg) = "NotAnInstruction: " ++ msg
   show AlreadyDefined = "AlreadyDefined"
+
   show _ = "oh oh"
