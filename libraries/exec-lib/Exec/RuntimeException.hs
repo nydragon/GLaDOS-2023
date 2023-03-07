@@ -19,6 +19,7 @@ data RuntimeException
   | FatalError -- For stuff that shouldn't happen
   | AlreadyDefined
   | NotAnInstruction String
+  | UnknownType String
   deriving (Eq)
 
 instance Exception RuntimeException
@@ -34,5 +35,6 @@ instance Show RuntimeException where
   show FatalError = "FatalError"
   show (NotAnInstruction msg) = "NotAnInstruction: " ++ msg
   show AlreadyDefined = "AlreadyDefined"
+  show (UnknownType val) = "UnknownType: Type couldn't be inferred " ++ val
 
   show _ = "oh oh"
