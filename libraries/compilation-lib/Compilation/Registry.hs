@@ -7,6 +7,14 @@ import Data.List
 --   Variable names
 type Registry = ([String], [String])
 
+-- ─── Addition ────────────────────────────────────────────────────────────────────────────────────
+
+addVar :: String -> Registry -> Registry
+addVar s (f, v) = (f, s : v)
+
+addFunction :: String -> Registry -> Registry
+addFunction s (f, v) = (f, s : v)
+
 -- ─── Utility Functions ──────────────────────────────────────────────────────────────────────────
 
 isFunction :: String -> Registry -> Bool
