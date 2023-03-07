@@ -8,17 +8,28 @@ import Exec.RuntimeException (RuntimeException(FatalError, NotAnInstruction))
 
 split' :: String -> String -> (String, String)
 split' lStr (' ':xs)  = (lStr,xs)
-split' lStr (x:xs) = split' xs (lStr ++ [x])
+split' lStr (x:xs) = split' (lStr ++ [x]) xs
+split' "" "" = throw FatalError
+split' (_:_) [] = throw FatalError
+
+splitString :: String -> String -> (String, String)
+splitString lStr ('\\': x: xs) = splitString (lStr ++ "\\" ++ [x]) xs
+splitString lStr ('"': ' ' : xs) = (lStr ++ "\"", xs)
+splitString lStr (x:xs) = splitString (lStr ++ [x]) xs
+splitString "" "" = throw FatalError
+splitString (_:_) "" = throw FatalError
 
 split :: String -> (String, String)
-split = split' ""
+split "" = throw FatalError
+split str | head str == '\"' = splitString "" str
+split str = split' "" str
 
 stringToInstruction :: String -> Instruction 
 stringToInstruction str | "push" `isPrefixOf` str = Push $ drop 5 str
 stringToInstruction str | "pop"  `isPrefixOf` str = Pop  $ drop 4 str
 stringToInstruction str | "call" `isPrefixOf` str = Call $ drop 5 str
 stringToInstruction str | "init" `isPrefixOf` str = Init $ drop 5 str
-stringToInstruction str | "move" `isPrefixOf` str = uncurry Move (split str)
+stringToInstruction str | "move" `isPrefixOf` str = uncurry Move (split $ drop 5 str)
 stringToInstruction str = throw $ NotAnInstruction str
 
 getCondition :: [String] -> ([Instruction], [String])
@@ -29,6 +40,7 @@ getCondition ("if":is) = (con, rest)
     where (con, rest) = getCondition is
 getCondition (i:is) = (stringToInstruction i:con, rest) 
     where (con, rest) = getCondition is
+getCondition [] = throw FatalError
 
 getLeftBranch :: [String] -> ([Instruction], [String])
 getLeftBranch (i:is) | "if" `isPrefixOf` i =  ([con], rest) 
@@ -38,6 +50,7 @@ getLeftBranch ("then":is) = (con, rest)
     where (con, rest) = getLeftBranch is
 getLeftBranch (i:is) = (stringToInstruction i:con, rest) 
     where (con, rest) = getLeftBranch is
+getLeftBranch [] = throw FatalError
 
 getRightBranch :: [String] -> ([Instruction], [String])
 getRightBranch (i:is) | "if" `isPrefixOf` i = ([con], rest) 
@@ -47,6 +60,8 @@ getRightBranch ("else":is) = (con, rest)
     where (con, rest) = getRightBranch is
 getRightBranch (i:is) = (stringToInstruction i:con, rest) 
     where (con, rest) = getRightBranch is
+getRightBranch [] = throw FatalError
+
  
 reduceConditional' :: [String] -> (Instruction, [String])
 reduceConditional' instr = (Instruction.Conditional cond lBranch rBranch, rest3)
@@ -74,7 +89,7 @@ convertToInstructions (l:ls)
         funcBody = parseBody funcSection
 
 splitOn :: Char -> String -> [String]
-splitOn del [] = []
+splitOn _ [] = []
 splitOn del str 
     | not $ null rest = substring : splitOn del (tail rest)
     | otherwise = [substring]

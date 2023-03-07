@@ -15,7 +15,7 @@ getOutput :: String -> IO Bool
 getOutput fn =
   test fn
     =<< readProcessWithExitCode
-      "./glados"
+      "./runner_lnk"
       [ ("./integration-tests/TestFiles/" ++ fn ++ ".scm") ]
       ""
 

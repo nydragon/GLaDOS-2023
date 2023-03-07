@@ -11,7 +11,7 @@ data RuntimeException
   = InvalidFunctionCall String
   | InvalidFunctionDefinition String
   | UndefinedBehaviour -- Pretty much for anything that shouldn't ever happen
-  | NotYetImplemented
+  | Unimplemented
   -- args: argument index, expected type, got type
   | InvalidArgument Integer String String
   | InvalidArgumentCount String
@@ -27,7 +27,7 @@ instance Show RuntimeException where
   show :: RuntimeException -> String
   show (InvalidFunctionCall a) = "InvalidFunctionCall: " ++ a ++ " is not a function."
   show UndefinedBehaviour = "UndefinedBehaviour: This behaviour is undefined."
-  show NotYetImplemented = "NotYetImplemented"
+  show Unimplemented = "Unimplemented"
   show (InvalidArgument a b c) = "InvalidArgument: argument " ++ show a ++ ", expected '" ++ b ++ "' but received '" ++ c ++ "'."
   show (InvalidArgumentCount fn) = "InvalidArgumentCount: Function " ++ fn ++ " received an invalid amount of arguments."
   show NullDivision = "NullDivision: Did you not pay attention in math class?"
