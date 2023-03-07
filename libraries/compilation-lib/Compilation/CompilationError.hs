@@ -2,11 +2,16 @@
 
 module Compilation.CompilationError where
 
+import Control.Exception
+
 data CompilationError =
     NotAFunction String
     | VariableAlreadyDefined String
     | FatalError
     | Unimplemented
+    deriving (Eq)
+
+instance Exception CompilationError
 
 instance Show CompilationError where
     show :: CompilationError -> String
