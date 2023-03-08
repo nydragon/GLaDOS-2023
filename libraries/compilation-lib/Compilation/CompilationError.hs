@@ -8,6 +8,7 @@ data CompilationError =
     NotAFunction String
     | VariableNotDefined String
     | VariableAlreadyDefined String
+    | NonAtomicValue
     | FatalError
     | Unimplemented
     deriving (Eq)
@@ -19,5 +20,6 @@ instance Show CompilationError where
     show (NotAFunction name) = "Error: '" ++ name ++ "' cannot be compiled to function."
     show (VariableNotDefined name) = "Error: '" ++ name ++ "' is not a variable"
     show (VariableAlreadyDefined name) = "Error: '" ++ name ++ "' has already been defined."
+    show NonAtomicValue = "Error: List contains "
     show FatalError = "Error: Fatal Error."
     show Unimplemented = "Error: This feature of the language has not yet been implemented."

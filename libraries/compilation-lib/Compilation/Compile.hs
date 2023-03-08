@@ -10,7 +10,6 @@ import FunctionBlock
 import Instruction
 
 import Control.Exception
-import Data.Maybe
 import Debug.Trace
 
 -- ─── Compile Expression ──────────────────────────────────────────────────────────────────────────
@@ -76,6 +75,7 @@ convertToCall :: Ast.Expr -> Registry -> Maybe Ast.Expr
 convertToCall (Ast.ExprList (Ast.Symbole name : ls)) reg = if isFunction name reg
     then Just $ Ast.Call name ls
     else Nothing
+convertToCall _ _ = Nothing
 
 -- ─── Variable Compilation ────────────────────────────────────────────────────────────────────────
 
@@ -84,15 +84,17 @@ convertToCall (Ast.ExprList (Ast.Symbole name : ls)) reg = if isFunction name re
 -- Note : This does not check the registry if the variable is already defined
 -- Args : Ast.Call (Expected to haveproper define form for a variable definition) -> reg -> functions
 compileVariable :: Ast.Expr -> Registry -> RetVal
-compileVariable (Ast.Call "define" [Ast.Symbole s, Ast.ExprList ls]) reg = throw Unimplemented
 compileVariable (Ast.Call "define" [Ast.Symbole s, Ast.Call name args]) reg = throw Unimplemented
-compileVariable (Ast.Call "define" [Ast.Symbole s1, Ast.Symbole s2]) reg = if not $ isVariable s2 reg
-    then throw $ VariableNotDefined s2
-    else RetVal instructions [] newReg
+compileVariable (Ast.Call "define" [Ast.Symbole s1, Ast.Symbole s2]) reg = if isVariable s2 reg
+    then RetVal instructions [] newReg
+    else throw $ VariableNotDefined s2
         where
             newReg = addVar s1 reg
             instructions = [Init s1, Move s1 s2]
-compileVariable (Ast.Call "define" [Ast.Symbole s, atom]) reg = RetVal instructions [] newReg
-    where
-        newReg = addVar s reg
-        instructions = [Init s, Move s $ show atom]
+compileVariable (Ast.Call "define" [Ast.Symbole s, atom]) reg = if isAtomic atom
+    then RetVal instructions [] newReg
+    else throw NonAtomicValue
+        where
+            newReg = addVar s reg
+            instructions = [Init s, Move s $ show atom]
+compileVariable _ _ = throw FatalError
