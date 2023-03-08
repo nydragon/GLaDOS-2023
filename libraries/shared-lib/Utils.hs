@@ -28,6 +28,8 @@ isValidBuiltin "last" = True
 isValidBuiltin "join" = True
 isValidBuiltin "read" = True
 isValidBuiltin "readInt" = True
+isValidBuiltin "pushFront" = True
+isValidBuiltin "pushBack" = True
 isValidBuiltin _ = False
 
 isPositiveInt :: String -> Bool
