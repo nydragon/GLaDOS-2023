@@ -8,7 +8,6 @@ import Compilation.CompilationError
 import FunctionBlock ( FunctionBlock(..) )
 import Instruction ( Instruction(Move, Call, Push, Init, Pop, Conditional) )
 import Control.Exception ( throw )
-import Debug.Trace (trace)
 
 -- ─── Compile Expression ──────────────────────────────────────────────────────────────────────────
 
@@ -25,7 +24,7 @@ isLambda _ = False
 compileExpr :: Ast.Expr -> Registry -> RetVal
 compileExpr expr reg | isLambda expr = compileFunction expr reg
 
-compileExpr (Ast.Call "if" body) reg = trace ("in if " ++ show body) compileConditional (Ast.Call "if" body) reg
+compileExpr (Ast.Call "if" body) reg = compileConditional (Ast.Call "if" body) reg
 compileExpr (Ast.Call "define" ((Ast.Symbole s) : val)) reg = compileVariable call reg
     where call = Ast.Call "define" (Ast.Symbole s : val)
 
@@ -103,7 +102,7 @@ flipL = foldl (flip (:)) []
 compileCall :: Ast.Expr -> Registry -> RetVal
 compileCall (Ast.Call funcName args) reg | isAtomic (Ast.ExprList args) = RetVal instruction [] reg
     where instruction = [Push $ show arg | arg <- flipL args] ++ [Call funcName, Push "#RET"] 
-compileCall (Ast.Call funcName args) reg = trace ("here" ++ funcName ++ " " ++ show args) RetVal (instructions ++ [Call funcName, Push "#RET"]) [] reg
+compileCall (Ast.Call funcName args) reg = RetVal (instructions ++ [Call funcName, Push "#RET"]) [] reg
     where (RetVal instructions _ _) = compileCallArgs (Ast.ExprList $ flipL args) reg
 compileCall (Ast.ExprList (Ast.Symbole name : args)) reg | name `elem` fst reg = compileCall (Ast.Call name args) reg
 compileCall _ _ = throw $ FatalError "compileCall"

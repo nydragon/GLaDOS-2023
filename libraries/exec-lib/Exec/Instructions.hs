@@ -6,7 +6,6 @@ import qualified Exec.InferType as Type
 import Control.Exception (throw)
 import Exec.RuntimeException (RuntimeException(FatalError))
 import Exec.Utils (assignRet)
-import Debug.Trace (trace)
 
 pushVal :: Type -> Stack -> Stack
 pushVal (Type.Symbol sym) (Stack sf as reg) = Stack sf (resolveVar (Type.Symbol sym) reg : as) reg
@@ -29,7 +28,7 @@ initVar (Type.Symbol sym) (Stack sf as reg) = Stack sf as (insert (Type.Symbol s
 initVar _ _ = throw $ FatalError "initVar"
 
 moveVar :: Type -> Type -> Stack -> Stack 
-moveVar (Type.Symbol "#RET") val (Stack sf as reg) = trace (show val)  Stack sf as (assignRet val reg)
+moveVar (Type.Symbol "#RET") val (Stack sf as reg) = Stack sf as (assignRet val reg)
 moveVar (Type.Symbol sym) val (Stack sf as reg) = Stack sf as (insert (Type.Symbol sym) val reg)
 moveVar _ _ _ = throw $ FatalError "moveVar"
 
