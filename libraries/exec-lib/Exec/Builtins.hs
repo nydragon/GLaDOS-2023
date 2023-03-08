@@ -35,6 +35,8 @@ execBuiltin (Type.Symbol "last") = lastBuiltin
 execBuiltin (Type.Symbol "join") = joinBuiltin
 execBuiltin (Type.Symbol "read") = readBuiltin
 execBuiltin (Type.Symbol "readInt") = readIntBuiltin
+execBuiltin (Type.Symbol "pushFront") = pushFrontBuiltin
+execBuiltin (Type.Symbol "pushBack") = pushBackBuiltin
 execBuiltin t = trace (show t) return $ throwIO UndefinedBehaviour -- Builtin not found
 
 -- ─── Builtin Implementations ─────────────────────────────────────────────────────────────────────
@@ -153,6 +155,18 @@ joinBuiltin (Stack callStack (Type.List a : Type.List b : newArgStack) reg) = re
 joinBuiltin (Stack callStack (Type.String a : Type.String b : newArgStack) reg) = return newStack
     where newStack = Stack callStack newArgStack $ assignRet (Type.String $ a ++ b) reg
 joinBuiltin _ = throwIO $ FatalError ""
+
+pushFrontBuiltin :: Stack -> IO Stack
+pushFrontBuiltin (Stack _ argStack _) | null argStack = throwIO $ InvalidArgumentCount "push"
+pushFrontBuiltin (Stack callStack (Type.List a : b : newArgStack) reg) = return newStack
+    where newStack = Stack callStack newArgStack $ assignRet (Type.List  (b : a)) reg
+pushFrontBuiltin _ = throwIO $ FatalError ""
+
+pushBackBuiltin :: Stack -> IO Stack
+pushBackBuiltin (Stack _ argStack _) | null argStack = throwIO $ InvalidArgumentCount "push"
+pushBackBuiltin (Stack callStack (Type.List a : b : newArgStack) reg) = return newStack
+    where newStack = Stack callStack newArgStack $ assignRet (Type.List  (a ++ [b])) reg
+pushBackBuiltin _ = throwIO $ FatalError ""
 
 readBuiltin :: Stack -> IO Stack
 readBuiltin (Stack callStack argStack reg) = do

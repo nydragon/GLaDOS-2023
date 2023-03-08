@@ -5,6 +5,7 @@ module Parsing.Ast where
 import qualified Parsing.Cpt as Cpt
 import Parsing.Infix (infixToPrefix)
 import GHC.IO.Handle
+import Utils (isValidBuiltin)
 
 -- ─── Abstract Syntax Tree ───────────────────────────────────────────────────────────────────────
 
@@ -69,33 +70,3 @@ exprListToCall :: [Expr] -> Maybe Expr
 exprListToCall [] = Nothing
 exprListToCall (Symbole name : xs) = Just (Call name xs)
 exprListToCall _ = Nothing
-
--- This is where we put builtins
-isValidBuiltin :: String -> Bool
-isValidBuiltin "define" = True
-isValidBuiltin "lambda" = True
-isValidBuiltin "+" = True
-isValidBuiltin "-" = True
-isValidBuiltin "/" = True
-isValidBuiltin "*" = True
-isValidBuiltin "%" = True
-isValidBuiltin "<" = True
-isValidBuiltin "<=" = True
-isValidBuiltin ">" = True
-isValidBuiltin ">=" = True
-isValidBuiltin "if" = True
-isValidBuiltin "println" = True
-isValidBuiltin "print" = True
-isValidBuiltin "==" = True
-isValidBuiltin "/=" = True
-isValidBuiltin "readFile" = True
-isValidBuiltin "openFile" = True
-isValidBuiltin "head" = True
-isValidBuiltin "tail" = True
-isValidBuiltin "init" = True
-isValidBuiltin "last" = True
-isValidBuiltin "join" = True
-isValidBuiltin "read" = True
-isValidBuiltin "readInt" = True
-isValidBuiltin _ = False
-

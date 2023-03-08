@@ -48,17 +48,17 @@ compileExprList' (Ast.ExprList []) reg = RetVal [] [] reg
 compileExprList' _ _ = throw $ FatalError "compileExprList'"
 
 -- Entry point function for compileExprList'
-compileExprList :: Ast.Expr -> RetVal
-compileExprList (Ast.ExprList ls) = compileExprList' list emptyRegistry
+compileExprList :: Ast.Expr -> Registry -> RetVal
+compileExprList (Ast.ExprList ls) reg = compileExprList' list reg
     where list = Ast.ExprList ls
-compileExprList _ = throw $ FatalError "compileExprList"
+compileExprList _ _ = throw $ FatalError "compileExprList"
 
 -- Compiles program into list of FunctionBlock INCLUDING main func
 -- Arg : ExprList to be compiled (corresponds to base depth level of input code)
 compileProgram :: Ast.Expr -> [FunctionBlock]
 compileProgram list = output
     where
-        (RetVal instrs funcs _) = compileExprList list
+        (RetVal instrs funcs _) = compileExprList list emptyRegistry
         mainFunc = Function "main" instrs
         output = mainFunc : funcs
 
