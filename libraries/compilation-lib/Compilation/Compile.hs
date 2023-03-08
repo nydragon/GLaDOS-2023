@@ -135,9 +135,10 @@ takeNames _ = throw $ FatalError "takeNames"
 
 
 compileFunction :: Ast.Expr -> Registry -> RetVal
-compileFunction (Ast.Call "define" [Ast.Symbole name, Ast.Call "lambda" [Ast.ExprList args, astBody]]) reg = RetVal [] [Function name (Pop "a" : Pop "b" :  body)] (addFunction name newReg)
+compileFunction (Ast.Call "define" [Ast.Symbole name, Ast.Call "lambda" [Ast.ExprList args, astBody]]) reg = RetVal [] [Function name (popedArgs ++  body)] newReg
     where
-        (RetVal body _ newReg) = compileExpr astBody (addVars (takeNames args) reg)
+        popedArgs = map Pop (takeNames args)
+        (RetVal body _ newReg) = compileExpr astBody (addVars (takeNames args) (addFunction name reg))
 compileFunction _ _ = throw $ FatalError "compileFunction"
 
 compileBranch :: Ast.Expr -> Registry -> RetVal
