@@ -40,11 +40,11 @@ compileExpr _ _ = throw FatalError
 --
 -- This will compile all instructions inside a retval as well as saving additional function declarations
 compileExprList' :: Ast.Expr -> Registry -> RetVal
-compileExprList' (Ast.ExprList (x:xs)) reg = concatRetVal compiledLeftover compiledExpr
+compileExprList' (Ast.ExprList (x:xs)) reg = concatRetVal compiledExpr compiledLeftover
     where
-        compiledLeftover = compileExprList' (Ast.ExprList xs) reg
-        (RetVal _ _ updatedReg) = compiledLeftover
-        compiledExpr = compileExpr x updatedReg
+        compiledExpr = compileExpr x reg
+        (RetVal _ _ updatedReg) = compiledExpr
+        compiledLeftover = compileExprList' (Ast.ExprList xs) updatedReg
 compileExprList' (Ast.ExprList []) reg = RetVal [] [] reg
 compileExprList' _ _ = throw FatalError
 
