@@ -20,11 +20,12 @@
 - Written in **Haskell**
 - **Strict** testing policy
     - Continuous integration running tests on every **Pull Request**
-    - **Over 60** Unit tests and close to **50% coverage**
+    - **Over 100** Unit tests and close to **50% coverage**
     - **Close to 20** Integration tests
 - **Abstract Syntax Tree** and **Concrete Parse Tree** implementation
 - Standard input reading
 - An [ABNF syntax description](./doc/syntax-description.md)
+- An [ABNF syntax description for the "compiled" code](./doc/compiled-syntax-description)
 - **Infix notations** for operators and custom functions
 
 ## Supported Scheme Features

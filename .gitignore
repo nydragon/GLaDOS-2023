@@ -26,3 +26,5 @@ glados
 tmp
 packagedb
 /*.scm
+*_lnk
+a.out

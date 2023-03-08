@@ -2,7 +2,7 @@ name: Haskell CI
 
 on:
   pull_request:
-    branches: [main, develop]
+    branches: [main, develop, compilation-develop]
 
 permissions:
   contents: read
@@ -38,6 +38,5 @@ jobs:
         run: cabal build --enable-tests --enable-benchmarks all
       - name: Run tests
         run: |
-          find .  -wholename "*glados/glados" -exec cp {} . \;;
-          cabal test all;
+          make test;
 
