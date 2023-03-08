@@ -1,93 +1,148 @@
 cabal-version:      2.4
 name:               GLaDOS2023
-version:            0.1.0.0
--- A short (one-line) description of the package.
--- synopsis:
-
--- A longer description of the package.
--- description:
-
--- A URL where users can report bugs.
--- bug-reports:
-
--- The license under which the package is released.
--- license:
+version:            0.2.0.0
 author:             Nydragon
 
--- A copyright notice.
--- copyright:
--- category:
 extra-source-files:
     CHANGELOG.md
     README.md
 
-library
+--
+-- Compilation
+--
+
+library compilation-lib
     default-language: Haskell2010
-    hs-source-dirs:   lib
-    exposed-modules:  Parsing,
+    build-depends:    base >= 4.14.1.0, containers >= 0.5.10.2, shared-lib
+    hs-source-dirs:   libraries/compilation-lib
+    ghc-options: -Wall -debug
+    exposed-modules:
         Parsing.Args,
-        Parsing.Token,
-        Parsing.TokenType,
         Parsing.Ast,
         Parsing.Cpt,
         Parsing.Infix,
-        Exec,
-        Exec.RuntimeException,
-        Exec.Function,
-        Exec.Variables
-        Exec.Registry,
-        Exec.Builtins,
-        Exec.InteractivePrompt
-        Exec.Eval,
-        Exec.Utils
+        Parsing.Token,
+        Parsing.TokenType,
+        Compilation.Utils,
+        Compilation.Compile,
+        Compilation.CompilationError,
+        Compilation.Registry,
+        Compilation.RetVal
 
-
-    hs-source-dirs:   lib
-    build-depends:    base >= 4.14.1.0, containers
-    default-language: Haskell2010
-    build-depends:    base >= 4.14.1.0,
-        containers >=0.5.10.2
-
+-- Compiler
 executable glados
     default-language: Haskell2010
-    hs-source-dirs:   app test
-    main-is:          Main.hs
-    -- Modules included in this executable, other than Main.
-    -- LANGUAGE extensions used by modules in this package.
-    -- other-extensions:
-    build-depends:    base  >= 4.14.1.0, tasty >= 1.4.3, tasty-discover >= 5.0.0, tasty-hunit >= 0.10.0.3, containers >=0.5.10.2, GLaDOS2023
+    hs-source-dirs: compiler unit-tests
+    ghc-options: -Wall -debug
+    build-depends:  base >= 4.14.1.0,
+                    compilation-lib,
+                    shared-lib,
+                    -- Testing deps are here for vscode highlighting purposes
+                    tasty >= 1.4.3,
+                    tasty-discover >= 5.0.0,
+                    tasty-hunit >= 0.10.0.3,
+                    containers >= 0.5.10.2
+    main-is: Main.hs
 
+--
+-- Execution
+--
 
-test-suite unitTest
+library exec-lib
     default-language: Haskell2010
-    type: exitcode-stdio-1.0
-    hs-source-dirs: unitTest
-    main-is: TestMain.hs
-    other-modules: Parsing.ArgsTests,
-        Parsing.TokenTests,
-        Parsing.CptTests,
-        Parsing.AstTests,
-        Parsing.InfixTests,
-        ParsingTests,
-        ExecTests
-    build-depends: base >=4.14.1.0,
-        tasty >= 1.4.3,
-        tasty-discover >= 5.0.0,
-        tasty-hunit >= 0.10.0.3,
-        containers >=0.5.10.2,
-        GLaDOS2023
+    hs-source-dirs: libraries/exec-lib
+    build-depends: base >= 4.14.1.0, shared-lib, containers
+    ghc-options: -Wall
+    exposed-modules:
+        Parser.ReadFile,
+        Exec.InferType,
+        Exec.Builtins,
+        Exec.Infer,
+        Exec.Instructions,
+        Exec.RuntimeException,
+        Exec.Utils,
+        Exec
 
-test-suite integrationTest
+executable runner
     default-language: Haskell2010
-    type:               exitcode-stdio-1.0
-    hs-source-dirs:     integrationTests/
+    hs-source-dirs: runner
+    build-depends: base >= 4.14.1.0, exec-lib
+    main-is: Main.hs
+
+--
+-- Shared
+--
+
+library shared-lib
+    default-language: Haskell2010
+    build-depends:    base >= 4.14.1.0, containers >= 0.5.10.2
+    hs-source-dirs:   libraries/shared-lib
+    ghc-options: -Wall
+    exposed-modules:
+        Instruction,
+        FunctionBlock,
+        Utils
+
+--
+-- Interactive
+--
+
+executable sun-tzu
+    default-language:   Haskell2010
+    build-depends:      base >= 4.14.1.0,
+                        containers,
+                        shared-lib,
+                        compilation-lib,
+                        exec-lib
+    hs-source-dirs:     interactive
     main-is:            Main.hs
-    other-modules: Print
-        Test
+    ghc-options:        -Wall
+    other-modules:
+        Utils
+
+--
+-- Tests
+--
+
+test-suite unit-tests
+    default-language: Haskell2010
+    hs-source-dirs: tests/unit-tests
     build-depends:  base >=4.14.1.0,
-        ansi-terminal >= 0.11.3,
-        process >= 1.6.8.0,
-        filepath >= 1.4.2.1,
-        directory >= 1.3.3.0,
-        exitcode >= 0.1.0.0,
-        GLaDOS2023
+                    tasty >= 1.4.3,
+                    tasty-discover >= 5.0.0,
+                    tasty-hunit >= 0.10.0.3,
+                    containers >=0.5.10.2,
+                    exec-lib,
+                    compilation-lib,
+                    shared-lib
+    main-is: TestMain.hs
+    type: exitcode-stdio-1.0
+    other-modules:
+        CompilationLib.Parser.ArgsTests,
+        CompilationLib.Parser.TokenTests,
+        CompilationLib.Parser.CptTests,
+        CompilationLib.Parser.AstTests,
+        CompilationLib.Parser.InfixTests,
+        ExecLib.Exec.Infer,
+        ExecLib.Exec.Instructions,
+        ExecLib.Exec.Utils,
+        ExecLib.Parser.ReadFile,
+        CompilationLib
+        ExecLib
+
+test-suite integration-tests
+    default-language: Haskell2010
+    hs-source-dirs: tests/integration-tests
+    build-depends:  base >=4.14.1.0,
+                    ansi-terminal >= 0.11.3,
+                    process >= 1.6.8.0,
+                    filepath >= 1.4.2.1,
+                    directory >= 1.3.3.0,
+                    exitcode >= 0.1.0.0,
+                    exec-lib,
+                    compilation-lib
+    main-is: Main.hs
+    type: exitcode-stdio-1.0
+    other-modules:
+        Print,
+        Test

@@ -1,10 +1,25 @@
 cradle:
   cabal:
-    - path: "./lib"
-      component: "lib:GLaDOS2023"
+    - path: "./libraries/compilation-lib"
+      component: "GLaDOS2023:lib:compilation-lib"
 
-    - path: "./app/Main.hs"
+    - path: "./libraries/shared-lib"
+      component: "GLaDOS2023:lib:shared-lib"
+
+    - path: "./libraries/exec-lib"
+      component: "GLaDOS2023:lib:exec-lib"
+
+    - path: "./compiler/Main.hs"
       component: "GLaDOS2023:exe:glados"
 
-    - path: "./test"
-      component: "GLaDOS2023:test:test"
+    - path: "./runner/Main.hs"
+      component: "GLaDOS2023:exe:runner"
+
+    - path: "./interactive/Main.hs"
+      component: "GLaDOS2023:exe:sun-tzu"
+
+    - path: "./tests/unit-tests"
+      component: "GLaDOS2023:test:unit-tests"
+
+    - path: "./tests/integration-tests"
+      component: "GLaDOS2023:test:integration-tests"
