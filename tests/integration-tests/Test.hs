@@ -13,12 +13,12 @@ getFiles = map takeBaseName . filter (isSuffixOf ".scm") <$> filter (`notElem` [
 
 getOutput :: String -> IO Bool
 getOutput fn = do
-  callCommand ("./glados_lnk ./tests/integration-tests/TestFiles/" ++ fn ++ ".scm")
-  test fn =<< readProcessWithExitCode "./runner_lnk" [ ("a.out") ] ""
+  readProcessWithExitCode "./glados_lnk" ["./tests/integration-tests/TestFiles/" ++ fn ++ ".scm"] ""
+  test fn =<< readProcessWithExitCode "./runner_lnk" ["a.out"] ""
 
 test :: String -> (ExitCode, String, String) -> IO Bool
 test fn (ex, out, err) = do
   solvedStr <- readFile ("./tests/integration-tests/TestFiles/" ++ fn ++ ".scm.slv")
-  printRes (solvedStr == out) (isInfixOf "error" fn) ex
+  printRes (solvedStr == out) ("error" `isInfixOf` fn) ex
   putStrLn fn
   return (solvedStr == out)
