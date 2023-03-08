@@ -37,6 +37,7 @@ executable glados
     ghc-options: -Wall -debug
     build-depends:  base >= 4.14.1.0,
                     compilation-lib,
+                    shared-lib,
                     -- Testing deps are here for vscode highlighting purposes
                     tasty >= 1.4.3,
                     tasty-discover >= 5.0.0,

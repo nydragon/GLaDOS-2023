@@ -6,8 +6,9 @@ import Compilation.RetVal ( RetVal(..), concatRetVal )
 import Compilation.Registry
 import Compilation.CompilationError
 import FunctionBlock ( FunctionBlock(..) )
-import Instruction ( Instruction(Move, Call, Push, Init, Pop) )
+import Instruction ( Instruction(Move, Call, Push, Init, Pop, Conditional) )
 import Control.Exception ( throw )
+import Debug.Trace (trace)
 
 -- ─── Compile Expression ──────────────────────────────────────────────────────────────────────────
 
@@ -22,19 +23,14 @@ isLambda _ = False
 -- Args : Expression -> Registry -> Defined Functions
 -- Return : (Instructions (if not function def), Updated function definitions)
 compileExpr :: Ast.Expr -> Registry -> RetVal
--- Lambda called on definition
--- compileExpr (Ast.ExprList (Ast.Call "lambda" [Ast.ExprList args, body] : argValues)) reg funcs = evalLambda args body argValues reg
--- Basic ExprList
--- compileExpr (Ast.ExprList ls) reg funcs = evalExprList ls reg
--- Function definition
 compileExpr expr reg | isLambda expr = compileFunction expr reg
--- Function Call
+
+compileExpr (Ast.Call "if" body) reg = trace ("in if " ++ show body) compileConditional (Ast.Call "if" body) reg
 compileExpr (Ast.Call "define" ((Ast.Symbole s) : val)) reg = compileVariable call reg
     where call = Ast.Call "define" (Ast.Symbole s : val)
-compileExpr (Ast.Call funcName args) reg = compileCall call reg
-    where call = Ast.Call funcName args
+
+compileExpr (Ast.Call funcName args) reg = compileCall (Ast.Call funcName args) reg
 compileExpr (Ast.ExprList (Ast.Symbole sym : xs)) reg | sym `elem` fst reg = compileCall (Ast.Call sym xs) reg
--- Variable definition
 compileExpr _ _ = throw $ FatalError "compileExpr"
 
 -- ─── Compilation Main Functions ──────────────────────────────────────────────────────────────────
@@ -68,21 +64,22 @@ compileProgram list = output
 
 -- ─── Function Compilation ────────────────────────────────────────────────────────────────────────
 
+isCall :: Ast.Expr -> Bool
+isCall (Ast.Call _ _) = True
+isCall _ = False
 -- Compiles an ExprList into instructions required for the function call
 -- Args are compiled from last to first
 --
 -- Args : Ast.ExprList -> Reg
 compileCallArgs :: Ast.Expr -> Registry -> RetVal
 compileCallArgs (Ast.ExprList []) reg = RetVal [] [] reg
-compileCallArgs (Ast.ExprList (Ast.Symbole name : x)) reg | name `elem` fst reg = compileCall (Ast.Call name x) reg 
-compileCallArgs (Ast.ExprList xs) reg
-    | isAtomic x = RetVal (instr ++ [Push $ show x]) [] reg
-    | isSymbol x = RetVal (instr ++ [Push $ show x]) [] reg
-    | otherwise = concatRetVal ret (RetVal instr [] reg)
+compileCallArgs (Ast.ExprList (Ast.Symbole name : x)) reg | name `elem` fst reg = compileCall (Ast.Call name x) reg
+compileCallArgs (Ast.ExprList (x:xs)) reg | isAtomic x || isSymbol x = RetVal (Push (show x) : instr) [] reg
+    where (RetVal instr _ _) = compileCallArgs (Ast.ExprList xs) reg
+compileCallArgs (Ast.ExprList (x:xs)) reg = concatRetVal ret (RetVal instr [] reg)
     where
-        x = last xs
-        (RetVal instr _ _) = compileCallArgs (Ast.ExprList (init xs)) reg
-        ret = compileCall x reg 
+        (RetVal instr _ _) = compileCallArgs (Ast.ExprList xs) reg
+        ret = compileExpr x reg 
 compileCallArgs _ _ = throw $ FatalError "compileCallArgs"
 
 flipL :: [a] -> [a]
@@ -94,8 +91,8 @@ flipL = foldl (flip (:)) []
 compileCall :: Ast.Expr -> Registry -> RetVal
 compileCall (Ast.Call funcName args) reg | isAtomic (Ast.ExprList args) = RetVal instruction [] reg
     where instruction = [Push $ show arg | arg <- flipL args] ++ [Call funcName, Push "#RET"] 
-compileCall (Ast.Call funcName args) reg = RetVal (instructions ++ [Call funcName, Push "#RET"]) [] reg
-    where (RetVal instructions _ _) = compileCallArgs (Ast.ExprList args) reg
+compileCall (Ast.Call funcName args) reg = trace ("here" ++ funcName ++ " " ++ show args) RetVal (instructions ++ [Call funcName, Push "#RET"]) [] reg
+    where (RetVal instructions _ _) = compileCallArgs (Ast.ExprList $ flipL args) reg
 compileCall (Ast.ExprList (Ast.Symbole name : args)) reg | name `elem` fst reg = compileCall (Ast.Call name args) reg
 compileCall _ _ = throw $ FatalError "compileCall"
 
@@ -142,3 +139,15 @@ compileFunction (Ast.Call "define" [Ast.Symbole name, Ast.Call "lambda" [Ast.Exp
     where
         (RetVal body _ newReg) = compileExpr astBody (addVars (takeNames args) reg)
 compileFunction _ _ = throw $ FatalError "compileFunction"
+
+compileBranch :: Ast.Expr -> Registry -> RetVal
+compileBranch a | isAtomic a = RetVal [Push $ show a] []
+compileBranch a = compileExpr a
+
+compileConditional :: Ast.Expr -> Registry -> RetVal
+compileConditional (Ast.Call _ [astCond, astLBranch, astRBranch]) reg = RetVal [Conditional cond lBranch rBranch] [] reg
+    where
+        (RetVal cond _ _) = compileBranch astCond reg
+        (RetVal lBranch _ _) = compileBranch astLBranch reg
+        (RetVal rBranch _ _) = compileBranch astRBranch reg
+compileConditional _ _ = throw $ FatalError "compileFunction"

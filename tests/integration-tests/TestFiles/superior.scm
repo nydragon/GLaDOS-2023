@@ -1,5 +1,5 @@
 (define (> a b)
-    (if (eq? a b)
+    (if (== a b)
         #f
         (if (< a b)
             #f

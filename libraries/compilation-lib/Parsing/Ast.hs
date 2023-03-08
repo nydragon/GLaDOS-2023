@@ -31,7 +31,7 @@ instance Show Expr where
   show (Symbole s) = s
   show (Literal s) = show s
   show (Handle s) = show s
-  show (Call _ _) = "#<procedure>"
+  show (Call _a _b) = "#<procedure>" ++ _a ++ show _b
   show Null = "NULL"
 
 -- ─── Parsing ─────────────────────────────────────────────────────────────────────────────────────

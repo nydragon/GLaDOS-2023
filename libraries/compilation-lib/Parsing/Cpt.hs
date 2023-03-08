@@ -2,7 +2,6 @@ module Parsing.Cpt where
 
 import Parsing.TokenType
 import Data.Maybe
-import Debug.Trace
 
 -- ─── Concrete Parsing Tree ───────────────────────────────────────────────────────────────────────
 
@@ -42,7 +41,7 @@ tokenToCpt (Keyword str) = Just (Sym str)
 -- Args : Tokens -> Output
 parseTokenList :: [Token] -> [Cpt]
 parseTokenList [] = []
-parseTokenList (CloseScope:xs) = [] -- Normally shouldn't happen
+parseTokenList (CloseScope:_) = [] -- Normally shouldn't happen
 parseTokenList (OpenScope:xs) = sublist : parseTokenList newList
         where   sublist = List (parseTokenList xs)
                 index = getCloseScope xs + 1
