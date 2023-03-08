@@ -74,7 +74,7 @@ getCloseScope' (_:xs) c1 c2 i = getCloseScope' xs c1 c2 (i + 1)
 -- EXPECTS : First token in list to be OpenScope
 getCloseScope :: [Token] -> Int
 getCloseScope [] = 0
-getCloseScope (x:xs) = getCloseScope' xs 1 0 1 -- index starts at 1 since first element is skipped
+getCloseScope (_:xs) = getCloseScope' xs 1 0 1 -- index starts at 1 since first element is skipped
 
 -- ─── Utilities ───────────────────────────────────────────────────────────────────────────────────
 

@@ -1,7 +1,8 @@
 module Parsing.Infix where
 
 import qualified Parsing.Cpt as Cpt
-import           Data.Maybe  (fromMaybe)
+import Control.Exception (throw)
+import Compilation.CompilationError (CompilationError(FatalError))
 
 getPrecedence ::  [Cpt.Cpt] -> Integer
 getPrecedence [] = 0
@@ -27,7 +28,7 @@ process buffer opStack expr
 -- when encountering an operator we pop the operator stack onto the value stack
 -- as described in Djikstra's shunting yard algorithm
 popStack :: [Cpt.Cpt] -> [Cpt.Cpt] -> [Cpt.Cpt] -> Integer-> [Cpt.Cpt]
-popStack [] buffer opStack i = fst $ process buffer opStack [] 
+popStack [] buffer opStack _ = fst $ process buffer opStack [] 
 popStack (x : infixExpr) buffer opStack i =  infixToPrefix'' infixExpr newBuffer (newOpStack <> [x]) (succ i)
       where
         (newBuffer, newOpStack) = process buffer opStack (x : infixExpr)  
@@ -39,6 +40,7 @@ infixToPrefix'' (x: xs) buffer opStack i
     | even i = infixToPrefix'' xs (buffer <> [x]) opStack (succ i)
     | odd i &&  (null opStack || (getOpPrecedence (last opStack) <= getOpPrecedence x)) = infixToPrefix'' xs buffer (opStack <> [x]) (succ i)
     | otherwise = popStack (x: xs) buffer opStack i
+infixToPrefix'' _ _ _ _ = throw $ FatalError "infixToPrefix''"
 
 infixToPrefix' :: [Cpt.Cpt] -> [Cpt.Cpt]
 infixToPrefix' a = reverseList $ infixToPrefix'' (reverseList a) [] [] 0
@@ -78,7 +80,7 @@ isInfix :: [Cpt.Cpt] -> Bool
 isInfix a = isInfix' a 0
 
 valid :: Cpt.Cpt -> Bool
-valid (Cpt.Sym a) = False
+valid (Cpt.Sym _) = False
 valid _ = True
 
 insertLists' :: [Cpt.Cpt] -> [Cpt.Cpt]
