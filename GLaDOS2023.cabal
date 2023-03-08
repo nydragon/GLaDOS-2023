@@ -23,7 +23,6 @@ library compilation-lib
         Parsing.Infix,
         Parsing.Token,
         Parsing.TokenType,
-        Compilation.Function,
         Compilation.Utils,
         Compilation.Compile,
         Compilation.CompilationError,

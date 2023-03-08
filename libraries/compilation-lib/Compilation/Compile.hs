@@ -23,7 +23,7 @@ compileExpr :: Ast.Expr -> Registry -> RetVal
 -- Basic ExprList
 -- compileExpr (Ast.ExprList ls) reg funcs = evalExprList ls reg
 -- Function definition
--- compileExpr (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg funcs = execCall (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg
+-- compileExpr (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg = execCall (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg
 -- Function Call
 compileExpr (Ast.Call funcName args) reg = compileCall call reg
     where call = Ast.Call funcName args
