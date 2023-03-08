@@ -5,10 +5,10 @@ import Parsing.Ast (Expr (ExprList), parseExprList)
 import Parsing.Cpt (parseTokenList)
 import Parsing.Token (tokenizeFile, tokenize)
 import Parsing.TokenType ( Token )
+import Compilation.Compile (compileProgram)
 
 import Data.Maybe (fromMaybe)
 import System.Environment (getArgs)
-import Compilation.Compile (assembleProgram, compileProgram)
 
 getFileName :: [String] -> Maybe FilePath -> String
 getFileName [] b = fromMaybe "stdin" b
@@ -29,7 +29,7 @@ compile tokens = do
     let ast = parseExprList cpt
 
     -- Compile
-    let assembledProgram = assembleProgram $ ExprList ast
+    let assembledProgram = compileProgram $ ExprList ast
 
     -- Print
     print assembledProgram
