@@ -1,16 +1,13 @@
 module Compilation.Compile where
 
 import qualified Parsing.Ast as Ast
-import Compilation.Function
-import Compilation.Utils
-import Compilation.RetVal
+import Compilation.Utils ( isAtomic )
+import Compilation.RetVal ( RetVal(..), concatRetVal )
 import Compilation.Registry
 import Compilation.CompilationError
-import FunctionBlock
-import Instruction
-
-import Control.Exception
-import Debug.Trace
+import FunctionBlock ( FunctionBlock(..) )
+import Instruction ( Instruction(Move, Call, Push, Init) )
+import Control.Exception ( throw )
 
 -- ─── Compile Expression ──────────────────────────────────────────────────────────────────────────
 
@@ -32,7 +29,7 @@ compileExpr (Ast.Call funcName args) reg = compileCall call reg
     where call = Ast.Call funcName args
 -- Variable definition
 compileExpr (Ast.Call "define" ((Ast.Symbole s) : val)) reg = compileVariable call reg
-    where call = Ast.Call "define" (Ast.Symbole s : val) b
+    where call = Ast.Call "define" (Ast.Symbole s : val)
 compileExpr _ _ = throw FatalError
 
 -- ─── Compilation Main Functions ──────────────────────────────────────────────────────────────────
@@ -71,13 +68,25 @@ compileProgram list = output
 --
 -- Args : Ast.ExprList -> Reg
 compileCallArgs :: Ast.Expr -> Registry -> RetVal
-compileCallArgs (Ast.ExprList (x : xs))
+compileCallArgs (Ast.ExprList []) reg = RetVal [] [] reg
+compileCallArgs (Ast.ExprList (x : xs)) reg | isAtomic x = RetVal (instr ++ [Push $ show x]) [] reg
+    | otherwise = concatRetVal ret  (RetVal instr [] reg)
+    where
+        (RetVal instr _ _) = compileCallArgs (Ast.ExprList xs) reg
+        ret = compileCall x reg 
+compileCallArgs _ _ = throw FatalError
 
+flipL :: [a] -> [a]
+flipL = foldl (flip (:)) []
+
+--
 -- Compiles function call as well as args (calls compileCallArgs)
 --
---
 compileCall :: Ast.Expr -> Registry -> RetVal
-compileCall (Ast.Call funcName args) = 
+compileCall (Ast.Call funcName args) reg | isAtomic (Ast.ExprList args) = RetVal instruction [] reg
+    where instruction = [Push $ show arg | arg <- flipL args] ++ [Call funcName, Push "#RET"] 
+compileCall (Ast.Call funcName args) reg = RetVal (instructions ++ [Call funcName, Push "#RET"]) [] reg
+    where (RetVal instructions _ _) = compileCallArgs (Ast.ExprList args) reg
 compileCall _ _ = throw FatalError
 
 -- This function attempts to convert an Ast.ExprList to a Ast.Call

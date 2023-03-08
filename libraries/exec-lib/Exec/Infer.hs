@@ -16,16 +16,16 @@ isSymbol str | all isAlpha str || isValidBuiltin str = True
 isSymbol _ = False
 
 isList :: String -> Bool
-isList ls | head ls == '(' && last ls == ')' = True
+isList ls | head ls == '[' && last ls == ']' = True
 isList _ = False
 
 getNextElem' :: String -> String -> Integer -> (String, String)
 getNextElem' buff (',':rest) 0 = (buff, ',': rest)
-getNextElem' buff (')': rest) openB
-    | openB == 1 = (buff ++ ")", rest)
+getNextElem' buff (']': rest) openB
+    | openB == 1 = (buff ++ "]", rest)
     | openB == 0 = (buff, rest)
-    | otherwise = getNextElem' (buff ++ [')']) rest (pred openB)
-getNextElem' buff ('(': rest) openB = getNextElem' (buff ++ ['(']) rest (succ openB)
+    | otherwise = getNextElem' (buff ++ [']']) rest (pred openB)
+getNextElem' buff ('[': rest) openB = getNextElem' (buff ++ ['[']) rest (succ openB)
 getNextElem' buff (c:cs) openB = getNextElem' (buff ++ [c]) cs openB
 getNextElem' buff [] _ = (buff,"")
 
