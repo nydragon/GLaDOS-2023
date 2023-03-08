@@ -15,6 +15,9 @@ cradle:
     - path: "./runner/Main.hs"
       component: "GLaDOS2023:exe:runner"
 
+    - path: "./interactive/Main.hs"
+      component: "GLaDOS2023:exe:sun-tzu"
+
     - path: "./tests/unit-tests"
       component: "GLaDOS2023:test:unit-tests"
 
