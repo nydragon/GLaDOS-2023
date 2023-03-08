@@ -12,7 +12,7 @@ isString str | head str == '"' && last str == '"' = True
 isString _ = False
 
 isSymbol :: String -> Bool
-isSymbol str | all isAlpha str || isValidBuiltin str = True
+isSymbol str | all isAlpha str || isValidBuiltin str || str == "#RET" = True
 isSymbol _ = False
 
 isList :: String -> Bool
@@ -49,4 +49,7 @@ infer str | isString str = Type.String $ removeEscapes str
 infer str | isNumeric str =  parseNum str
 infer str | isSymbol str = Type.Symbol str
 infer str | isList str = Type.List $ parseList str
+infer str 
+    | str == "#t" = Type.Boolean True
+    | str == "#f" = Type.Boolean False
 infer str = throw $ UnknownType str

@@ -27,7 +27,7 @@ compile tokens = do
 
     -- Parse AST
     let ast = parseExprList cpt
-
+    print ast
     -- Compile
     let assembledProgram = compileProgram $ ExprList ast
 

@@ -9,6 +9,7 @@ import Exec.RuntimeException
     ( RuntimeException(InvalidArgumentCount, UndefinedBehaviour, FatalError) )
 import Exec.Utils (assignRet, parseNum)
 import Utils (isNumeric)
+import Debug.Trace (trace)
 
 -- ─── Builtin Execution ───────────────────────────────────────────────────────────────────────────
 
@@ -34,7 +35,7 @@ execBuiltin (Type.Symbol "last") = lastBuiltin
 execBuiltin (Type.Symbol "join") = joinBuiltin
 execBuiltin (Type.Symbol "read") = readBuiltin
 execBuiltin (Type.Symbol "readInt") = readIntBuiltin
-execBuiltin _ = return $ throwIO UndefinedBehaviour -- Builtin not found
+execBuiltin t = trace (show t) return $ throwIO UndefinedBehaviour -- Builtin not found
 
 -- ─── Builtin Implementations ─────────────────────────────────────────────────────────────────────
 

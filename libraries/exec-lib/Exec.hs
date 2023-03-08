@@ -17,7 +17,6 @@ currSF :: Stack -> StackFrame
 currSF (Stack (s:_) _ _) = s
 currSF _ = throw $ FatalError ""
 
-
 getCurrentFunc :: [FunctionBlock] -> String -> Maybe FunctionBlock
 getCurrentFunc [] _ = Nothing
 getCurrentFunc (f:_) a | funcName == a = Just f
@@ -31,8 +30,8 @@ resolveVar str stack = fromMaybe (infer str) $ Data.Map.lookup (Type.Symbol str)
 
 executeCond :: [FunctionBlock] -> [Instruction] -> [Instruction] -> [Instruction] -> Stack -> IO Stack
 executeCond c cond lBranch rBranch stack = do
-    (Stack sf as newReg) <- processInstr c cond stack
-    let condRes = lookupRet newReg == Just ( Type.Boolean True)
+    (Stack sf (res:as) newReg) <- processInstr c cond stack
+    let condRes = res == Type.Boolean True
     if condRes
         then processInstr c lBranch (Stack sf as newReg)
         else processInstr c rBranch (Stack sf as newReg)
@@ -45,8 +44,7 @@ processInstr c (Pop a:is) stack = processInstr c is (popVal (infer a) stack)
 processInstr c (Init a:is) stack = processInstr c is (initVar (infer a) stack)
 processInstr c (Move a b:is) stack = processInstr c is (moveVar (infer a) (infer b) stack)
 processInstr c (Call a:is) stack = executeFunc c a stack >>= processInstr c is
-processInstr c [Conditional cond lBranch rBranch] stack = executeCond c cond lBranch rBranch stack
-processInstr _ _ _ = throw $ FatalError "processInstr"
+processInstr c (Conditional cond lBranch rBranch : is) stack = executeCond c cond lBranch rBranch stack >>= processInstr c is
 
 executeFunc :: [FunctionBlock] -> String -> Stack -> IO Stack
 executeFunc _ name stack | isValidBuiltin name = execBuiltin (infer name) stack
