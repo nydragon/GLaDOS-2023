@@ -62,6 +62,18 @@ compileProgram list = output
         mainFunc = Function "main" instrs
         output = mainFunc : funcs
 
+-- ─── Special Interactive Functions ───────────────────────────────────────────────────────────────
+--
+-- The following are special function adaptations to enable the implementation
+
+-- Function used to pass pre existing reg and return
+compileProgramAddition :: Ast.Expr -> Registry -> ([FunctionBlock], Registry)
+compileProgramAddition list reg = (output, newReg)
+    where
+        (RetVal instrs funcs newReg) = compileExprList' list reg
+        mainFunc = Function "main" instrs
+        output = mainFunc : funcs
+
 -- ─── Function Compilation ────────────────────────────────────────────────────────────────────────
 
 isCall :: Ast.Expr -> Bool
