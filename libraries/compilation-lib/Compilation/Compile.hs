@@ -74,18 +74,6 @@ compileProgramAddition list reg = (output, newReg)
         mainFunc = Function "main" instrs
         output = mainFunc : funcs
 
--- ─── Special Interactive Functions ───────────────────────────────────────────────────────────────
---
--- The following are special function adaptations to enable the implementation
-
--- Function used to pass pre existing reg and return
-compileProgramAddition :: Ast.Expr -> Registry -> ([FunctionBlock], Registry)
-compileProgramAddition list reg = (output, newReg)
-    where
-        (RetVal instrs funcs newReg) = compileExprList' list reg
-        mainFunc = Function "main" instrs
-        output = mainFunc : funcs
-
 -- ─── Function Compilation ────────────────────────────────────────────────────────────────────────
 
 isCall :: Ast.Expr -> Bool
@@ -129,12 +117,6 @@ convertToCall (Ast.ExprList (Ast.Symbole name : ls)) reg = if isFunction name re
     then Just $ Ast.Call name ls
     else Nothing
 convertToCall _ _ = Nothing
-
-compileFunction :: Ast.Expr -> Registry -> RetVal
-compileFunction (Ast.Call "define" [Ast.Symbole name, Ast.Call "lambda" [Ast.ExprList args, astBody]]) reg = RetVal [] [Function name (Pop "a" : Pop "b" :  body)] (addFunction name newReg)
-    where
-        (RetVal body _ newReg) = compileExpr astBody (addVars (takeNames args) reg)
-compileFunction _ _ = throw $ FatalError "compileFunction"
 
 -- ─── Variable Compilation ────────────────────────────────────────────────────────────────────────
 
