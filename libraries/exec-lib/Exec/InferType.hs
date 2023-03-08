@@ -5,8 +5,6 @@
 module Exec.InferType where
 
 import qualified Data.Map as Map
-import GHC.Float
-
 data Type 
     = String String
     | Float Float
@@ -44,12 +42,12 @@ instance Fractional Type where
 
 instance Show Type where
   show :: Type -> String
-  show (String a) = a
+  show (String a) = init $ tail a
   show (Float a) = show a
   show (Integer a) = show a
   show (Symbol a) = a
   show (List a) = show a
-  show (Boolean a) = show a
+  show (Boolean a) | a = "#t" | otherwise = "#f" 
   show Null = "Null"
 
 type Registers = Map.Map Type Type

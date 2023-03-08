@@ -39,8 +39,13 @@ parseList str
     | otherwise = []
     where (e, rest) = getNextElem $ tail str
 
+removeEscapes :: String -> String
+removeEscapes ('\\':xs)  = removeEscapes xs
+removeEscapes (x:xs)  = x : removeEscapes xs
+removeEscapes _ = ""
+
 infer :: String -> Type
-infer str | isString str = Type.String str
+infer str | isString str = Type.String $ removeEscapes str
 infer str | isNumeric str =  parseNum str
 infer str | isSymbol str = Type.Symbol str
 infer str | isList str = Type.List $ parseList str

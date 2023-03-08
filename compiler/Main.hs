@@ -1,9 +1,9 @@
 module Main where
 
-import Parsing.Args (Args (file, interactive), parse)
+import Parsing.Args (Args (file), parse)
 import Parsing.Ast (Expr (ExprList), parseExprList)
 import Parsing.Cpt (parseTokenList)
-import Parsing.Token (tokenizeFile, tokenize)
+import Parsing.Token (tokenizeFile)
 import Parsing.TokenType ( Token )
 import Compilation.Compile (compileProgram)
 
@@ -12,7 +12,7 @@ import System.Environment (getArgs)
 
 getFileName :: [String] -> Maybe FilePath -> String
 getFileName [] b = fromMaybe "stdin" b
-getFileName (x : xs) b = x
+getFileName (x : _) _ = x
 
 compileFile :: String -> IO ()
 compileFile filename = do
@@ -31,10 +31,13 @@ compile tokens = do
     -- Compile
     let assembledProgram = compileProgram $ ExprList ast
 
-    -- Print
-    print assembledProgram
+    let content = concatMap show assembledProgram
+
+    writeFile "a.out" content
 
     return ()
+
+
 
 main :: IO ()
 main = do

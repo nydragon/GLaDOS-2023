@@ -9,19 +9,17 @@ import Exec.RuntimeException (RuntimeException(FatalError, NotAnInstruction))
 split' :: String -> String -> (String, String)
 split' lStr (' ':xs)  = (lStr,xs)
 split' lStr (x:xs) = split' (lStr ++ [x]) xs
-split' "" "" = throw FatalError
-split' (_:_) [] = throw FatalError
+split' "" "" = throw $ FatalError ""
+split' (_:_) [] = throw $ FatalError ""
 
 splitString :: String -> String -> (String, String)
-splitString lStr ('\\': x: xs) = splitString (lStr ++ "\\" ++ [x]) xs
-splitString lStr ('"': ' ' : xs) = (lStr ++ "\"", xs)
+splitString lStr ('"' : ' ' : xs) = (lStr ++ "\"", xs)
 splitString lStr (x:xs) = splitString (lStr ++ [x]) xs
-splitString "" "" = throw FatalError
-splitString (_:_) "" = throw FatalError
+splitString _ _ = throw $ FatalError ""
 
 split :: String -> (String, String)
-split "" = throw FatalError
-split str | head str == '\"' = splitString "" str
+split "" = throw $ FatalError ""
+split str | head str == '"' = splitString "" str
 split str = split' "" str
 
 stringToInstruction :: String -> Instruction 
@@ -40,7 +38,7 @@ getCondition ("if":is) = (con, rest)
     where (con, rest) = getCondition is
 getCondition (i:is) = (stringToInstruction i:con, rest) 
     where (con, rest) = getCondition is
-getCondition [] = throw FatalError
+getCondition [] = throw $ FatalError ""
 
 getLeftBranch :: [String] -> ([Instruction], [String])
 getLeftBranch (i:is) | "if" `isPrefixOf` i =  ([con], rest) 
@@ -50,7 +48,7 @@ getLeftBranch ("then":is) = (con, rest)
     where (con, rest) = getLeftBranch is
 getLeftBranch (i:is) = (stringToInstruction i:con, rest) 
     where (con, rest) = getLeftBranch is
-getLeftBranch [] = throw FatalError
+getLeftBranch [] = throw $ FatalError ""
 
 getRightBranch :: [String] -> ([Instruction], [String])
 getRightBranch (i:is) | "if" `isPrefixOf` i = ([con], rest) 
@@ -60,7 +58,7 @@ getRightBranch ("else":is) = (con, rest)
     where (con, rest) = getRightBranch is
 getRightBranch (i:is) = (stringToInstruction i:con, rest) 
     where (con, rest) = getRightBranch is
-getRightBranch [] = throw FatalError
+getRightBranch [] = throw $ FatalError ""
 
  
 reduceConditional' :: [String] -> (Instruction, [String])

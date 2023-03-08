@@ -28,7 +28,7 @@ instance Show Expr where
   show (ExprList ls) = show ls
   show (Num n) = show n
   show (Flt n) = show n
-  show (Symbole s) = show s
+  show (Symbole s) = s
   show (Literal s) = show s
   show (Handle s) = show s
   show (Call _ _) = "#<procedure>"
@@ -86,7 +86,8 @@ isValidBuiltin ">=" = True
 isValidBuiltin "if" = True
 isValidBuiltin "println" = True
 isValidBuiltin "print" = True
-isValidBuiltin "eq?" = True
+isValidBuiltin "==" = True
+isValidBuiltin "/=" = True
 isValidBuiltin "readFile" = True
 isValidBuiltin "openFile" = True
 isValidBuiltin "head" = True

@@ -1,15 +1,19 @@
 module Compilation.Compile where
 
 import qualified Parsing.Ast as Ast
-import Compilation.Utils ( isAtomic )
+import Compilation.Utils ( isAtomic, isSymbol )
 import Compilation.RetVal ( RetVal(..), concatRetVal )
 import Compilation.Registry
 import Compilation.CompilationError
 import FunctionBlock ( FunctionBlock(..) )
-import Instruction ( Instruction(Move, Call, Push, Init) )
+import Instruction ( Instruction(Move, Call, Push, Init, Pop) )
 import Control.Exception ( throw )
 
 -- ─── Compile Expression ──────────────────────────────────────────────────────────────────────────
+
+isLambda :: Ast.Expr -> Bool
+isLambda (Ast.Call "define" (_ : Ast.Call "lambda" _ : _)) = True
+isLambda _ = False
 
 -- Compiles and Ast Expression
 --
@@ -23,14 +27,15 @@ compileExpr :: Ast.Expr -> Registry -> RetVal
 -- Basic ExprList
 -- compileExpr (Ast.ExprList ls) reg funcs = evalExprList ls reg
 -- Function definition
--- compileExpr (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg = execCall (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg
+compileExpr expr reg | isLambda expr = compileFunction expr reg
 -- Function Call
-compileExpr (Ast.Call funcName args) reg = compileCall call reg
-    where call = Ast.Call funcName args
--- Variable definition
 compileExpr (Ast.Call "define" ((Ast.Symbole s) : val)) reg = compileVariable call reg
     where call = Ast.Call "define" (Ast.Symbole s : val)
-compileExpr _ _ = throw FatalError
+compileExpr (Ast.Call funcName args) reg = compileCall call reg
+    where call = Ast.Call funcName args
+compileExpr (Ast.ExprList (Ast.Symbole sym : xs)) reg | sym `elem` fst reg = compileCall (Ast.Call sym xs) reg
+-- Variable definition
+compileExpr _ _ = throw $ FatalError "compileExpr"
 
 -- ─── Compilation Main Functions ──────────────────────────────────────────────────────────────────
 
@@ -44,13 +49,13 @@ compileExprList' (Ast.ExprList (x:xs)) reg = concatRetVal compiledExpr compiledL
         (RetVal _ _ updatedReg) = compiledExpr
         compiledLeftover = compileExprList' (Ast.ExprList xs) updatedReg
 compileExprList' (Ast.ExprList []) reg = RetVal [] [] reg
-compileExprList' _ _ = throw FatalError
+compileExprList' _ _ = throw $ FatalError "compileExprList'"
 
 -- Entry point function for compileExprList'
 compileExprList :: Ast.Expr -> RetVal
 compileExprList (Ast.ExprList ls) = compileExprList' list emptyRegistry
     where list = Ast.ExprList ls
-compileExprList _ = throw FatalError
+compileExprList _ = throw $ FatalError "compileExprList"
 
 -- Compiles program into list of FunctionBlock INCLUDING main func
 -- Arg : ExprList to be compiled (corresponds to base depth level of input code)
@@ -69,12 +74,16 @@ compileProgram list = output
 -- Args : Ast.ExprList -> Reg
 compileCallArgs :: Ast.Expr -> Registry -> RetVal
 compileCallArgs (Ast.ExprList []) reg = RetVal [] [] reg
-compileCallArgs (Ast.ExprList (x : xs)) reg | isAtomic x = RetVal (instr ++ [Push $ show x]) [] reg
-    | otherwise = concatRetVal ret  (RetVal instr [] reg)
+compileCallArgs (Ast.ExprList (Ast.Symbole name : x)) reg | name `elem` fst reg = compileCall (Ast.Call name x) reg 
+compileCallArgs (Ast.ExprList xs) reg
+    | isAtomic x = RetVal (instr ++ [Push $ show x]) [] reg
+    | isSymbol x = RetVal (instr ++ [Push $ show x]) [] reg
+    | otherwise = concatRetVal ret (RetVal instr [] reg)
     where
-        (RetVal instr _ _) = compileCallArgs (Ast.ExprList xs) reg
+        x = last xs
+        (RetVal instr _ _) = compileCallArgs (Ast.ExprList (init xs)) reg
         ret = compileCall x reg 
-compileCallArgs _ _ = throw FatalError
+compileCallArgs _ _ = throw $ FatalError "compileCallArgs"
 
 flipL :: [a] -> [a]
 flipL = foldl (flip (:)) []
@@ -87,7 +96,8 @@ compileCall (Ast.Call funcName args) reg | isAtomic (Ast.ExprList args) = RetVal
     where instruction = [Push $ show arg | arg <- flipL args] ++ [Call funcName, Push "#RET"] 
 compileCall (Ast.Call funcName args) reg = RetVal (instructions ++ [Call funcName, Push "#RET"]) [] reg
     where (RetVal instructions _ _) = compileCallArgs (Ast.ExprList args) reg
-compileCall _ _ = throw FatalError
+compileCall (Ast.ExprList (Ast.Symbole name : args)) reg | name `elem` fst reg = compileCall (Ast.Call name args) reg
+compileCall _ _ = throw $ FatalError "compileCall"
 
 -- This function attempts to convert an Ast.ExprList to a Ast.Call
 -- If the function does not exist, it returns Nothing
@@ -106,7 +116,6 @@ convertToCall _ _ = Nothing
 -- Note : This does not check the registry if the variable is already defined
 -- Args : Ast.Call (Expected to haveproper define form for a variable definition) -> reg -> functions
 compileVariable :: Ast.Expr -> Registry -> RetVal
-compileVariable (Ast.Call "define" [Ast.Symbole s, Ast.Call name args]) reg = throw Unimplemented
 compileVariable (Ast.Call "define" [Ast.Symbole s1, Ast.Symbole s2]) reg = if isVariable s2 reg
     then RetVal instructions [] newReg
     else throw $ VariableNotDefined s2
@@ -119,4 +128,17 @@ compileVariable (Ast.Call "define" [Ast.Symbole s, atom]) reg = if isAtomic atom
         where
             newReg = addVar s reg
             instructions = [Init s, Move s $ show atom]
-compileVariable _ _ = throw FatalError
+compileVariable _ _ = throw $ FatalError "compileVariable"
+
+
+takeNames :: [Ast.Expr] -> [String]
+takeNames [] = []
+takeNames (Ast.Symbole x : xs) =  x : takeNames xs
+takeNames _ = throw $ FatalError "takeNames"
+
+
+compileFunction :: Ast.Expr -> Registry -> RetVal
+compileFunction (Ast.Call "define" [Ast.Symbole name, Ast.Call "lambda" [Ast.ExprList args, astBody]]) reg = RetVal [] [Function name (Pop "a" : Pop "b" :  body)] (addFunction name newReg)
+    where
+        (RetVal body _ newReg) = compileExpr astBody (addVars (takeNames args) reg)
+compileFunction _ _ = throw $ FatalError "compileFunction"

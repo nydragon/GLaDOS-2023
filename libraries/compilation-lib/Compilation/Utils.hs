@@ -13,6 +13,10 @@ parseNum str | isNegativeInt str =  Ast.Num $ negate (read (tail str) :: Integer
 parseNum str | isPositiveFloat str = Ast.Flt (read str :: Float)
 parseNum str | isNegativeFloat str = Ast.Flt $ negate (read (tail str) :: Float)
 
+isSymbol :: Ast.Expr -> Bool
+isSymbol (Ast.Symbole _) = True
+isSymbol _ = False
+
 -- Returns boolean if Expr is atomic. This means it cannot be further reduced.
 -- Note: Sym is not atomic as it needs to be reduced to a value
 isAtomic :: Ast.Expr -> Bool

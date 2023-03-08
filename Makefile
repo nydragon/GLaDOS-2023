@@ -35,6 +35,7 @@ else ifeq ($(filter integration,$(MAKECMDGOALS)),integration)
 	make build
 	@cabal run integration-tests --test-show-details=direct
 else
+	make build
 	@cabal run unit-tests --test-show-details=direct
 	@cabal run integration-tests --test-show-details=direct
 endif
