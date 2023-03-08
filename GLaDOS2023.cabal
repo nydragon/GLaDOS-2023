@@ -90,6 +90,7 @@ library shared-lib
 executable sun-tzu
     default-language:   Haskell2010
     build-depends:      base >= 4.14.1.0,
+                        containers,
                         shared-lib,
                         compilation-lib,
                         exec-lib

@@ -3,6 +3,7 @@ SHELL := /bin/bash
 # Binary Names
 COMPILER_NAME = glados
 RUNNER_NAME = runner
+INTERACTIVE=sun-tzu
 
 all: clean
 	@cabal run glados -- $(ARGS)
@@ -17,8 +18,10 @@ else ifeq ($(filter $(RUNNER_NAME),$(MAKECMDGOALS)),$(RUNNER_NAME))
 else
 	@cabal build $(COMPILER_NAME)
 	@cabal build $(RUNNER_NAME)
+	@cabal build $(INTERACTIVE)
 	@find . -wholename "*$(COMPILER_NAME)/$(COMPILER_NAME)" -exec ln -fs {} ./$(COMPILER_NAME)_lnk \;
 	@find . -wholename "*$(RUNNER_NAME)/$(RUNNER_NAME)" -exec ln -fs {} ./$(RUNNER_NAME)_lnk \;
+	@find . -wholename "*$(INTERACTIVE)/$(INTERACTIVE)" -exec ln -fs {} ./$(INTERACTIVE)_lnk \;
 endif
 
 clean:
