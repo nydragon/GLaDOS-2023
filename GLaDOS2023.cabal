@@ -123,6 +123,7 @@ test-suite unit-tests
         CompilationLib.Parser.CptTests,
         CompilationLib.Parser.AstTests,
         CompilationLib.Parser.InfixTests,
+        CompilationLib.Compilation.CompilationTests,
         ExecLib.Exec.Infer,
         ExecLib.Exec.Instructions,
         ExecLib.Exec.Utils,
