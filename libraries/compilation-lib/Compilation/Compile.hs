@@ -8,7 +8,6 @@ import Compilation.CompilationError
 import FunctionBlock ( FunctionBlock(..) )
 import Instruction ( Instruction(Move, Call, Push, Init, Pop) )
 import Control.Exception ( throw )
-import Debug.Trace (trace)
 
 -- ─── Compile Expression ──────────────────────────────────────────────────────────────────────────
 
@@ -30,13 +29,13 @@ compileExpr :: Ast.Expr -> Registry -> RetVal
 -- Function definition
 compileExpr expr reg | isLambda expr = compileFunction expr reg
 -- Function Call
-compileExpr (Ast.Call funcName args) reg = trace (show funcName) compileCall call reg
-    where call = Ast.Call funcName args
-compileExpr (Ast.ExprList (Ast.Symbole sym : xs)) reg | sym `elem` fst reg = trace ("func: " ++  show xs ) compileCall (Ast.Call sym xs) reg
--- Variable definition
 compileExpr (Ast.Call "define" ((Ast.Symbole s) : val)) reg = compileVariable call reg
     where call = Ast.Call "define" (Ast.Symbole s : val)
-compileExpr _c _ = trace (show _c) throw $ FatalError "compileExpr"
+compileExpr (Ast.Call funcName args) reg = compileCall call reg
+    where call = Ast.Call funcName args
+compileExpr (Ast.ExprList (Ast.Symbole sym : xs)) reg | sym `elem` fst reg = compileCall (Ast.Call sym xs) reg
+-- Variable definition
+compileExpr _ _ = throw $ FatalError "compileExpr"
 
 -- ─── Compilation Main Functions ──────────────────────────────────────────────────────────────────
 
@@ -56,7 +55,7 @@ compileExprList' _ _ = throw $ FatalError "compileExprList'"
 compileExprList :: Ast.Expr -> RetVal
 compileExprList (Ast.ExprList ls) = compileExprList' list emptyRegistry
     where list = Ast.ExprList ls
-compileExprList as = trace (show as) throw $ FatalError "compileExprList"
+compileExprList _ = throw $ FatalError "compileExprList"
 
 -- Compiles program into list of FunctionBlock INCLUDING main func
 -- Arg : ExprList to be compiled (corresponds to base depth level of input code)
@@ -76,12 +75,13 @@ compileProgram list = output
 compileCallArgs :: Ast.Expr -> Registry -> RetVal
 compileCallArgs (Ast.ExprList []) reg = RetVal [] [] reg
 compileCallArgs (Ast.ExprList (Ast.Symbole name : x)) reg | name `elem` fst reg = compileCall (Ast.Call name x) reg 
-compileCallArgs (Ast.ExprList (x : xs)) reg
+compileCallArgs (Ast.ExprList xs) reg
     | isAtomic x = RetVal (instr ++ [Push $ show x]) [] reg
     | isSymbol x = RetVal (instr ++ [Push $ show x]) [] reg
     | otherwise = concatRetVal ret (RetVal instr [] reg)
     where
-        (RetVal instr _ _) = compileCallArgs (Ast.ExprList xs) reg
+        x = last xs
+        (RetVal instr _ _) = compileCallArgs (Ast.ExprList (init xs)) reg
         ret = compileCall x reg 
 compileCallArgs _ _ = throw $ FatalError "compileCallArgs"
 
@@ -97,7 +97,7 @@ compileCall (Ast.Call funcName args) reg | isAtomic (Ast.ExprList args) = RetVal
 compileCall (Ast.Call funcName args) reg = RetVal (instructions ++ [Call funcName, Push "#RET"]) [] reg
     where (RetVal instructions _ _) = compileCallArgs (Ast.ExprList args) reg
 compileCall (Ast.ExprList (Ast.Symbole name : args)) reg | name `elem` fst reg = compileCall (Ast.Call name args) reg
-compileCall expr reg = trace ("compileCall: " ++ show expr ++ show reg) throw $ FatalError "compileCall"
+compileCall _ _ = throw $ FatalError "compileCall"
 
 -- This function attempts to convert an Ast.ExprList to a Ast.Call
 -- If the function does not exist, it returns Nothing
@@ -134,6 +134,7 @@ compileVariable _ _ = throw $ FatalError "compileVariable"
 takeNames :: [Ast.Expr] -> [String]
 takeNames [] = []
 takeNames (Ast.Symbole x : xs) =  x : takeNames xs
+takeNames _ = throw $ FatalError "takeNames"
 
 
 compileFunction :: Ast.Expr -> Registry -> RetVal

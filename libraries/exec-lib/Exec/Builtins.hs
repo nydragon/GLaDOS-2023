@@ -6,7 +6,7 @@ import GHC.IO.Handle.FD ( openFile )
 import Exec.InferType (Stack (Stack), Type)
 import qualified Exec.InferType as Type
 import Exec.RuntimeException
-    ( RuntimeException(InvalidArgumentCount, UndefinedBehaviour) )
+    ( RuntimeException(InvalidArgumentCount, UndefinedBehaviour, FatalError) )
 import Exec.Utils (assignRet, parseNum)
 import Utils (isNumeric)
 
@@ -40,17 +40,17 @@ execBuiltin _ = return $ throwIO UndefinedBehaviour -- Builtin not found
 
 printlnBuiltin :: Stack -> IO Stack
 printlnBuiltin (Stack _ argStack _) | null argStack = throwIO $ InvalidArgumentCount "println"
-printlnBuiltin (Stack callStack argStack reg) = print arg >> return newStack
+printlnBuiltin (Stack callStack as reg) = print a >> return newStack
     where
-        ([arg], rest) = splitAt 1 argStack
+        ([a], rest) = splitAt 1 as
         newRegistry = assignRet Type.Null reg
         newStack = Stack callStack rest newRegistry
 
 printBuiltin :: Stack -> IO Stack
-printBuiltin (Stack _ argStack _) | null argStack = throwIO $ InvalidArgumentCount "println"
-printBuiltin (Stack callStack argStack reg) = putStr (show arg) >> return newStack
+printBuiltin (Stack _ argStack _) | null argStack = throwIO $ InvalidArgumentCount "print"
+printBuiltin (Stack callStack as reg) = putStr (show a) >> return newStack
     where
-        ([arg], rest) = splitAt 1 argStack
+        ([a], rest) = splitAt 1 as
         newRegistry = assignRet Type.Null reg
         newStack = Stack callStack rest newRegistry
 

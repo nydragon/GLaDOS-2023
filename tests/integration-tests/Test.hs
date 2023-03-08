@@ -9,7 +9,7 @@ import System.Process
 import Print
 
 getFiles :: IO [String]
-getFiles = map takeBaseName . filter (isSuffixOf ".scm") <$> filter (`notElem` [".", ".."]) <$> getDirectoryContents "./tests/integration-tests/TestFiles/"
+getFiles = (map takeBaseName . filter (isSuffixOf ".scm")) . filter (`notElem` [".", ".."]) <$> getDirectoryContents "./tests/integration-tests/TestFiles/"
 
 getOutput :: String -> IO Bool
 getOutput fn = do

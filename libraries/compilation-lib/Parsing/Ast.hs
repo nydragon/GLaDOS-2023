@@ -86,7 +86,8 @@ isValidBuiltin ">=" = True
 isValidBuiltin "if" = True
 isValidBuiltin "println" = True
 isValidBuiltin "print" = True
-isValidBuiltin "eq?" = True
+isValidBuiltin "==" = True
+isValidBuiltin "/=" = True
 isValidBuiltin "readFile" = True
 isValidBuiltin "openFile" = True
 isValidBuiltin "head" = True
