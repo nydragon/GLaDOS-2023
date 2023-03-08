@@ -85,6 +85,21 @@ library shared-lib
         Utils
 
 --
+-- Interactive
+--
+
+executable glair
+    default-language:   Haskell2010
+    build-depends:      base >= 4.14.1.0
+    hs-source-dirs:     interactive
+    main-is:            Main.hs
+    ghc-options: -Wall
+    exposed-modules:
+        Instruction,
+        FunctionBlock,
+        Utils
+
+--
 -- Tests
 --
 
