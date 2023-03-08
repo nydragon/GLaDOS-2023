@@ -12,8 +12,8 @@ stringToInstructionTest = testGroup "stringToInstruction" [
         testCase "parse pop" $ stringToInstruction "pop q" @?= Pop "q",
         testCase "parse call" $ stringToInstruction "call q" @?= Call "q",
         testCase "parse init" $ stringToInstruction "init q" @?= Init "q",
-        testCase "parse move" $ stringToInstruction "move 3 q" @?= Move "3" "q",
-        testCase "parse move" $ stringToInstruction "move \"Hello World\" q" @?= Move "\"Hello World\"" "q"
+        testCase "parse move" $ stringToInstruction "move q 3" @?= Move "q" "3",
+        testCase "parse move" $ stringToInstruction "move q \"Hello World\"" @?= Move "q" "\"Hello World\""
     ]
 
 readFileSuite :: TestTree
