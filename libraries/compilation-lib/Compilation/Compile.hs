@@ -27,10 +27,12 @@ compileExpr :: Ast.Expr -> Registry -> RetVal
 -- compileExpr (Ast.ExprList ls) reg funcs = evalExprList ls reg
 -- Function definition
 -- compileExpr (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg funcs = execCall (Ast.Call "define" (sym : Ast.Call "lambda" args : r)) reg
+-- Function Call
+compileExpr (Ast.Call funcName args) reg = compileCall call reg
+    where call = Ast.Call funcName args
 -- Variable definition
 compileExpr (Ast.Call "define" ((Ast.Symbole s) : val)) reg = compileVariable call reg
-    where
-        call = Ast.Call "define" (Ast.Symbole s : val)
+    where call = Ast.Call "define" (Ast.Symbole s : val) b
 compileExpr _ _ = throw FatalError
 
 -- ─── Compilation Main Functions ──────────────────────────────────────────────────────────────────
@@ -50,8 +52,7 @@ compileExprList' _ _ = throw FatalError
 -- Entry point function for compileExprList'
 compileExprList :: Ast.Expr -> RetVal
 compileExprList (Ast.ExprList ls) = compileExprList' list emptyRegistry
-    where
-        list = Ast.ExprList ls
+    where list = Ast.ExprList ls
 compileExprList _ = throw FatalError
 
 -- Compiles program into list of FunctionBlock INCLUDING main func
@@ -65,7 +66,19 @@ compileProgram list = output
 
 -- ─── Function Compilation ────────────────────────────────────────────────────────────────────────
 
--- compileCall :: Ast.Expr -> Registry -> RetVal
+-- Compiles an ExprList into instructions required for the function call
+-- Args are compiled from last to first
+--
+-- Args : Ast.ExprList -> Reg
+compileCallArgs :: Ast.Expr -> Registry -> RetVal
+compileCallArgs (Ast.ExprList (x : xs))
+
+-- Compiles function call as well as args (calls compileCallArgs)
+--
+--
+compileCall :: Ast.Expr -> Registry -> RetVal
+compileCall (Ast.Call funcName args) = 
+compileCall _ _ = throw FatalError
 
 -- This function attempts to convert an Ast.ExprList to a Ast.Call
 -- If the function does not exist, it returns Nothing
