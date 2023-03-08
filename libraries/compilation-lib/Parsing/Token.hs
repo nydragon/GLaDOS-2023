@@ -2,6 +2,8 @@ module Parsing.Token where
 
 import Utils (isPositiveInt, isNegativeInt, isPositiveFloat, isNegativeFloat)
 import Parsing.TokenType
+import Compilation.CompilationError ( CompilationError(FatalError) )
+import Control.Exception (throw)
 
 -- ─── Tokenization ────────────────────────────────────────────────────────────────────────────────
 
@@ -59,13 +61,16 @@ tokenizeFile path = do
 
 parseString' :: String -> String
 parseString' ('\\' : x : xs ) = x : parseString' xs
-parseString' ('"' : xs) = ""
+parseString' ('"' : _) = ""
 parseString' (x : xs) = x : parseString' xs
+parseString' _ = throw $ FatalError "parseString'"
 
 parseString :: String -> Token
 parseString ('"' : str) = Literal $ parseString' str
+parseString _ = throw $ FatalError "parseString"
 
 stringFastForward :: String -> String
-stringFastForward ('\\' : x : xs ) = stringFastForward xs
+stringFastForward ('\\' : _ : xs ) = stringFastForward xs
 stringFastForward ('"' : xs) = xs
-stringFastForward (x : xs) = stringFastForward xs
+stringFastForward (_ : xs) = stringFastForward xs
+stringFastForward _ = throw $ FatalError "stringFastForward"

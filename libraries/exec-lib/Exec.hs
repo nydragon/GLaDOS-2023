@@ -38,15 +38,15 @@ executeCond c cond lBranch rBranch stack = do
         else processInstr c rBranch (Stack sf as newReg)
 
 processInstr :: [FunctionBlock] -> [Instruction] -> Stack -> IO Stack
-processInstr c [] stack = return stack
+processInstr _ [] stack = return stack
 processInstr c (Push a:is) stack = processInstr c is (pushVal val stack)
     where val = resolveVar a stack
 processInstr c (Pop a:is) stack = processInstr c is (popVal (infer a) stack)
 processInstr c (Init a:is) stack = processInstr c is (initVar (infer a) stack)
 processInstr c (Move a b:is) stack = processInstr c is (moveVar (infer a) (infer b) stack)
 processInstr c (Call a:is) stack = executeFunc c a stack >>= processInstr c is
-processInstr c (Call a:is) stack = executeFunc c a stack >>= processInstr c is
 processInstr c [Conditional cond lBranch rBranch] stack = executeCond c cond lBranch rBranch stack
+processInstr _ _ _ = throw $ FatalError "processInstr"
 
 executeFunc :: [FunctionBlock] -> String -> Stack -> IO Stack
 executeFunc _ name stack | isValidBuiltin name = execBuiltin (infer name) stack
