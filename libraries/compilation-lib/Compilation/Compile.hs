@@ -82,7 +82,7 @@ compileCallArgs (Ast.ExprList xs) reg
     where
         x = last xs
         (RetVal instr _ _) = compileCallArgs (Ast.ExprList (init xs)) reg
-        ret = compileCall x reg 
+        ret = compileCall x reg
 compileCallArgs _ _ = throw $ FatalError "compileCallArgs"
 
 flipL :: [a] -> [a]
@@ -93,7 +93,7 @@ flipL = foldl (flip (:)) []
 --
 compileCall :: Ast.Expr -> Registry -> RetVal
 compileCall (Ast.Call funcName args) reg | isAtomic (Ast.ExprList args) = RetVal instruction [] reg
-    where instruction = [Push $ show arg | arg <- flipL args] ++ [Call funcName, Push "#RET"] 
+    where instruction = [Push $ show arg | arg <- flipL args] ++ [Call funcName, Push "#RET"]
 compileCall (Ast.Call funcName args) reg = RetVal (instructions ++ [Call funcName, Push "#RET"]) [] reg
     where (RetVal instructions _ _) = compileCallArgs (Ast.ExprList args) reg
 compileCall (Ast.ExprList (Ast.Symbole name : args)) reg | name `elem` fst reg = compileCall (Ast.Call name args) reg
@@ -108,6 +108,12 @@ convertToCall (Ast.ExprList (Ast.Symbole name : ls)) reg = if isFunction name re
     then Just $ Ast.Call name ls
     else Nothing
 convertToCall _ _ = Nothing
+
+compileFunction :: Ast.Expr -> Registry -> RetVal
+compileFunction (Ast.Call "define" [Ast.Symbole name, Ast.Call "lambda" [Ast.ExprList args, astBody]]) reg = RetVal [] [Function name (Pop "a" : Pop "b" :  body)] (addFunction name newReg)
+    where
+        (RetVal body _ newReg) = compileExpr astBody (addVars (takeNames args) reg)
+compileFunction _ _ = throw $ FatalError "compileFunction"
 
 -- ─── Variable Compilation ────────────────────────────────────────────────────────────────────────
 
@@ -135,10 +141,3 @@ takeNames :: [Ast.Expr] -> [String]
 takeNames [] = []
 takeNames (Ast.Symbole x : xs) =  x : takeNames xs
 takeNames _ = throw $ FatalError "takeNames"
-
-
-compileFunction :: Ast.Expr -> Registry -> RetVal
-compileFunction (Ast.Call "define" [Ast.Symbole name, Ast.Call "lambda" [Ast.ExprList args, astBody]]) reg = RetVal [] [Function name (Pop "a" : Pop "b" :  body)] (addFunction name newReg)
-    where
-        (RetVal body _ newReg) = compileExpr astBody (addVars (takeNames args) reg)
-compileFunction _ _ = throw $ FatalError "compileFunction"
