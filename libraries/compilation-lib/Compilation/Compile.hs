@@ -106,6 +106,12 @@ convertToCall (Ast.ExprList (Ast.Symbole name : ls)) reg = if isFunction name re
     else Nothing
 convertToCall _ _ = Nothing
 
+compileFunction :: Ast.Expr -> Registry -> RetVal
+compileFunction (Ast.Call "define" [Ast.Symbole name, Ast.Call "lambda" [Ast.ExprList args, astBody]]) reg = RetVal [] [Function name (Pop "a" : Pop "b" :  body)] (addFunction name newReg)
+    where
+        (RetVal body _ newReg) = compileExpr astBody (addVars (takeNames args) reg)
+compileFunction _ _ = throw $ FatalError "compileFunction"
+
 -- ─── Variable Compilation ────────────────────────────────────────────────────────────────────────
 
 -- Compiles instructions required for variable compilation
