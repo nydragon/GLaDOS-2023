@@ -29,7 +29,6 @@ library compilation-lib
         Compilation.Registry,
         Compilation.RetVal
 
-
 -- Compiler
 executable glados
     default-language: Haskell2010
@@ -87,15 +86,16 @@ library shared-lib
 -- Interactive
 --
 
-executable glair
+executable sun-tzu
     default-language:   Haskell2010
-    build-depends:      base >= 4.14.1.0
+    build-depends:      base >= 4.14.1.0,
+                        shared-lib,
+                        compilation-lib,
+                        exec-lib
     hs-source-dirs:     interactive
     main-is:            Main.hs
-    ghc-options: -Wall
-    exposed-modules:
-        Instruction,
-        FunctionBlock,
+    ghc-options:        -Wall
+    other-modules:
         Utils
 
 --
