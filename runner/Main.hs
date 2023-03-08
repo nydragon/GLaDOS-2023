@@ -5,7 +5,7 @@ import Exec.InferType (initStack)
 
 main :: IO ()
 main = do
-    file <- parseFile "test.cmp"
+    file <- parseFile "a.out"
     let instr = convertToInstructions file
 
     executeFunc instr "main" initStack

@@ -32,7 +32,7 @@ instance Show RuntimeException where
   show (InvalidArgument a b c) = "InvalidArgument: argument " ++ show a ++ ", expected '" ++ b ++ "' but received '" ++ c ++ "'."
   show (InvalidArgumentCount fn) = "InvalidArgumentCount: Function " ++ fn ++ " received an invalid amount of arguments."
   show NullDivision = "NullDivision: Did you not pay attention in math class?"
-  show FatalError = "FatalError"
+  show FatalError = "FatalError "
   show (NotAnInstruction msg) = "NotAnInstruction: " ++ msg
   show AlreadyDefined = "AlreadyDefined"
   show (UnknownType val) = "UnknownType: Type couldn't be inferred " ++ val

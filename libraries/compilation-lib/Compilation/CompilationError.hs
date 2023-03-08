@@ -9,7 +9,7 @@ data CompilationError =
     | VariableNotDefined String
     | VariableAlreadyDefined String
     | NonAtomicValue
-    | FatalError
+    | FatalError String
     | Unimplemented
     deriving (Eq)
 
@@ -21,5 +21,5 @@ instance Show CompilationError where
     show (VariableNotDefined name) = "Error: '" ++ name ++ "' is not a variable"
     show (VariableAlreadyDefined name) = "Error: '" ++ name ++ "' has already been defined."
     show NonAtomicValue = "Error: List contains "
-    show FatalError = "Error: Fatal Error."
+    show (FatalError name)= "Error: Fatal Error in " ++ name
     show Unimplemented = "Error: This feature of the language has not yet been implemented."

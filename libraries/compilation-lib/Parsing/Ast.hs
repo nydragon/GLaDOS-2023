@@ -28,7 +28,7 @@ instance Show Expr where
   show (ExprList ls) = show ls
   show (Num n) = show n
   show (Flt n) = show n
-  show (Symbole s) = show s
+  show (Symbole s) = s
   show (Literal s) = show s
   show (Handle s) = show s
   show (Call _ _) = "#<procedure>"

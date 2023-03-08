@@ -12,8 +12,11 @@ type Registry = ([String], [String])
 addVar :: String -> Registry -> Registry
 addVar s (f, v) = (f, s : v)
 
+addVars :: [String] -> Registry -> Registry
+addVars s (f, v) = (f, s ++ v)
+
 addFunction :: String -> Registry -> Registry
-addFunction s (f, v) = (f, s : v)
+addFunction s (f, v) = (s : f, v)
 
 -- ─── Utility Functions ──────────────────────────────────────────────────────────────────────────
 
