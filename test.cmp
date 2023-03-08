@@ -1,5 +1,15 @@
 func main
-push [1,2,3]
-call print
+push 2
+push 3
+call add
 push #RET
+call print
+end
+
+func add
+pop a
+pop b
+push b
+push a
+call +
 end
