@@ -1,31 +1,43 @@
 
 # Bonuses
 
-- [REPL](#repl)
-- [Rigor](#rigor)
-  - [Syntax Documentation for compiled code](#syntax-documentation-for-compiled-code)
-- [Arrays](#arrays)
-  - [Array Nesting](#array-nesting)
-  - [Array Operation](#array-operation)
-    - [Head](#head)
-    - [Last](#last)
-    - [Tail](#tail)
-    - [Init](#init)
-    - [Join](#join)
-    - [PushFront](#pushfront)
-    - [Pushback](#pushback)
-- [Strings and character escaping](#strings-and-character-escaping)
-- [Input/Output](#inputoutput)
-  - [Reading from Stdin](#reading-from-stdin)
-  - [Writing to Stdout](#writing-to-stdout)
-  - [Reading files](#reading-files)
-- [Floating point numbers](#floating-point-numbers)
-- [Rigor](#rigor-1)
+- [Bonuses](#bonuses)
+  - [REPL](#repl)
+    - [Syntax Documentation for compiled code](#syntax-documentation-for-compiled-code)
+  - [Arrays](#arrays)
+    - [Array Nesting](#array-nesting)
+    - [Array Operation](#array-operation)
+      - [Head](#head)
+      - [Last](#last)
+      - [Tail](#tail)
+      - [Init](#init)
+      - [Join](#join)
+      - [PushFront](#pushfront)
+      - [Pushback](#pushback)
+  - [Strings and character escaping](#strings-and-character-escaping)
+  - [Input/Output](#inputoutput)
+    - [Reading from Stdin](#reading-from-stdin)
+    - [Writing to Stdout](#writing-to-stdout)
+    - [Reading files](#reading-files)
+  - [Floating point numbers](#floating-point-numbers)
+  - [Rigor](#rigor)
 
 
 ## REPL
 
-## Rigor
+All of the following bonus's may be ran in our fully featured interactive prompt.
+
+You may build it by running...
+
+```
+make build
+```
+
+...and then run it by doing
+
+```
+./sun-tzu_lnk
+```
 
 ### Syntax Documentation for compiled code
 
