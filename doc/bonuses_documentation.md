@@ -1,32 +1,29 @@
 
 # Bonuses
 
-- [REPL](#repl)
-- [Rigor](#rigor)
-  - [Syntax Documentation for compiled code](#syntax-documentation-for-compiled-code)
-- [Strings, string operations and character escaping](#strings-string-operations-and-character-escaping)
-- [Arrays](#arrays)
-  - [Array Nesting](#array-nesting)
-  - [Array Operation](#array-operation)
-    - [Head](#head)
-    - [Last](#last)
-    - [Tail](#tail)
-    - [Init](#init)
-    - [Join](#join)
-    - [PushFront](#pushfront)
-    - [Pushback](#pushback)
-- [Input/Output](#inputoutput)
-  - [Reading from Stdin](#reading-from-stdin)
-  - [Writing to Stdout](#writing-to-stdout)
-  - [Reading files](#reading-files)
-- [Floating point numbers](#floating-point-numbers)
+- [Bonuses](#bonuses)
+  - [REPL](#repl)
+  - [Strings, string operations and character escaping](#strings-string-operations-and-character-escaping)
+  - [Arrays](#arrays)
+    - [Array Nesting](#array-nesting)
+    - [Array Operation](#array-operation)
+      - [Head](#head)
+      - [Last](#last)
+      - [Tail](#tail)
+      - [Init](#init)
+      - [Join](#join)
+      - [PushFront](#pushfront)
+      - [Pushback](#pushback)
+  - [Input/Output](#inputoutput)
+    - [Reading from Stdin](#reading-from-stdin)
+    - [Writing to Stdout](#writing-to-stdout)
+    - [Reading files](#reading-files)
+  - [Floating point numbers](#floating-point-numbers)
+  - [Rigor](#rigor)
 
 
 ## REPL
 
-## Rigor
-
-### Syntax Documentation for compiled code
 ## Strings, string operations and character escaping
 
 ## Arrays
@@ -131,4 +128,17 @@ There are a total of 7 array operations:
 ### Reading files
 
 ## Floating point numbers
-  
+
+## Rigor
+
+We would also like to take the time to point out a couple best practices that we implemented rigorously while working on this project.
+
+Here are a couple of these points :
+
+- Issue tracking - **Over 60 issues**
+- Pull request workflow - **Over 90 pull requests**
+- Concise and meaningful commits - **Over 500 commits**
+- Commit linting using [commitizen](https://github.com/commitizen/cz-cli)
+- Lots of code commenting
+
+We also added an other BNF style [document](compiled-syntax-description.md) along with some documentation for our custom assembly like language that we compile into.
