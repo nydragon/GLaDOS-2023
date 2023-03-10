@@ -1,30 +1,33 @@
 
 # Bonuses
 
-- [Bonuses](#bonuses)
-  - [REPL](#repl)
-  - [Strings, string operations and character escaping](#strings-string-operations-and-character-escaping)
-  - [Arrays](#arrays)
-    - [Array Nesting](#array-nesting)
-    - [Array Operation](#array-operation)
-      - [Head](#head)
-      - [Last](#last)
-      - [Tail](#tail)
-      - [Init](#init)
-      - [Join](#join)
-      - [PushFront](#pushfront)
-      - [Pushback](#pushback)
-  - [Input/Output](#inputoutput)
-    - [Reading from Stdin](#reading-from-stdin)
-    - [Writing to Stdout](#writing-to-stdout)
-    - [Reading files](#reading-files)
-  - [Floating point numbers](#floating-point-numbers)
-  - [Rigor](#rigor)
+- [REPL](#repl)
+- [Rigor](#rigor)
+  - [Syntax Documentation for compiled code](#syntax-documentation-for-compiled-code)
+- [Arrays](#arrays)
+  - [Array Nesting](#array-nesting)
+  - [Array Operation](#array-operation)
+    - [Head](#head)
+    - [Last](#last)
+    - [Tail](#tail)
+    - [Init](#init)
+    - [Join](#join)
+    - [PushFront](#pushfront)
+    - [Pushback](#pushback)
+- [Strings and character escaping](#strings-and-character-escaping)
+- [Input/Output](#inputoutput)
+  - [Reading from Stdin](#reading-from-stdin)
+  - [Writing to Stdout](#writing-to-stdout)
+  - [Reading files](#reading-files)
+- [Floating point numbers](#floating-point-numbers)
+- [Rigor](#rigor-1)
 
 
 ## REPL
 
-## Strings, string operations and character escaping
+## Rigor
+
+### Syntax Documentation for compiled code
 
 ## Arrays
 
@@ -117,6 +120,15 @@ There are a total of 7 array operations:
 > (define b 4)
 > (pushBack a b)
 [1,2,3,4]
+```
+
+## Strings and character escaping
+
+It is possible to use strings in our code, they are written using the following syntax : `"Hello World!"`. It is also possible to escape the character `"` to use it inside of strings.
+
+```lisp
+> (print "\"Hello World!\"")
+"Hello World!"
 ```
 
 
