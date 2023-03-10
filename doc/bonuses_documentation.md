@@ -129,6 +129,8 @@ There are a total of 7 array operations:
 
 ## Floating point numbers
 
+Our language supports **floating point numbers** as well as any **corresponding arithmetic operation** and full array support.
+
 ## Rigor
 
 We would also like to take the time to point out a couple best practices that we implemented rigorously while working on this project.
@@ -141,4 +143,4 @@ Here are a couple of these points :
 - Commit linting using [commitizen](https://github.com/commitizen/cz-cli)
 - Lots of code commenting
 
-We also added an other BNF style [document](compiled-syntax-description.md) along with some documentation for our custom assembly like language that we compile into.
+We also added **an other BNF style** [document](compiled-syntax-description.md) along with some documentation for our custom assembly like language that we compile into.
