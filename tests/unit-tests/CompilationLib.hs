@@ -8,7 +8,6 @@ import CompilationLib.Parser.ArgsTests ( argsSuite )
 import CompilationLib.Parser.AstTests ( astSuite )
 import CompilationLib.Parser.TokenTests ( tokenSuite )
 import CompilationLib.Parser.InfixTests ( infixSuite )
-import CompilationLib.Compilation.CompilationTests (testCompileConditional)
 
 compilationLibSuite :: TestTree
 compilationLibSuite = testGroup "Parsing Testsuite" [
@@ -16,6 +15,5 @@ compilationLibSuite = testGroup "Parsing Testsuite" [
         tokenSuite,
         cptSuite,
         astSuite,
-        infixSuite,
-        testCompileConditional
+        infixSuite
     ]

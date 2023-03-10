@@ -1,31 +1,31 @@
 
 # Bonuses
 
-- [Bonuses](#bonuses)
-  - [REPL](#repl)
-    - [Syntax Documentation for compiled code](#syntax-documentation-for-compiled-code)
-  - [Arrays](#arrays)
-    - [Array Nesting](#array-nesting)
-    - [Array Operation](#array-operation)
-      - [Head](#head)
-      - [Last](#last)
-      - [Tail](#tail)
-      - [Init](#init)
-      - [Join](#join)
-      - [PushFront](#pushfront)
-      - [Pushback](#pushback)
-  - [Strings and character escaping](#strings-and-character-escaping)
-  - [Input/Output](#inputoutput)
-    - [Reading from Stdin](#reading-from-stdin)
-    - [Writing to Stdout](#writing-to-stdout)
-    - [Reading files](#reading-files)
-  - [Floating point numbers](#floating-point-numbers)
-  - [Rigor](#rigor)
+- [REPL](#repl)
+  - [Syntax Documentation for compiled code](#syntax-documentation-for-compiled-code)
+- [Arrays](#arrays)
+  - [Array Nesting](#array-nesting)
+  - [Array Operation](#array-operation)
+    - [Head](#head)
+    - [Last](#last)
+    - [Tail](#tail)
+    - [Init](#init)
+    - [Join](#join)
+    - [PushFront](#pushfront)
+    - [Pushback](#pushback)
+- [Strings and character escaping](#strings-and-character-escaping)
+- [Input/Output](#inputoutput)
+  - [Reading from Stdin](#reading-from-stdin)
+  - [Writing to Stdout](#writing-to-stdout)
+- [Floating point numbers](#floating-point-numbers)
+- [Rigor](#rigor)
 
+
+This Document might be nicer to read on [GitHub](https://github.com/nLatt/GLaDOS-2023/blob/main/doc/bonuses_documentation.md)
 
 ## REPL
 
-All of the following bonus's may be ran in our fully featured interactive prompt.
+All of the following bonuses may be run in our fully featured interactive prompt.
 
 You may build it by running...
 
@@ -146,10 +146,37 @@ It is possible to use strings in our code, they are written using the following 
 
 ## Input/Output
 
+It is possible to interact with the local filesystem and ask for user input to built interactive programs.
+
 ### Reading from Stdin
 
+```lisp
+> (+ (readInt) 2)
+in: 3
+out: 5
+```
+
+```lisp
+> (+ (readInt) (readInt))
+in: 5
+in: 6
+out: 11
+```
+
 ### Writing to Stdout
-### Reading files
+
+There are 2 functions for writing to stdout, `print` and `println`.
+
+
+```lisp
+> (print "Hello World!")
+Hello World! -- no newline
+```
+
+```lisp
+> (println "Hello World!")
+Hello World! -- newline
+```
 
 ## Floating point numbers
 
@@ -189,5 +216,10 @@ Here are a couple of these points :
 - Concise and meaningful commits - **Over 500 commits**
 - Commit linting using [commitizen](https://github.com/commitizen/cz-cli)
 - Lots of code commenting
+- Unit Testing - **Over 100** tests
+- Integration Testing - **Over 20** end to end integration tests
 
-We also added **an other BNF style** [document](compiled-syntax-description.md) along with some documentation for our custom assembly like language that we compile into.
+We also added **an other ABNF style** [document](compiled-syntax-description.md) along with some documentation for our custom assembly like language that we compile into.
+
+
+[Return to the main page](../README.md)
