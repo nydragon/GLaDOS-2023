@@ -153,7 +153,30 @@ It is possible to use strings in our code, they are written using the following 
 
 ## Floating point numbers
 
-Our language supports **floating point numbers** as well as any **corresponding arithmetic operation** and full array support.
+Our language supports **floating point numbers** as well as any **corresponding basic arithmetic operation** and full array support.
+
+```lisp
+> (3.2 + 4.5)
+7.7
+```
+
+
+```lisp
+> (3.2 - 4.5)
+-1.3
+```
+
+
+```lisp
+> (3.2 * 4.5)
+14.400001
+```
+
+
+```lisp
+> (3.2 / 4.5)
+0.7111111
+```
 
 ## Rigor
 
