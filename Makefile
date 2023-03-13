@@ -3,7 +3,7 @@ SHELL := /bin/bash
 # Binary Names
 COMPILER_NAME = glados
 RUNNER_NAME = runner
-INTERACTIVE=sun-tzu
+INTERACTIVE = sun-tzu
 
 all: clean
 	@cabal run glados -- $(ARGS)
